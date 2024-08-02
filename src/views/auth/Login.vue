@@ -6,9 +6,11 @@
     <form @submit.prevent="funIngresar()">
         <label for="e">INGRESE SU CORREO</label>
         <input type="email" id="e" required v-model="usuario.email">
+        {{ errors.email }}
         <br>
         <label for="pass">INGRESE SU CONTRASEÑA</label>
         <input type="password" id="pass" required v-model="usuario.password">
+        {{ errors.password }}
         <br>
         <input type="submit" value="Ingresar">
         <a href="">¿Olvidaste tu Contraseña?</a>
@@ -24,6 +26,7 @@ import { useRouter } from "vue-router"
 const router = useRouter();
 
 const usuario = ref({email: "", password: ""})
+const errors = ref({})
 
 async function funIngresar(){
 
@@ -37,7 +40,12 @@ async function funIngresar(){
         // console.log(data);
         
     } catch (error) {
-        alert("Credenciales Incorrectas")
+        console.log(error.response.data);
+        if(error.response.data.errors){
+            errors.value = error.response.data.errors
+        }else{
+            alert("Credenciales Incorrectas")
+        }
     }
 }
 
