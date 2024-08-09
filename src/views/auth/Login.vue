@@ -35,7 +35,7 @@ async function funIngresar(){
         console.log(data.access_token);
         localStorage.setItem("access_token", data.access_token);
     
-        router.push("/servicios");
+        router.push("/admin/perfil");
         // const {data} = await axios.post("http://127.0.0.1:8000/api/v1/auth/login", usuario.value);
         // console.log(data);
         
