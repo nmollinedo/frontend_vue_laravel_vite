@@ -14,15 +14,23 @@ const router = createRouter({
         { path: '/servicios', component: Servicio },
         {
             path: '/login',
-            component: Login
+            component: Login,
+            name: 'Login',
+            meta: { redirectIfAuth: true }
         },
         {
             path: '/admin/perfil',
-            component: Perfil
+            component: Perfil,
+            name: 'Perfil',
+            meta: { requireAuth: true }
+
         },
         {
             path: '/admin/usuario',
-            component: Usuario
+            component: Usuario,
+            name: 'Usuario',
+            meta: { requireAuth: true }
+
         },
         {
             path: '/:pathMatch(.*)*',
@@ -30,6 +38,26 @@ const router = createRouter({
         }
         
     ]
+})
+
+// GUARDS
+router.beforeEach((to, from, next) => {
+    
+    let token = localStorage.getItem("access_token");
+
+    if(to.meta.requireAuth){
+        if(!token){
+            return next({name: 'Login'})
+        }
+        return next();
+    }
+
+    //console.log(to.meta.redirectIfAuth);
+    if(to.meta.redirectIfAuth && token){
+        return next({name: 'Usuario'});
+    }
+
+    return next();
 })
 
 export default router;
