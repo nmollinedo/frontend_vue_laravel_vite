@@ -7,6 +7,9 @@ import Perfil from '../views/admin/perfil/Perfil.vue'
 import Usuario from '../views/admin/usuario/Usuario.vue'
 import NotFound from '../views/errors/NotFound.vue'
 
+import AppLayout from '@/layout/AppLayout.vue';
+
+
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -19,19 +22,25 @@ const router = createRouter({
             meta: { redirectIfAuth: true }
         },
         {
-            path: '/admin/perfil',
-            component: Perfil,
-            name: 'Perfil',
-            meta: { requireAuth: true }
-
-        },
-        {
-            path: '/admin/usuario',
-            component: Usuario,
-            name: 'Usuario',
-            meta: { requireAuth: true }
-
-        },
+            path: '/admin',
+            component: AppLayout,
+            children: [
+                {
+                    path: 'perfil',
+                    component: Perfil,
+                    name: 'Perfil',
+                    meta: { requireAuth: true }
+        
+                },
+                {
+                    path: 'usuario',
+                    component: Usuario,
+                    name: 'Usuario',
+                    meta: { requireAuth: true }
+        
+                },
+            ]
+        },        
         {
             path: '/:pathMatch(.*)*',
             component: NotFound
