@@ -16,4 +16,7 @@ export default {
     destroy: (id) => {
         return Api().delete(`/usuario/${id}`);
     },
+    asignarPersona: (datos) => {
+        return Api().post(`/usuario/asignar-persona`, datos);
+    }
 }

@@ -5,6 +5,7 @@ import Servicio from "./../views/web/Servicios.vue"
 import Login from "./../views/auth/Login.vue"
 import Perfil from '../views/admin/perfil/Perfil.vue'
 import Usuario from '../views/admin/usuario/Usuario.vue'
+import Persona from '../views/admin/usuario/Persona.vue'
 import NotFound from '../views/errors/NotFound.vue'
 
 import AppLayout from '@/layout/AppLayout.vue';
@@ -36,6 +37,13 @@ const router = createRouter({
                     path: 'usuario',
                     component: Usuario,
                     name: 'Usuario',
+                    meta: { requireAuth: true }
+        
+                },
+                {
+                    path: 'persona',
+                    component: Persona,
+                    name: 'Persona',
                     meta: { requireAuth: true }
         
                 },
