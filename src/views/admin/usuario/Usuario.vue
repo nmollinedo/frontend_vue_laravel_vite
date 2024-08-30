@@ -2,9 +2,9 @@
     <div class="card">
         <h1>Usuario</h1>
         <!--{{ usuarios }}-->
-        {{ usuario }}
+        <!--{{ usuario }}-->
         <!--{{ errors }}-->
-        <div>
+    <!--    <div>
             <label for="n">NOMBRE:</label>
             <InputText id="n" v-model.trim="usuario.name" required="true" autofocus />
             {{ errors.name }}
@@ -21,7 +21,7 @@
             <button @click="cancelarRegistro">Cancelar</button>
         </div>
     
-        
+        -->
 
         <DataTable :value="usuarios" tableStyle="min-width: 50rem">
             <Column field="id" header="COD"></Column>
@@ -39,7 +39,7 @@
             </Column>
                 
         </DataTable>
-
+<!--
         <table border="1">
             <thead>
                 <tr>
@@ -60,7 +60,7 @@
                     </td>
                 </tr>
             </tbody>
-        </table>
+        </table>  -->
 
     </div>
 

@@ -1,0 +1,881 @@
+<template>
+    <!--   <div class="card">
+        <DataTable :value="transferencias" tableStyle="min-width: 50rem">
+            <Column field="id" header="COD"></Column>
+            <Column field="codigo_tpp" header="CODIGO"></Column>
+            <Column field="nombre_formal" header="NOMBRES"></Column>
+            <Column field="fecha_registro" header="FECHA INICIO"></Column>
+
+            <Column :exportable="false" style="min-width: 12rem">{{slotProps.data}}
+                <template #body="slotProps">
+                  
+                    <Button icon="pi pi-user-edit" rounded outlined class="mr-2" @click="mostrarDatosPersonales(slotProps.data)" />
+
+                    <Button icon="pi pi-pencil" rounded class="mr-2" @click="funEditar(slotProps.data)" />
+                    <Button icon="pi pi-trash" outlined rounded severity="danger" @click="funEliminar(slotProps.data)" />
+                </template>
+</Column>
+
+</DataTable>
+</div> -->
+
+    <div>
+        <div class="card">
+            <Toolbar class="mb-6">
+                <template #start>
+                    <Button label="Nuevo transferencia" icon="pi pi-plus" severity="secondary" class="mr-2"
+                        @click="openNew" />
+                </template>
+
+                <template #end>
+                    <Button label="Export" icon="pi pi-upload" severity="secondary" @click="exportCSV($event)" />
+                </template>
+            </Toolbar>
+
+            <DataTable ref="dt" :value="transferencias" dataKey="id" :paginator="true" :rows="10"
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                :rowsPerPageOptions="[5, 10, 25]"
+                currentPageReportTemplate="Mostrando {first} al {last} de {totalRecords} transferenciaos">
+                <template #header>
+                    <div class="flex flex-wrap gap-2 items-center justify-between">
+                        <h4 class="m-0">Gestión Proyectos</h4>
+                        <IconField>
+                            <InputIcon>
+                                <i class="pi pi-search" />
+                            </InputIcon>
+                            <InputText placeholder="Buscar..." />
+                        </IconField>
+                    </div>
+                </template>
+
+                <Column field="id" header="COD" sortable style="min-width: 1rem"></Column>
+                <Column field="codigo_tpp" header="CODIGO" sortable style="min-width: 7rem"></Column>
+                <Column field="nombre_original" header="NOMBRES" sortable style="min-width: 12rem"></Column>
+                <Column field="fecha_inicio_estimada" header="FECHA INICIO"></Column>
+
+                <Column :exportable="false" style="min-width: 12rem">
+                    <template #body="slotProps">
+                        <Button icon="pi pi-pencil" outlined rounded class="mr-2"
+                            @click="editTransferencia(slotProps.data)"
+                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+                        <Button icon="pi pi-trash" outlined rounded severity="danger"
+                            @click="confirmDeleteTransferencia(slotProps.data)" />
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
+
+        <Dialog v-model:visible="transferenciaDialog" :style="{ width: '650px' }" header="transferencias" :modal="true">
+          <!--  {{ transferencia }} -->
+            <div class="flex flex-col gap-6">
+                <Fieldset legend="Header">
+                    <td>
+                        <label for="Entidad" class="block font-bold mb-3">Responsable de la operacion</label>
+                    </td>
+                    <div>
+
+                        <Dropdown v-model="selectedEntidad" :options="entidades" optionLabel="nombre"
+                            placeholder="Select a Entidad" class="w-full md:w-14rem" />
+                        <p>ID de la ciudad seleccionada: {{ selectedEntidad.id }}</p>
+                    </div>
+                    <div>
+                        <label for="responsableEjecucion" class="block font-bold mb-3">Responsable de la
+                            ejecucion</label>
+                        <!-- Aquí el campo InputText se llena automáticamente con el nombre de la entidad seleccionada -->
+                        <InputText v-model="selectedEntidadNombre" id="responsableEjecucion" fluid />
+                    </div>
+
+                </Fieldset>
+
+
+                <div class="grid grid-cols-10 gap-1">
+                    <div class="col-span-2">
+                        <label for="price" class="block font-bold mb-2">Codigo TPP</label>
+
+                    </div>
+                    <div class="col-span-2">
+                        <label for="codigo_tpp1" class="block font-bold mb-2"></label>
+                        <InputText id="codigo_tpp1" value='TPP' integeronly fluid disabled />
+                    </div>
+                    <div class="col-span-2">
+                        <label for="codigo_tpp2" class="block font-bold mb-2"></label>
+                        <InputText id="codigo_tpp2" value='0047' integeronly fluid disabled />
+                    </div>
+                    <div class="col-span-2">
+                        <label for="codigo_tpp" class="block font-bold mb-2"></label>
+                        <InputText id="codigo_tpp" value='0000000' integeronly fluid disabled />
+                    </div>
+                </div>
+                <div>
+                    <label for="objeto" class="block font-bold mb-3">Objeto</label>
+                    <InputText id="objeto" v-model.trim="transferencia.objeto" required="true" autofocus
+                        :invalid="submitted && !transferencia.objeto" fluid />
+                </div>
+                <div>
+                    <label for="localizacion" class="block font-bold mb-3">Localización</label>
+                    <InputText id="localizacion" v-model.trim="transferencia.localizacion" required="true" autofocus
+                        :invalid="submitted && !transferencia.localizacion" fluid />
+                </div>
+                <div>
+                    <label for="nombre_tpp">Nombre TPP</label>
+                    <InputText id="nombre_tpp" :value="nombreTpp" readonly fluid />
+                </div>
+
+                <div>
+                    <label for="denominacion_convenio">Denominación del convenio</label>
+                    <Textarea id="denominacion_convenio" v-model="transferencia.denominacion_convenio" rows="4"
+                        integeronly fluid />
+
+                </div>
+                <td>
+                    <label for="Entidad" class="block font-bold mb-3">Area de Influencia</label>
+                </td>
+                <div>{{areas}}
+
+                    <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione Area"
+                        class="w-full md:w-14rem" />
+                    <p>ID de la ciudad seleccionada: {{ selectedArea.id }}</p>
+                </div>
+                <div>
+                    <label for="fecha_inicio" class="block font-bold mb-3">Fecha Inicio</label>
+                    <Calendar v-model="fecha_inicio" dateFormat="dd/mm/yy" showIcon />
+                </div>
+                <div>
+                    <label for="fecha_termino" class="block font-bold mb-3">Fecha Termino</label>
+                    <Calendar v-model="fecha_termino" dateFormat="dd/mm/yy" showIcon />
+                </div>
+
+                <div class="mt-3">
+                    <p><strong>Fecha Inicio Seleccionada:</strong> {{ fecha_inicio }}</p>
+                    <p><strong>Fecha Término Seleccionada:</strong> {{ fecha_termino }}</p>
+                </div>
+
+
+            </div>
+            <div v-if="error" class="text-red-500">
+                {{ error }}
+            </div>
+
+
+            <template #footer>
+                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog"
+                    style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+                <Button label="Save" icon="pi pi-check" @click="validarFechas"
+                    style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+            </template>
+        </Dialog>
+
+        <Dialog v-model:visible="deletetransferenciaDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+            <div class="flex items-center gap-4">
+                <i class="pi pi-exclamation-triangle !text-3xl" />
+                <span v-if="transferencia">Are you sure you want to delete <b>{{ transferencia.name }}</b>?</span>
+            </div>
+            <template #footer>
+                <Button label="No" icon="pi pi-times" text @click="deletetransferenciaDialog = false" />
+                <Button label="Yes" icon="pi pi-check" @click="deletetransferencia" />
+            </template>
+        </Dialog>
+    </div>
+
+
+
+    <Dialog v-model:visible="visibleDialogTransferencia" modal header="Actualizar Datos" :style="{ width: '56rem' }">
+        <!--    <div class="p-6">
+        <p>Codigo TPP: <span class="text-lg font-medium text-gray-900">{{  }}</span></p>
+        <p>Nombre: <span class="text-lg font-medium text-gray-900">{{  }}</span></p>
+        </div>
+ {{ transferencia }}   -->
+        
+
+        <div class="mt-6 mb-6 space-y-6" style="max-width: 750px; margin-top: 20px; margin-bottom: 20px;">
+
+            <basic-tabs class="mt-6 mb-6 space-y-6 " style="max-width: 750px; margin-top: 20px; margin-bottom: 20px;">
+                <basic-tab title="Aspectos Generales">
+                    <div class="flex flex-col gap-6">
+                       <!-- <Fieldset legend="Header">
+                            <label for="Entidad" class="block font-bold mb-3">Responsable de la Operación</label>
+                            <Dropdown v-model="transferencia.entidad_operadora" :options="entidades"
+                                optionLabel="nombre" placeholder="Seleccione Entidad" class="w-full md:w-14rem" />
+
+                            <label for="responsableEjecucion" class="block font-bold mb-3">Responsable de la
+                                Ejecución</label>
+                            <Dropdown v-model="transferencia.entidad_ejecutora" :options="entidades_ejecutoras"
+                                optionLabel="nombre" placeholder="Seleccione Entidad Ejecutora" class="w-full md:w-14rem" />    
+                            
+                        </Fieldset> -->
+                        <Fieldset legend="Header">
+                    <td>{{transferencia}}
+                        <label for="Entidad" class="block font-bold mb-3">Responsable de la operacion</label>
+                    </td>
+                    <div>
+
+                        <Dropdown v-model="selectedEntidad" :options="entidades" optionLabel="nombre"
+                            placeholder="Select a Entidad" class="w-full md:w-14rem" />
+                        <p>ID de la ciudad seleccionada: {{ selectedEntidad.id }}</p>
+                    </div>
+                    <div>
+                        <label for="responsableEjecucion" class="block font-bold mb-3">Responsable de la
+                            ejecucion</label>
+                        <!-- Aquí el campo InputText se llena automáticamente con el nombre de la entidad seleccionada -->
+                        <InputText v-model="selectedEntidadNombre" id="responsableEjecucion" fluid />
+                    </div>
+
+                </Fieldset>
+
+                        <div class="grid grid-cols-10 gap-1">
+                            <div class="col-span-2">
+                                <label for="codigo_tpp" class="block font-bold mb-2">Código TPP</label>
+                                <InputText id="codigo_tpp" v-model="transferencia.codigo_tpp" integeronly fluid
+                                    disabled />
+                            </div>
+                        </div>
+
+                        <div>
+                            <p><strong>Fecha Inicio Seleccionada:</strong>{{ objeto }}</p>
+                            <label for="objeto" class="block font-bold mb-3">Objeto</label>
+                            <InputText id="objeto" v-model="transferencia.objeto" required="true" fluid />
+                        </div>
+                <!--{{ transferencia.localizacion }}-->        
+                        <div>
+                            <label for="localizacion" class="block font-bold mb-3">Localización</label>
+                            <InputText id="localizacion" v-model="transferencia.localizacion" required="true" fluid />
+                        </div>
+
+                        <div>
+                            <label for="nombre_tpp" class="block font-bold mb-3">Nombre TPP</label>
+                            <InputText id="nombre_tpp" v-model="transferencia.nombre_tpp" readonly fluid />
+                        </div>
+
+                        <div>
+                            <label for="denominacion_convenio" class="block font-bold mb-3">Denominación del
+                                Convenio</label>
+                            <Textarea id="denominacion_convenio" v-model="transferencia.denominacion_convenio" rows="4"
+                                fluid />
+                        </div>
+
+                        <div>{{areas}}
+                            <label for="area_influencia" class="block font-bold mb-3">Área de Influencia</label>
+                            <Dropdown v-model="transferencia.id_area" :options="areas" optionLabel="descrip_area"
+                                placeholder="Seleccione Área" class="w-full md:w-14rem" />
+                        </div>
+
+                        <div>
+                            <label for="fecha_inicio" class="block font-bold mb-3">Fecha Inicio</label>
+                            <Calendar v-model="transferencia.fecha_inicio" dateFormat="dd/mm/yy" showIcon />
+                        </div>
+
+                        <div>
+                            <label for="fecha_termino" class="block font-bold mb-3">Fecha Término</label>
+                            <Calendar v-model="transferencia.fecha_termino" dateFormat="dd/mm/yy" showIcon />
+                        </div>
+
+                        <div class="mt-3">
+                            <p><strong>Fecha Inicio Seleccionada:</strong> {{ transferencia.fecha_inicio }}</p>
+                            <p><strong>Fecha Término Seleccionada:</strong> {{ transferencia.fecha_termino }}</p>
+                        </div>
+                        <!--
+                        <div v-if="error" class="text-red-500">
+                            {{ error }}
+                        </div> -->
+                    </div>
+                    <Button label="Guardar datos" icon="pi pi-check" @click="validarFechasYGuardar"
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+                </basic-tab>
+
+                <basic-tab title="Problematica  ">
+                    <div class="flex flex-col gap-6"> <!--{{ planes }} -->
+                        <Fieldset legend="Header">
+                                <!-- Plan Dropdown -->
+                                <label for="Plan" class="block font-bold mb-3">Plan</label>
+                                <Dropdown
+                                    v-model="transferencia.plan"
+                                    :options="planes"
+                                    optionLabel="descrip_plan"
+                                    placeholder="Seleccione plan"
+                                    class="w-full md:w-14rem"
+                                    @change="onPlanChange"
+                                />
+
+                                <!-- Programa Dropdown -->
+                                <label for="Programa" class="block font-bold mb-3">Programa</label><!--{{programas}} -->
+                                <Dropdown
+                                    v-model="transferencia.id_area"
+                                    :options="programas"
+                                    optionLabel="descrip_programa"
+                                    placeholder="Seleccione programa"
+                                    class="w-full md:w-14rem"
+                                    :disabled="!transferencia.plan"
+                                />
+                        </Fieldset>
+
+                        <div>
+                            <label for="descripcion" class="block font-bold mb-3">Descripcion</label>
+                            <Textarea id="descripcion" v-model="transferencia.descripcion" rows="4" fluid />
+                        </div>
+
+                        <Button label="Guardar problematica" icon="pi pi-check" @click="guardarProblematica"
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+                    </div>
+                </basic-tab>
+
+                <basic-tab title="Localizacion geografica">
+                    <div class="flex flex-col gap-6">
+                        <Fieldset legend="Header">
+                        <label for="Departamento" class="block font-bold mb-3">Departamento</label>
+                        <Dropdown 
+                            v-model="transferencia.departamento" 
+                            :options="departamentos" 
+                            optionLabel="nombre"
+                            placeholder="Seleccione departamento" 
+                            class="w-full md:w-14rem" 
+                        />
+
+                        <label for="Municipio" class="block font-bold mb-3">Municipio</label>
+                        <Dropdown 
+                            v-model="transferencia.municipio" 
+                            :options="municipios" 
+                            optionLabel="nombre"
+                            placeholder="Seleccione municipio" 
+                            class="w-full md:w-14rem"
+                        />
+
+                        <label for="Poblacion" class="block font-bold mb-3">Población</label>
+                        <Dropdown 
+                            v-model="transferencia.poblacion" 
+                            :options="poblaciones" 
+                            optionLabel="nombre"
+                            placeholder="Seleccione población" 
+                            class="w-full md:w-14rem"
+                        />
+                        </Fieldset>
+
+                        <div>
+                        <label for="descripcion" class="block font-bold mb-3">Descripcion</label>
+                        <Textarea 
+                            id="descripcion" 
+                            v-model="transferencia.descripcion" 
+                            rows="4" 
+                            fluid 
+                        />
+                        </div>
+
+                        <Button 
+                        label="Guardar localizacion" 
+                        icon="pi pi-check" 
+                        @click="guardarLocalizacion"
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                        />
+                    </div>
+                </basic-tab>
+
+
+                <basic-tab title="Etapa - Componenete">
+                    <div class="flex flex-col gap-4">
+                        <InputText v-model="value1" type="text" size="small" placeholder="Entidad ejecutora" />
+                        <InputText v-model="value1" type="text" size="small" placeholder="Unidad ejecutora" />
+                        <InputText v-model="value1" type="text" size="small" placeholder="CODIGO TPP" />
+                        <InputText v-model="value1" type="text" size="small" placeholder="Objeto" />
+                        <InputText v-model="value1" type="text" size="small" placeholder="localización" />
+                        <InputText v-model="value1" type="text" size="small" placeholder="Nombre TPP" />
+                        <InputText v-model="value1" type="text" size="small" placeholder="Denominacion del convenio" />
+                        <InputText v-model="value1" type="text" size="small" placeholder="Area de influencia" />
+
+
+                        <Button label="Guardar4" severity="info" raised />
+                    </div>
+                </basic-tab>
+
+
+            </basic-tabs>
+        </div>
+
+
+
+    </Dialog>
+
+
+    <Dialog v-model:visible="deleteTransferenciaDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+        <div class="flex items-center gap-4">
+            <i class="pi pi-exclamation-triangle !text-3xl" />
+            <span v-if="transferencia">Esta seguro de eliminar <b>{{ transferencia.nombre }}</b>?</span>
+        </div>
+        <template #footer>
+            <Button label="No" icon="pi pi-times" text @click="deleteTransferenciaDialog = false" />
+            <Button label="Yes" icon="pi pi-check" @click="deleteTransferencia" />
+        </template>
+    </Dialog>
+</template>
+<script setup>
+import Fieldset from "primevue/fieldset";
+import Select from "primevue/select";
+import Tabs from "primevue/tabs";
+import TabList from "primevue/tablist";
+import Tab from "primevue/tab";
+import TabPanels from "primevue/tabpanels";
+import TabPanel from "primevue/tabpanel";
+import Calendar from 'primevue/calendar';
+import { onMounted, ref, watch, computed } from "vue";
+import SelectEntidad from "./../../../components/SelectEntidad.vue";
+import transferenciaService from "./../../../services/transferencia.service";
+import BasicTab from "./../../../components/Tab.vue";
+import BasicTabs from "./../../../components/Tabs.vue";
+import entidadService from "../../../services/entidad.service";
+import planService from "../../../services/plan.service";
+import areaService from "../../../services/area.service";
+import programaService from "../../../services/programa.service";
+
+
+const selectedCity = ref();
+const cities = ref([
+    { name: "New York", code: "NY" },
+    { name: "Rome", code: "RM" },
+    { name: "London", code: "LDN" },
+    { name: "Istanbul", code: "IST" },
+    { name: "Paris", code: "PRS" },
+]);
+
+const transferencias = ref([]);
+const entidades = ref({ id: "", nombre: "", codigo_presupuestario: "" });
+const entidad = ref([]);
+const visibleDialogTransferencia = ref(false);
+const submitted = ref(false);
+const transferenciaDialog = ref(false);
+const error = ref('');
+const transferencia = ref({
+    id: null,
+    entidad_operadora: '',
+    responsable_ejecucion: '',
+    codigo_tpp: '',
+    objeto: '',
+    localizacion: '',
+    nombre_tpp: '',
+    denominacion_convenio: '',
+    area_id: '',
+    fecha_inicio: '',
+    fecha_termino: '',
+    entidad_ejecutora: '',
+    unidad_ejecutora: '',
+    area_influencia: ''
+});
+const areas = ref([]);
+const selectedCountry = ref(null);
+const selectedArea = ref({ id: null });
+const selectedEntidad = ref({ id: null });
+const selectedEntidadNombre = ref('');
+const deleteTransferenciaDialog = ref(false);
+const codigo_tpp1 = 'TPP';
+const codigo_tpp2 = '0047';
+const codigo_tpp = '0000000';
+
+const fecha_inicio = ref(null);
+const fecha_termino = ref(null);
+
+
+const objeto = ref('');
+const localizacion = ref('');
+//const submitted = ref(false);
+
+
+// Computed property para concatenar el nombre TPP
+const nombreTpp = computed(() => {
+    return `${transferencia.value.objeto} ${transferencia.value.localizacion}`.trim().substring(0, 110);
+});
+
+
+//const selectedEntidad = reactive({ id: null });
+onMounted(() => {
+    obtenerEntidad();
+    getEntidades();
+    getPlanes();
+    getAreas();
+    getTransferencias();
+    //fetchProgramas();
+});
+
+
+const planes = ref([]);
+
+const programas = ref([]);
+
+const getPlanes = async () => {
+    const { data } = await planService.index();
+
+    planes.value = data;
+    //alert(entidades.value);
+};
+
+const getAreas = async () => {
+    const { data } = await areaService.index();
+
+    areas.value = data;
+    //alert(entidades.value);
+};
+// Fetch programas based on selected plan
+const fetchProgramas = async (planId) => {
+    alert(planId);
+    try {
+        //const response = await axios.get(`http://127.0.0.1:8000/api/programa/${planId}`);
+        const { data } = await programaService.show(planId);
+        programas.value = data;
+    } catch (err) {
+        error.value = 'Error fetching programas';
+    }
+};
+
+// Handler when plan is changed
+const onPlanChange = () => {
+    const selectedPlanId = transferencia.value.plan.id;
+    console.log("Selected Plan ID:", selectedPlanId);
+    if (selectedPlanId) {
+        fetchProgramas(selectedPlanId);
+    } else {
+        programas.value = [];
+    }
+};
+
+// Save problematica to database
+/*const guardarProblematica = async () => {
+    try {
+        const response = await axios.post('/api/guardar-problematica', transferencia.value);
+        console.log('Problematica guardada exitosamente:', response.data);
+    } catch (err) {
+        error.value = 'Error al guardar problematica';
+    }
+};*/
+
+function guardarProblematica() {
+    console.log('Problematica guardada exitosamente:');
+    try {
+        //const response = axios.post('/api/guardar-problematica', transferencia.value);
+        console.log('Problematica guardada exitosamente:', response.data);
+    } catch (err) {
+        error.value = 'Error al guardar problematica';
+    }
+}
+
+
+// Options for dropdowns
+const departamentos = ref([]);
+const municipios = ref([]);
+const poblaciones = ref([]);
+
+// Fetch municipios based on departamento
+const fetchMunicipios = async (departamentoId) => {
+    try {
+        const response = await axios.get(`/api/municipios/${departamentoId}`);
+        municipios.value = response.data;
+        poblaciones.value = []; // Reset poblaciones when departamento changes
+    } catch (err) {
+        error.value = 'Error fetching municipios';
+    }
+};
+
+// Fetch poblaciones based on municipio
+const fetchPoblaciones = async (municipioId) => {
+    try {
+        const response = await axios.get(`/api/poblaciones/${municipioId}`);
+        poblaciones.value = response.data;
+    } catch (err) {
+        error.value = 'Error fetching poblaciones';
+    }
+};
+
+// Watcher for departamento change
+watch(() => transferencia.value.departamento, (newDepartamento) => {
+    if (newDepartamento) {
+        fetchMunicipios(newDepartamento.id);
+    } else {
+        municipios.value = [];
+        poblaciones.value = [];
+    }
+});
+
+// Watcher for municipio change
+watch(() => transferencia.value.municipio, (newMunicipio) => {
+    if (newMunicipio) {
+        fetchPoblaciones(newMunicipio.id);
+    } else {
+        poblaciones.value = [];
+    }
+});
+
+// Function to save data
+const guardarLocalizacion = async () => {
+    try {
+        const response = await axios.post('/api/guardar-localizacion', transferencia.value);
+        console.log('Data saved successfully:', response.data);
+    } catch (err) {
+        error.value = 'Error saving data';
+    }
+};
+
+function updateFechaInicio(value) {
+    this.fecha_inicio = value;
+};
+
+const getEntidades = async () => {
+    const { data } = await entidadService.index();
+
+    entidades.value = data;
+    //alert(entidades.value);
+};
+
+function obtenerEntidad() {
+    fetch("http://127.0.0.1:8000/api/entidad")
+        .then((respuesta) => respuesta.json())
+        .then((json) => (entidad.value = json));
+}
+
+const getTransferencias = async () => {
+    const { data } = await transferenciaService.index();
+
+    transferencias.value = data;
+    //alert(transferencias);
+};
+
+function mostrarDatosPersonales(transferencia) {
+    transferencia.value = {};
+    visibleDialogTransferencia.value = true;
+    //alert("ffggggfgfggffg");
+    //usuario_id.value = user.id;
+    //if(user.persona){
+    //    persona.value = user.persona
+    //}
+}
+
+function funEditar(user) {
+    usuario.value = user;
+}
+
+
+async function editTransferencia(transferenciaData) {
+    try {
+        const { data } = await transferenciaService.show(transferenciaData.id);
+        transferencia.value = data;
+        transferencia.value.fecha_inicio=transferencia.value.fecha_inicio;
+
+        //transferencia.value = jsonData;
+    // Asignar el responsable de la operación basado en la entidad
+    //selectedEntidad.value = entidades.value.find(ent => ent.nombre === transferencia.value.responsable_ejecucion);
+    // Asignar el nombre de la entidad seleccionada
+    selectedEntidadNombre.value = data[0]["responsable_ejecucion"];
+        Object.assign(transferencia.value, data[0]);
+        visibleDialogTransferencia.value = true;
+    } catch (err) {
+        error.value = 'Error al cargar los datos de la transferencia.';
+    }
+}
+
+function openNew() {
+    transferencia.value = {};
+    submitted.value = false;
+    transferenciaDialog.value = true;
+}
+
+function hideDialog() {
+    transferenciaDialog.value = false;
+    submitted.value = false;
+}
+
+watch(selectedEntidad, (newVal) => {
+    if (newVal) {
+        selectedEntidadNombre.value = newVal.nombre;
+    } else {
+        selectedEntidadNombre.value = '';
+    }
+});
+
+function formatDateToDDMMYYYY(dateString) {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
+function validarFechasYGuardar() {
+    console.log('Problematica guardada exitosamente:');
+    // Accede a las fechas desde el objeto 'transferencia'
+    let fechaInicio = transferencia.value.fecha_inicio;
+    let fechaTermino = transferencia.value.fecha_termino;
+    alert(fechaInicio);
+    alert(fechaTermino);
+    // Verifica que ambas fechas estén presentes
+    if (!fechaInicio || !fechaTermino) {
+        error = 'Ambas fechas son obligatorias.';
+        return;
+    }
+
+    // Formatea las fechas a dd/mm/aaaa
+    fechaInicio = formatDateToDDMMYYYY(fechaInicio);
+    fechaTermino = formatDateToDDMMYYYY(fechaTermino);
+    alert(fechaInicio);
+    alert(fechaTermino);
+    // Compara las fechas (convertidas a formato 'yyyy-mm-dd' para comparación)
+    const fechaInicioISO = new Date(fechaInicio.split('/').reverse().join('-'));
+    const fechaTerminoISO = new Date(fechaTermino.split('/').reverse().join('-'));
+    //actulizarTransferencia();
+    saveTransferenciaUpdate();
+ /*   if (fechaTerminoISO <= fechaInicioISO) {
+        error = 'La fecha de término debe ser al menos un día después de la fecha de inicio.';
+    } else {
+        //error = '';
+        // Asigna las fechas formateadas antes de guardar
+        transferencia.fecha_inicio = fechaInicio;
+        transferencia.fecha_termino = fechaTermino;
+        // Lógica para guardar los datos
+        saveTransferencia();
+    }*/
+}
+
+function validarFechas() {
+    alert(fecha_inicio.value);
+    const fechaInicio = formatDate(fecha_inicio.value);
+    const fechaTermino = formatDate(fecha_termino.value);
+    alert(fechaInicio);
+    alert(fechaTermino);
+    if (!fecha_inicio.value || !fecha_termino.value) {
+        error.value = 'Ambas fechas son obligatorias.';
+        return;
+    }
+
+    //const fechaTermino = parseDate(fecha_termino.value);
+    //const fechaInicio = fecha_inicio.value;
+    //const fechaTermino = fecha_termino.value;
+
+    if (fechaTermino <= fechaInicio) {
+        error.value = 'La fecha de término debe ser al menos un día después de la fecha de inicio.';
+    } else {
+        error.value = '';
+        // Lógica para guardar los datos
+        saveTransferencia();
+    }
+}
+
+function formatDate(date) {
+
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+/*
+function parseDate(dateStr) {
+    const [day, month, year] = dateStr.split('/');
+    return new Date(`${year}-${month}-${day}`);
+}*/
+function actulizarTransferencia() {
+  // Validar que todos los campos requeridos estén completos
+  if (!transferencia.value.entidad_operadora || !transferencia.value.entidad_ejecutora ||
+      !transferencia.value.codigo_tpp || !transferencia.value.objeto ||
+      !transferencia.value.localizacion || !transferencia.value.nombre_tpp ||
+      !transferencia.value.denominacion_convenio || !transferencia.value.id_area ||
+      !transferencia.value.fecha_inicio || !transferencia.value.fecha_termino) {
+    error.value = 'Todos los campos son obligatorios.';
+    return;
+  }
+
+  // Simular una solicitud de guardado a un servidor
+  const payload = {
+    entidad_operadora: transferencia.value.entidad_operadora,
+    entidad_ejecutora: transferencia.value.entidad_ejecutora,
+    codigo_tpp: transferencia.value.codigo_tpp,
+    objeto: transferencia.value.objeto,
+    localizacion: transferencia.value.localizacion,
+    nombre_tpp: transferencia.value.nombre_tpp,
+    denominacion_convenio: transferencia.value.denominacion_convenio,
+    id_area: transferencia.value.id_area,
+    fecha_inicio: convertirFecha(transferencia.value.fecha_inicio), // Convertir a formato YYYY-MM-DD
+    fecha_termino: convertirFecha(transferencia.value.fecha_termino), // Convertir a formato YYYY-MM-DD
+  };
+
+  console.log('Guardando datos:', payload);
+
+  // Simular el guardado exitoso (reemplazar con una solicitud real)
+  setTimeout(() => {
+    console.log('Datos guardados exitosamente:', payload);
+    error.value = ''; // Limpiar cualquier error previo
+    alert('Los datos se han guardado exitosamente.');
+  }, 1000);
+
+
+}
+
+async function saveTransferenciaUpdate() {
+    try {
+        // Asignación de los valores a la transferencia
+        transferencia.value.nombre_tpp = nombreTpp.value;
+        transferencia.value.entidad_operadora = selectedEntidad.value.nombre;
+        transferencia.value.id_area = transferencia.area_id;
+        transferencia.value.fecha_inicio = '12/12/2024';
+        transferencia.value.fecha_termino = '12/12/2024';
+        const transferenciaData = { ...transferencia.value };
+        console.log("Id",transferencia.value.id);
+        console.log("dddddd",transferenciaData);
+        
+        // Envío de la solicitud al servicio
+        const { data } = await transferenciaService.actualizarTranferencia(transferencia.value.id,transferenciaData);
+
+        // Actualizar la lista de transferencias
+        getTransferencias();
+
+        // Marcar el formulario como enviado y cerrar el diálogo
+        submitted.value = true;
+        transferenciaDialog.value = false;
+
+        // Limpiar los valores de la transferencia
+        transferencia.value = {};
+
+    } catch (error) {
+        console.error("Error guardando la transferencia:", error);
+        // Aquí puedes mostrar un mensaje de error al usuario si es necesario
+    }
+}
+
+async function saveTransferencia() {
+    try {
+        // Asignación de los valores a la transferencia
+        transferencia.value.nombre_tpp = nombreTpp.value;
+        transferencia.value.entidad_operadora = selectedEntidad.value.nombre;
+        transferencia.value.id_area = selectedArea.value.id;
+        //transferencia.value.localizacion = localizacion;
+        transferencia.value.fecha_inicio = fecha_inicio;
+        transferencia.value.fecha_termino = fecha_termino;
+        //alert("ggggg"+transferencia.value);
+        console.log("dddddd",transferencia.value);
+        // Envío de la solicitud al servicio
+        const { data } = await transferenciaService.store(transferencia.value);
+
+        // Actualizar la lista de transferencias
+        getTransferencias();
+
+        // Marcar el formulario como enviado y cerrar el diálogo
+        submitted.value = true;
+        transferenciaDialog.value = false;
+
+        // Limpiar los valores de la transferencia
+        transferencia.value = {};
+
+    } catch (error) {
+        console.error("Error guardando la transferencia:", error);
+        // Aquí puedes mostrar un mensaje de error al usuario si es necesario
+    }
+}
+
+
+function confirmDeleteTransferencia(prod) {
+    transferencia.value = prod;
+    deleteTransferenciaDialog.value = true;
+}
+
+async function deleteTransferencia() {
+    //transferencias.value = transferencias.value.filter((val) => val.id !== transferencia.value.id);
+    const { data } = await transferenciaService.destroy(transferencia.value.id)
+    deleteTransferenciaDialog.value = false;
+    transferencia.value = {};
+    getTransferencias();
+    //toast.add({ severity: 'success', summary: 'Successful', detail: 'transferencia Deleted', life: 3000 });
+}
+</script>

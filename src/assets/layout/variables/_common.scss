@@ -1,5 +1,5 @@
 :root {
-    --primary-color: var(--p-primary-color);
+/*    --primary-color: var(--p-primary-color);
     --primary-contrast-color: var(--p-primary-contrast-color);
     --text-color: var(--p-text-color);
     --text-color-secondary: var(--p-text-muted-color);
@@ -16,5 +16,40 @@
     --focus-ring-style: var(--p-focus-ring-style);
     --focus-ring-color: var(--p-focus-ring-color);
     --focus-ring-offset: var(--p-focus-ring-offset);
-    --focus-ring-shadow: var(--p-focus-ring-shadow);
+    --focus-ring-shadow: var(--p-focus-ring-shadow);  */
+ 
+     --primary-color: #1e88e5; /* Primary blue color */
+   
+    --primary-contrast-color: #ffffff; /* White for contrast against the primary blue */
+    
+    --text-color: #0d47a1; /* Dark blue for primary text */
+     
+    --text-color-secondary: #1565c0; /* Slightly lighter blue for secondary text */
+     
+    --surface-border: #90caf9; /* Light blue for borders */
+    
+    --surface-card: #2d86c5; /* Very light blue for cards */
+    
+    --surface-hover: #bbdefb; /* Light blue for hover states */
+    
+    --surface-overlay: #82b1ff; /* Medium blue for overlays */
+   
+    --transition-duration: 0.3s; /* Standard transition duration */
+    
+    --maskbg: rgba(30, 136, 229, 0.5); /* Semi-transparent blue mask background */
+     
+    --content-border-radius: 6px; /* Standard border radius */
+    
+    --layout-section-transition-duration: 0.2s; /* Transition duration for layout sections */
+    
+    --element-transition-duration: 0.3s; /* Transition duration for elements */
+    
+    --focus-ring-width: 2px; /* Width of the focus ring */
+    
+    --focus-ring-style: solid; /* Style of the focus ring */
+    
+    --focus-ring-color: #82b1ff; /* Blue focus ring color */
+    --focus-ring-offset: 2px; /* Offset for the focus ring */
+           
+    --focus-ring-shadow: 0 0 0 2px rgba(30, 136, 229, 0.5); /* Blue shadow for focus ring */
 }

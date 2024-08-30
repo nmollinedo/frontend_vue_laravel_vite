@@ -13,10 +13,12 @@
     "axios": "^1.7.2",
     "chart.js": "3.3.2",
     "primeicons": "^6.0.1",
-    "primevue": "^4.0.0",
+    "primevue": "^4.0.4",
     "sweetalert2": "^11.12.4",
     "vue": "^3.4.31",
-    "vue-router": "^4.4.0"
+    "vue-router": "^4.4.0",
+    "vue3-captcha": "^0.3.4",
+    "vue3-captcha-canvas": "^0.2.1"
   },
   "devDependencies": {
     "@primevue/auto-import-resolver": "^4.0.1",

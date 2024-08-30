@@ -1,9 +1,3 @@
-<script setup>
-import { useLayout } from '@/layout/composables/layout';
-import AppConfigurator from './AppConfigurator.vue';
-
-const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
-</script>
 
 <template>
     <div class="layout-topbar">
@@ -12,7 +6,7 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
                 <i class="pi pi-bars"></i>
             </button>
             <router-link to="/" class="layout-topbar-logo">
-                <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!--    <svg viewBox="0 0 54 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
                         fill-rule="evenodd"
                         clip-rule="evenodd"
@@ -28,9 +22,9 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
                             fill="var(--primary-color)"
                         />
                     </g>
-                </svg>
+                </svg> -->
 
-                <span>SAKAI</span>
+                <span>TPP</span>
             </router-link>
         </div>
 
@@ -60,20 +54,125 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" @click="toggleProfileMenu">
                         <i class="pi pi-user"></i>
                         <span>Profile</span>
                     </button>
+                </div>
+
+                <!-- Profile Menu (Dropdown or Modal) -->
+                <div v-if="showProfileMenu" class="profile-menu">
+                    <div class="profile-details">
+                        <p><strong>Nombre:</strong> {{ perfil.name }}</p>
+                        <p><strong>Email:</strong> {{ perfil.email }}</p>
+                    </div>
+                    <button class="logout-button" @click="salir">Cerrar Sesión</button>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
+
+<script setup>
+
+import { useLayout } from '@/layout/composables/layout';
+import AppConfigurator from './AppConfigurator.vue';
+
+const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
+
+// Estado del menú de perfil
+const showProfileMenu = ref(false);
+
+import { onMounted, ref } from "vue";
+import authService from "../services/auth.service"
+import { useRoute } from "vue-router";
+
+    const router = useRoute()
+
+    const perfil = ref({});
+    const persona = ref({});
+
+    onMounted(() => {
+        obtenerPerfil()
+        //recorrerArray()
+    })
+
+ //   function recorrerArray(data) {
+//    for (let i = 0; i < data.length; i++){
+//        console.log(data[i]);
+//    }
+//}
+    async function obtenerPerfil(){
+        try {
+            const {data} = await authService.perfil()
+            perfil.value = data;
+            //console.log("entro::"+perfil.persona[1]);
+            //persona = perfil.persona
+            
+            
+        } catch (error) {
+            alert("Error al recuperar los datos de perfil")
+        }
+    }
+    
+    async function salir(){
+        try{
+            const {data} = await authService.salir();
+            localStorage.removeItem("access_token");
+            router.push({name: 'Login'});
+
+        } catch{
+
+        }
+    }
+
+
+// Datos de ejemplo del perfil del usuario
+/*const userProfile = ref({
+    name: "John Doe",
+    email: "johndoe@example.com"
+});
+*/
+// Función para mostrar u ocultar el menú de perfil
+function toggleProfileMenu() {
+    showProfileMenu.value = !showProfileMenu.value;
+}
+
+// Función para cerrar sesión
+function logout() {
+    // Aquí puedes implementar la lógica para cerrar sesión, como redirigir al usuario o hacer una solicitud a la API
+    console.log("Sesión cerrada");
+    showProfileMenu.value = false;
+}
+</script>
+
+<style scoped>
+.profile-menu {
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 1rem;
+    position: absolute;
+    right: 0;
+    top: 3rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.profile-details {
+    margin-bottom: 1rem;
+}
+
+.logout-button {
+    background-color: #f44336;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    width: 100%;
+}
+
+.logout-button:hover {
+    background-color: #d32f2f;
+}
+</style>
