@@ -273,16 +273,16 @@
                             <p><strong>Fecha Inicio Seleccionada:</strong> {{ transferencia.fecha_inicio }}</p>
                             <p><strong>Fecha Término Seleccionada:</strong> {{ transferencia.fecha_termino }}</p>
                         </div>
-                        <!--
+                        
                         <div v-if="error" class="text-red-500">
                             {{ error }}
-                        </div> -->
+                        </div> 
                     </div>
                     <Button label="Guardar datos" icon="pi pi-check" @click="validarFechasYGuardar"
                         style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
                 </basic-tab>
 
-                <basic-tab title="Problematica  ">
+                <basic-tab title="Problematica  "> {{ transferencia }}
                     <div class="flex flex-col gap-6"> <!--{{ planes }} -->
                         <Fieldset legend="Header">
                                 <!-- Plan Dropdown -->
@@ -297,9 +297,9 @@
                                 />
 
                                 <!-- Programa Dropdown -->
-                                <label for="Programa" class="block font-bold mb-3">Programa</label><!--{{programas}} -->
+                                <label for="Programa" class="block font-bold mb-3">Programa</label>{{programas}}
                                 <Dropdown
-                                    v-model="transferencia.id_area"
+                                    v-model="transferencia.programa"
                                     :options="programas"
                                     optionLabel="descrip_programa"
                                     placeholder="Seleccione programa"
@@ -312,73 +312,75 @@
                             <label for="descripcion" class="block font-bold mb-3">Descripcion</label>
                             <Textarea id="descripcion" v-model="transferencia.descripcion" rows="4" fluid />
                         </div>
-
+                   
+                        <div v-if="mensaje" class="text-green-500">
+                            {{ mensaje }}
+                        </div>     
                         <Button label="Guardar problematica" icon="pi pi-check" @click="guardarProblematica"
                         style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
                     </div>
                 </basic-tab>
 
-                <basic-tab title="Localizacion geografica">
-                    <div class="flex flex-col gap-6">
+                <basic-tab title="Localizacion geografica">{{transferencia}}
+                        <div class="flex flex-col gap-6">{{departamentos}}
                         <Fieldset legend="Header">
-                        <label for="Departamento" class="block font-bold mb-3">Departamento</label>
-                        <Dropdown 
+                            <label for="Departamento" class="block font-bold mb-3">Departamento</label>
+                            <Dropdown 
                             v-model="transferencia.departamento" 
                             :options="departamentos" 
-                            optionLabel="nombre"
+                            optionLabel="descrip_departamento"
                             placeholder="Seleccione departamento" 
                             class="w-full md:w-14rem" 
-                        />
+                            @change="onDepartamentoChange"
+                            />
 
-                        <label for="Municipio" class="block font-bold mb-3">Municipio</label>
-                        <Dropdown 
-                            v-model="transferencia.municipio" 
+                            <label for="Municipio" class="block font-bold mb-3">Municipio</label>
+                            <Dropdown 
+                            v-model="transferencia.descrip_municipio" 
                             :options="municipios" 
-                            optionLabel="nombre"
+                            optionLabel="descrip_municipio"
                             placeholder="Seleccione municipio" 
                             class="w-full md:w-14rem"
-                        />
+                            :disabled="!transferencia.departamento"
+                            @change="onMunicipioChange"
+                            />
 
-                        <label for="Poblacion" class="block font-bold mb-3">Población</label>
-                        <Dropdown 
+                            <label for="Poblacion" class="block font-bold mb-3">Población</label>
+                            <Dropdown 
                             v-model="transferencia.poblacion" 
                             :options="poblaciones" 
                             optionLabel="nombre"
                             placeholder="Seleccione población" 
                             class="w-full md:w-14rem"
-                        />
+                            :disabled="!transferencia.municipio"
+                            />
                         </Fieldset>
 
                         <div>
-                        <label for="descripcion" class="block font-bold mb-3">Descripcion</label>
-                        <Textarea 
-                            id="descripcion" 
-                            v-model="transferencia.descripcion" 
-                            rows="4" 
-                            fluid 
-                        />
+                            <label for="descripcion" class="block font-bold mb-3">Cobertura</label>
+                            <InputNumber v-model="transferencia.cobertura" inputId="integeronly" fluid />
+                           
+                        </div>
+                        <div>
+                            <label for="descripcion" class="block font-bold mb-3">Poblacion Beneficiada</label>
+                            <InputNumber v-model="transferencia.beneficiario" inputId="integeronly" fluid />
                         </div>
 
                         <Button 
-                        label="Guardar localizacion" 
-                        icon="pi pi-check" 
-                        @click="guardarLocalizacion"
-                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                            label="Guardar localizacion" 
+                            icon="pi pi-check" 
+                            @click="guardarLocalizacion"
+                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
                         />
-                    </div>
-                </basic-tab>
+                        </div>
+                    </basic-tab>
 
 
                 <basic-tab title="Etapa - Componenete">
                     <div class="flex flex-col gap-4">
-                        <InputText v-model="value1" type="text" size="small" placeholder="Entidad ejecutora" />
-                        <InputText v-model="value1" type="text" size="small" placeholder="Unidad ejecutora" />
-                        <InputText v-model="value1" type="text" size="small" placeholder="CODIGO TPP" />
-                        <InputText v-model="value1" type="text" size="small" placeholder="Objeto" />
-                        <InputText v-model="value1" type="text" size="small" placeholder="localización" />
-                        <InputText v-model="value1" type="text" size="small" placeholder="Nombre TPP" />
-                        <InputText v-model="value1" type="text" size="small" placeholder="Denominacion del convenio" />
-                        <InputText v-model="value1" type="text" size="small" placeholder="Area de influencia" />
+                        <InputText v-model="value1" type="text" size="small" placeholder="Componente" />
+                        
+                        
 
 
                         <Button label="Guardar4" severity="info" raised />
@@ -414,7 +416,7 @@ import Tab from "primevue/tab";
 import TabPanels from "primevue/tabpanels";
 import TabPanel from "primevue/tabpanel";
 import Calendar from 'primevue/calendar';
-import { onMounted, ref, watch, computed } from "vue";
+import { onMounted, ref, watch, computed, Text } from "vue";
 import SelectEntidad from "./../../../components/SelectEntidad.vue";
 import transferenciaService from "./../../../services/transferencia.service";
 import BasicTab from "./../../../components/Tab.vue";
@@ -423,6 +425,9 @@ import entidadService from "../../../services/entidad.service";
 import planService from "../../../services/plan.service";
 import areaService from "../../../services/area.service";
 import programaService from "../../../services/programa.service";
+import departamentoService from "../../../services/departamento.service";
+import municipioService from "../../../services/municipio.service";
+import poblacionService from "../../../services/poblacion.service";
 
 
 const selectedCity = ref();
@@ -435,12 +440,18 @@ const cities = ref([
 ]);
 
 const transferencias = ref([]);
+const plan = ref([]);
+const programa = ref([]);
+const departamentos = ref([]);
+const municipios = ref([]);
+const poblaciones = ref([]);
 const entidades = ref({ id: "", nombre: "", codigo_presupuestario: "" });
 const entidad = ref([]);
 const visibleDialogTransferencia = ref(false);
 const submitted = ref(false);
 const transferenciaDialog = ref(false);
 const error = ref('');
+const mensaje = ref('');
 const transferencia = ref({
     id: null,
     entidad_operadora: '',
@@ -455,8 +466,15 @@ const transferencia = ref({
     fecha_termino: '',
     entidad_ejecutora: '',
     unidad_ejecutora: '',
-    area_influencia: ''
-});
+    area_influencia: '',
+    plan: '',
+    programa: '',
+    descripcion:'',
+    departamento: null,
+  municipio: null,
+  poblacion: null,
+  departamento: null,
+    });
 const areas = ref([]);
 const selectedCountry = ref(null);
 const selectedArea = ref({ id: null });
@@ -489,13 +507,86 @@ onMounted(() => {
     getPlanes();
     getAreas();
     getTransferencias();
+    cargarDepartamentos();
+    cargarMunicipios();
+    cargarPoblaciones();
     //fetchProgramas();
 });
 
 
 const planes = ref([]);
-
 const programas = ref([]);
+
+
+
+function onDepartamentoChange() {
+    console.log("Departamento ID",transferencia.value.departamento.id);
+  if (transferencia.value.departamento) {
+    cargarMunicipios(transferencia.value.departamento.id);
+  } else {
+    municipios.value = [];
+    poblaciones.value = [];
+  }
+}
+
+function onMunicipioChange() {
+    console.log("Municipio ID",transferencia.value.municipio.id);
+  if (transferencia.value.municipio) {
+    cargarPoblaciones(transferencia.value.municipio.id);
+  }
+  municipios.value = [];
+    poblaciones.value = [];
+  transferencia.value.poblacion = [];
+}
+
+async function cargarDepartamentos() {
+  try {
+    const { data } = await departamentoService.index();
+    departamentos.value = data;
+  } catch (error) {
+    console.error("Error al cargar los departamentos:", error);
+  }
+}
+
+async function cargarMunicipios(departamentoId) {
+    console.log("Departamento ID 222",departamentoId);
+  try {
+    if (departamentoId) {
+      const { data } = await municipioService.index(departamentoId);
+      municipios.value = data;
+    } else {
+      municipios.value = [];
+    }
+  } catch (error) {
+    console.error("Error al cargar los municipios:", error);
+  }
+}
+
+async function cargarPoblaciones(municipioId) {
+  // Simulación de la carga de poblaciones basados en el municipio seleccionado
+  console.log("Municipio ID 222",municipioId);
+  try {
+    if (municipioId) {
+      const { data } = await poblacionService.show(municipioId);
+      municipios.value = data;
+    } else {
+      municipios.value = [];
+    }
+  } catch (error) {
+    console.error("Error al cargar los municipios:", error);
+  }
+}
+
+// Function to save data
+const guardarLocalizacion = async () => {
+    try {
+        const response = await axios.post('/api/guardar-localizacion', transferencia.value);
+        console.log('Data saved successfully:', response.data);
+    } catch (err) {
+        error.value = 'Error saving data';
+    }
+};
+
 
 const getPlanes = async () => {
     const { data } = await planService.index();
@@ -512,7 +603,8 @@ const getAreas = async () => {
 };
 // Fetch programas based on selected plan
 const fetchProgramas = async (planId) => {
-    alert(planId);
+    
+    console.log("Selected Plan ID***:", planId);
     try {
         //const response = await axios.get(`http://127.0.0.1:8000/api/programa/${planId}`);
         const { data } = await programaService.show(planId);
@@ -543,21 +635,29 @@ const onPlanChange = () => {
     }
 };*/
 
-function guardarProblematica() {
-    console.log('Problematica guardada exitosamente:');
+async function guardarProblematica() {
     try {
-        //const response = axios.post('/api/guardar-problematica', transferencia.value);
-        console.log('Problematica guardada exitosamente:', response.data);
-    } catch (err) {
-        error.value = 'Error al guardar problematica';
+        // Crear el payload con los datos de la transferencia
+        const payload = {
+            plan_id: transferencia.value.plan.id,
+            programa_id: transferencia.value.programa.id,
+            descripcion: transferencia.value.descripcion
+        };
+
+        // Llamar al servicio para guardar la problemática
+        const { data } = await transferenciaService.guardarProblematica(transferencia.value.id, payload);
+
+        // Mostrar mensaje de éxito o manejar la respuesta según sea necesario
+        console.log(data.message);
+        alert(data.message);
+        mensaje.value = 'Registro guardado';
+
+    } catch (error) {
+        console.error("Error al guardar la problemática:", error);
     }
 }
 
 
-// Options for dropdowns
-const departamentos = ref([]);
-const municipios = ref([]);
-const poblaciones = ref([]);
 
 // Fetch municipios based on departamento
 const fetchMunicipios = async (departamentoId) => {
@@ -599,15 +699,7 @@ watch(() => transferencia.value.municipio, (newMunicipio) => {
     }
 });
 
-// Function to save data
-const guardarLocalizacion = async () => {
-    try {
-        const response = await axios.post('/api/guardar-localizacion', transferencia.value);
-        console.log('Data saved successfully:', response.data);
-    } catch (err) {
-        error.value = 'Error saving data';
-    }
-};
+
 
 function updateFechaInicio(value) {
     this.fecha_inicio = value;
@@ -626,10 +718,19 @@ function obtenerEntidad() {
         .then((json) => (entidad.value = json));
 }
 
+//listar transferencias
 const getTransferencias = async () => {
     const { data } = await transferenciaService.index();
 
     transferencias.value = data;
+
+    if (transferencia.value.plan) {
+        plan.value.plan = transferencia.value.plan;
+    }
+
+    if (transferencia.value.programa) {
+        programa.value.programa = transferencia.value.programa;
+    }
     //alert(transferencias);
 };
 
@@ -694,7 +795,7 @@ function formatDateToDDMMYYYY(dateString) {
 }
 
 function validarFechasYGuardar() {
-    console.log('Problematica guardada exitosamente:');
+    
     // Accede a las fechas desde el objeto 'transferencia'
     let fechaInicio = transferencia.value.fecha_inicio;
     let fechaTermino = transferencia.value.fecha_termino;
@@ -716,16 +817,8 @@ function validarFechasYGuardar() {
     const fechaTerminoISO = new Date(fechaTermino.split('/').reverse().join('-'));
     //actulizarTransferencia();
     saveTransferenciaUpdate();
- /*   if (fechaTerminoISO <= fechaInicioISO) {
-        error = 'La fecha de término debe ser al menos un día después de la fecha de inicio.';
-    } else {
-        //error = '';
-        // Asigna las fechas formateadas antes de guardar
-        transferencia.fecha_inicio = fechaInicio;
-        transferencia.fecha_termino = fechaTermino;
-        // Lógica para guardar los datos
-        saveTransferencia();
-    }*/
+    console.log('Problematica guardada exitosamente:');
+
 }
 
 function validarFechas() {
@@ -808,9 +901,9 @@ async function saveTransferenciaUpdate() {
         // Asignación de los valores a la transferencia
         transferencia.value.nombre_tpp = nombreTpp.value;
         transferencia.value.entidad_operadora = selectedEntidad.value.nombre;
-        transferencia.value.id_area = transferencia.area_id;
-        transferencia.value.fecha_inicio = '12/12/2024';
-        transferencia.value.fecha_termino = '12/12/2024';
+        transferencia.value.area_id = transferencia.area_id;
+        transferencia.value.fecha_inicio = transferencia.fechaInicio;
+        transferencia.value.fecha_termino = transferencia.fechaTermino;
         const transferenciaData = { ...transferencia.value };
         console.log("Id",transferencia.value.id);
         console.log("dddddd",transferenciaData);

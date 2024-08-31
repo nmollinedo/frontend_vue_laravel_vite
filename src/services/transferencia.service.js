@@ -18,5 +18,8 @@ export default {
     },
     actualizarTranferencia: (id,datos) => {
         return Api().post(`/transferencia/actualizar-transferencia/${id}`, datos);
+    },
+    guardarProblematica: (id,datos) => {
+        return Api().post(`/guardar-problematica/${id}`, datos);
     }
 }
