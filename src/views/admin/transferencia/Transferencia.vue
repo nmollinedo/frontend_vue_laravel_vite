@@ -75,7 +75,7 @@
                     <div>
 
                         <Dropdown v-model="selectedEntidad" :options="entidades" optionLabel="nombre"
-                            placeholder="Select a Entidad" class="w-full md:w-14rem" />
+                            placeholder="Seleccionar una entidad" class="w-full md:w-14rem" />
                         <p>ID de la ciudad seleccionada: {{ selectedEntidad.id }}</p>
                     </div>
                     <div>
@@ -128,11 +128,11 @@
 
                 </div>
                 <td>
-                    <label for="Entidad" class="block font-bold mb-3">Area de Influencia</label>
+                    <label for="Entidad" class="block font-bold mb-3">Área de Influencia</label>
                 </td>
                 <div>{{areas}}
 
-                    <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione Area"
+                    <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione una área"
                         class="w-full md:w-14rem" />
                     <p>ID de la ciudad seleccionada: {{ selectedArea.id }}</p>
                 </div>
@@ -203,16 +203,16 @@
                                 optionLabel="nombre" placeholder="Seleccione Entidad Ejecutora" class="w-full md:w-14rem" />    
                             
                         </Fieldset> -->
-                        <Fieldset legend="Header">
+                <Fieldset legend="Header">
                     <td>{{transferencia}}
                         <label for="Entidad" class="block font-bold mb-3">Responsable de la operacion</label>
                     </td>
                     <div>
 
                         <Dropdown v-model="selectedEntidad" :options="entidades" optionLabel="nombre"
-                            placeholder="Select a Entidad" class="w-full md:w-14rem" />
-                        <p>ID de la ciudad seleccionada: {{ selectedEntidad.id }}</p>
-                    </div>
+                            placeholder="Seleccionar una entidad" class="w-full md:w-14rem" />
+                            <p>ID de la ciudad seleccionada: {{ selectedEntidad }}</p>
+                        </div>
                     <div>
                         <label for="responsableEjecucion" class="block font-bold mb-3">Responsable de la
                             ejecucion</label>
@@ -240,12 +240,10 @@
                             <label for="localizacion" class="block font-bold mb-3">Localización</label>
                             <InputText id="localizacion" v-model="transferencia.localizacion" required="true" fluid />
                         </div>
-
                         <div>
-                            <label for="nombre_tpp" class="block font-bold mb-3">Nombre TPP</label>
-                            <InputText id="nombre_tpp" v-model="transferencia.nombre_tpp" readonly fluid />
+                            <label for="nombre_tpp">Nombre TPP</label>
+                            <InputText id="nombre_tpp" :value="nombreTpp" readonly fluid />
                         </div>
-
                         <div>
                             <label for="denominacion_convenio" class="block font-bold mb-3">Denominación del
                                 Convenio</label>
@@ -255,7 +253,7 @@
 
                         <div>{{areas}}
                             <label for="area_influencia" class="block font-bold mb-3">Área de Influencia</label>
-                            <Dropdown v-model="transferencia.id_area" :options="areas" optionLabel="descrip_area"
+                            <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area"
                                 placeholder="Seleccione Área" class="w-full md:w-14rem" />
                         </div>
 
@@ -496,7 +494,7 @@ const localizacion = ref('');
 
 // Computed property para concatenar el nombre TPP
 const nombreTpp = computed(() => {
-    return `${transferencia.value.objeto} ${transferencia.value.localizacion}`.trim().substring(0, 110);
+    return `${transferencia.value.objeto ?? ''} ${transferencia.value.localizacion ?? ''}`.trim().substring(0, 110);
 });
 
 
@@ -517,7 +515,11 @@ onMounted(() => {
 const planes = ref([]);
 const programas = ref([]);
 
-
+function formatDateVista(date) {
+    if (!date) return '';
+    const [year, month, day] = date.split('-');
+    return `${day}/${month}/${year}`;
+}
 
 function onDepartamentoChange() {
     console.log("Departamento ID",transferencia.value.departamento.id);
@@ -722,6 +724,11 @@ function obtenerEntidad() {
 const getTransferencias = async () => {
     const { data } = await transferenciaService.index();
 
+    for (let i = 0; i < data.length; i++) {
+        data[i].fecha_inicio = formatDateVista(data[i].fecha_inicio);
+        data[i].fecha_termino = formatDateVista(data[i].fecha_termino);
+    }
+
     transferencias.value = data;
 
     if (transferencia.value.plan) {
@@ -754,12 +761,17 @@ async function editTransferencia(transferenciaData) {
         const { data } = await transferenciaService.show(transferenciaData.id);
         transferencia.value = data;
         transferencia.value.fecha_inicio=transferencia.value.fecha_inicio;
-
+        selectedEntidad.value = entidades.value.find(ent => ent.nombre === transferencia.value[0].entidad_operadora);
+        selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
         //transferencia.value = jsonData;
+        for (let i = 0; i < data.length; i++) {
+            data[i].fecha_inicio = formatDateVista(data[i].fecha_inicio);
+            data[i].fecha_termino = formatDateVista(data[i].fecha_termino);
+        }
     // Asignar el responsable de la operación basado en la entidad
     //selectedEntidad.value = entidades.value.find(ent => ent.nombre === transferencia.value.responsable_ejecucion);
     // Asignar el nombre de la entidad seleccionada
-    selectedEntidadNombre.value = data[0]["responsable_ejecucion"];
+        selectedEntidadNombre.value = data[0]["responsable_ejecucion"];
         Object.assign(transferencia.value, data[0]);
         visibleDialogTransferencia.value = true;
     } catch (err) {
@@ -769,6 +781,8 @@ async function editTransferencia(transferenciaData) {
 
 function openNew() {
     transferencia.value = {};
+    selectedEntidad.value = {};
+    selectedArea.value = {};
     submitted.value = false;
     transferenciaDialog.value = true;
 }
@@ -799,8 +813,8 @@ function validarFechasYGuardar() {
     // Accede a las fechas desde el objeto 'transferencia'
     let fechaInicio = transferencia.value.fecha_inicio;
     let fechaTermino = transferencia.value.fecha_termino;
-    alert(fechaInicio);
-    alert(fechaTermino);
+    // alert(fechaInicio);
+    // alert(fechaTermino);
     // Verifica que ambas fechas estén presentes
     if (!fechaInicio || !fechaTermino) {
         error = 'Ambas fechas son obligatorias.';
@@ -810,8 +824,8 @@ function validarFechasYGuardar() {
     // Formatea las fechas a dd/mm/aaaa
     fechaInicio = formatDateToDDMMYYYY(fechaInicio);
     fechaTermino = formatDateToDDMMYYYY(fechaTermino);
-    alert(fechaInicio);
-    alert(fechaTermino);
+    // alert(fechaInicio);
+    // alert(fechaTermino);
     // Compara las fechas (convertidas a formato 'yyyy-mm-dd' para comparación)
     const fechaInicioISO = new Date(fechaInicio.split('/').reverse().join('-'));
     const fechaTerminoISO = new Date(fechaTermino.split('/').reverse().join('-'));
@@ -899,28 +913,28 @@ function actulizarTransferencia() {
 async function saveTransferenciaUpdate() {
     try {
         // Asignación de los valores a la transferencia
-        transferencia.value.nombre_tpp = nombreTpp.value;
+        // transferencia.value.nombre_tpp = nombreTpp.value;
         transferencia.value.entidad_operadora = selectedEntidad.value.nombre;
-        transferencia.value.area_id = transferencia.area_id;
-        transferencia.value.fecha_inicio = transferencia.fechaInicio;
-        transferencia.value.fecha_termino = transferencia.fechaTermino;
+        transferencia.value.area_id = selectedArea.value.id;
+        // transferencia.value.area_id = transferencia.area_id;
+        // transferencia.value.fecha_inicio = transferencia.fechaInicio;
+        // transferencia.value.fecha_termino = transferencia.fechaTermino;
+
+
         const transferenciaData = { ...transferencia.value };
-        console.log("Id",transferencia.value.id);
-        console.log("dddddd",transferenciaData);
         
         // Envío de la solicitud al servicio
         const { data } = await transferenciaService.actualizarTranferencia(transferencia.value.id,transferenciaData);
-
         // Actualizar la lista de transferencias
         getTransferencias();
 
         // Marcar el formulario como enviado y cerrar el diálogo
         submitted.value = true;
         transferenciaDialog.value = false;
+        visibleDialogTransferencia.value = false;
 
         // Limpiar los valores de la transferencia
         transferencia.value = {};
-
     } catch (error) {
         console.error("Error guardando la transferencia:", error);
         // Aquí puedes mostrar un mensaje de error al usuario si es necesario

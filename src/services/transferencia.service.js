@@ -17,7 +17,7 @@ export default {
         return Api().delete(`/transferencia/${id}`);
     },
     actualizarTranferencia: (id,datos) => {
-        return Api().post(`/transferencia/actualizar-transferencia/${id}`, datos);
+        return Api().post(`/modificar-transferencia/${id}`, datos);
     },
     guardarProblematica: (id,datos) => {
         return Api().post(`/guardar-problematica/${id}`, datos);
