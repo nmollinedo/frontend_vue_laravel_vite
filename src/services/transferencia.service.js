@@ -21,5 +21,8 @@ export default {
     },
     guardarProblematica: (id,datos) => {
         return Api().post(`/guardar-problematica/${id}`, datos);
+    },
+    guardarLocalizacion: (id,datos) => {
+        return Api().post(`/guardar-localizacion/${id}`, datos);
     }
 }

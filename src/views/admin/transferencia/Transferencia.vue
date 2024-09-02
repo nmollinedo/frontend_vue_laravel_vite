@@ -286,23 +286,23 @@
                                 <!-- Plan Dropdown -->
                                 <label for="Plan" class="block font-bold mb-3">Plan</label>
                                 <Dropdown
-                                    v-model="transferencia.plan"
+                                    v-model="selectedPlan"
                                     :options="planes"
                                     optionLabel="descrip_plan"
                                     placeholder="Seleccione plan"
                                     class="w-full md:w-14rem"
                                     @change="onPlanChange"
                                 />
-
+                                {{planes}}
                                 <!-- Programa Dropdown -->
                                 <label for="Programa" class="block font-bold mb-3">Programa</label>{{programas}}
                                 <Dropdown
-                                    v-model="transferencia.programa"
+                                    v-model="selectedPrograma"
                                     :options="programas"
                                     optionLabel="descrip_programa"
                                     placeholder="Seleccione programa"
                                     class="w-full md:w-14rem"
-                                    :disabled="!transferencia.plan"
+                                    :disabled="!selectedPlan"
                                 />
                         </Fieldset>
 
@@ -324,44 +324,43 @@
                         <Fieldset legend="Header">
                             <label for="Departamento" class="block font-bold mb-3">Departamento</label>
                             <Dropdown 
-                            v-model="transferencia.departamento" 
+                            v-model="selectedDepartamento" 
                             :options="departamentos" 
                             optionLabel="descrip_departamento"
                             placeholder="Seleccione departamento" 
                             class="w-full md:w-14rem" 
                             @change="onDepartamentoChange"
                             />
-
+                            {{municipios}}
                             <label for="Municipio" class="block font-bold mb-3">Municipio</label>
                             <Dropdown 
-                            v-model="transferencia.descrip_municipio" 
+                            v-model="selectedMunicipio" 
                             :options="municipios" 
                             optionLabel="descrip_municipio"
                             placeholder="Seleccione municipio" 
                             class="w-full md:w-14rem"
-                            :disabled="!transferencia.departamento"
+                            :disabled="!selectedDepartamento"
                             @change="onMunicipioChange"
                             />
-
+                            {{poblaciones}}
                             <label for="Poblacion" class="block font-bold mb-3">Población</label>
                             <Dropdown 
-                            v-model="transferencia.poblacion" 
+                            v-model="selectedPoblacion" 
                             :options="poblaciones" 
-                            optionLabel="nombre"
+                            optionLabel="descrip_poblacion"
                             placeholder="Seleccione población" 
                             class="w-full md:w-14rem"
-                            :disabled="!transferencia.municipio"
+                            :disabled="!selectedMunicipio"
                             />
                         </Fieldset>
 
                         <div>
                             <label for="descripcion" class="block font-bold mb-3">Cobertura</label>
                             <InputNumber v-model="transferencia.cobertura" inputId="integeronly" fluid />
-                           
                         </div>
                         <div>
                             <label for="descripcion" class="block font-bold mb-3">Poblacion Beneficiada</label>
-                            <InputNumber v-model="transferencia.beneficiario" inputId="integeronly" fluid />
+                            <InputNumber v-model="transferencia.poblacion" inputId="integeronly" fluid />
                         </div>
 
                         <Button 
@@ -469,14 +468,20 @@ const transferencia = ref({
     programa: '',
     descripcion:'',
     departamento: null,
-  municipio: null,
-  poblacion: null,
-  departamento: null,
+    municipio: null,
+    poblacion_id: null,
+    cobertura: '',
+    poblacion: ''
     });
 const areas = ref([]);
 const selectedCountry = ref(null);
 const selectedArea = ref({ id: null });
 const selectedEntidad = ref({ id: null });
+const selectedPlan = ref({ id: null });
+const selectedPrograma = ref({ id: null });
+const selectedDepartamento = ref({ id: null });
+const selectedMunicipio = ref({ id: null });
+const selectedPoblacion = ref({ id: null });
 const selectedEntidadNombre = ref('');
 const deleteTransferenciaDialog = ref(false);
 const codigo_tpp1 = 'TPP';
@@ -522,23 +527,28 @@ function formatDateVista(date) {
 }
 
 function onDepartamentoChange() {
-    console.log("Departamento ID",transferencia.value.departamento.id);
-  if (transferencia.value.departamento) {
-    cargarMunicipios(transferencia.value.departamento.id);
-  } else {
-    municipios.value = [];
-    poblaciones.value = [];
-  }
+    const selectedDepartamentoId = selectedDepartamento.value.id;
+    console.log(selectedDepartamentoId);
+    // if (transferencia.value.departamento) {
+    if (selectedDepartamentoId) {
+        cargarMunicipios(selectedDepartamentoId);
+        municipios.value = [];
+        poblaciones.value = [];
+    } else {
+        municipios.value = [];
+        poblaciones.value = [];
+    }
 }
 
 function onMunicipioChange() {
-    console.log("Municipio ID",transferencia.value.municipio.id);
-  if (transferencia.value.municipio) {
-    cargarPoblaciones(transferencia.value.municipio.id);
-  }
-  municipios.value = [];
-    poblaciones.value = [];
-  transferencia.value.poblacion = [];
+    console.log("Municipio ID",selectedMunicipio.value.id);
+    const selectedMunicipioId = selectedMunicipio.value.id;
+    if (selectedMunicipioId) {
+        cargarPoblaciones(selectedMunicipioId);
+    }
+//   municipios.value = [];
+//   poblaciones.value = [];
+//   transferencia.value.poblacion = [];
 }
 
 async function cargarDepartamentos() {
@@ -569,10 +579,11 @@ async function cargarPoblaciones(municipioId) {
   console.log("Municipio ID 222",municipioId);
   try {
     if (municipioId) {
-      const { data } = await poblacionService.show(municipioId);
-      municipios.value = data;
+        const { data } = await poblacionService.show(municipioId);
+        poblaciones.value = data;
+        console.log(data);
     } else {
-      municipios.value = [];
+        poblaciones.value = [];
     }
   } catch (error) {
     console.error("Error al cargar los municipios:", error);
@@ -582,8 +593,25 @@ async function cargarPoblaciones(municipioId) {
 // Function to save data
 const guardarLocalizacion = async () => {
     try {
-        const response = await axios.post('/api/guardar-localizacion', transferencia.value);
-        console.log('Data saved successfully:', response.data);
+        // Crear el payload con los datos de la transferencia
+        const payload = {
+            departamento_id: selectedDepartamento.value.id,
+            municipio_id: selectedMunicipio.value.id,
+            poblacion_id: selectedPoblacion.value.id,
+            cobertura: transferencia.value.cobertura,
+            poblacion: transferencia.value.poblacion
+        };
+        console.log(payload);
+        // Llamar al servicio para guardar la problemática
+        const { data } = await transferenciaService.guardarLocalizacion(transferencia.value.id, payload);
+
+        // Mostrar mensaje de éxito o manejar la respuesta según sea necesario
+        console.log(data);
+        alert(data.message);
+        mensaje.value = 'Registro guardado';
+        // consoe.log("Transferencia", transferencia.value);
+        // const response = await axios.post('/api/guardar-localizacion', transferencia.value);
+        // console.log('Data saved successfully:', response.data);
     } catch (err) {
         error.value = 'Error saving data';
     }
@@ -618,7 +646,8 @@ const fetchProgramas = async (planId) => {
 
 // Handler when plan is changed
 const onPlanChange = () => {
-    const selectedPlanId = transferencia.value.plan.id;
+    // const selectedPlanId = transferencia.value.plan.id;
+    const selectedPlanId = selectedPlan.value.id;
     console.log("Selected Plan ID:", selectedPlanId);
     if (selectedPlanId) {
         fetchProgramas(selectedPlanId);
@@ -641,8 +670,10 @@ async function guardarProblematica() {
     try {
         // Crear el payload con los datos de la transferencia
         const payload = {
-            plan_id: transferencia.value.plan.id,
-            programa_id: transferencia.value.programa.id,
+            // plan_id: transferencia.value.plan.id,
+            plan_id: selectedPlan.value.id,
+            // programa_id: transferencia.value.programa.id,
+            programa_id: selectedPrograma.value.id,
             descripcion: transferencia.value.descripcion
         };
 
@@ -760,10 +791,21 @@ async function editTransferencia(transferenciaData) {
     try {
         const { data } = await transferenciaService.show(transferenciaData.id);
         transferencia.value = data;
+        //obtiene programas
+        await fetchProgramas(transferencia.value[0].plan_id);
+        //obtiene municipios y poblaciones
+        await cargarMunicipios(transferencia.value[0].departamento);
+        await cargarPoblaciones(transferencia.value[0].municipio);
+
         transferencia.value.fecha_inicio=transferencia.value.fecha_inicio;
         selectedEntidad.value = entidades.value.find(ent => ent.nombre === transferencia.value[0].entidad_operadora);
         selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
-        //transferencia.value = jsonData;
+        selectedPlan.value = planes.value.find(plan => plan.id === transferencia.value[0].plan_id);
+        selectedPrograma.value = programas.value.find(programa => programa.id === transferencia.value[0].programa_id);
+        selectedDepartamento.value = departamentos.value.find(departamento => departamento.id === transferencia.value[0].departamento);
+        selectedMunicipio.value = municipios.value.find(municipio => municipio.id === transferencia.value[0].municipio);
+        selectedPoblacion.value = poblaciones.value.find(poblacion => poblacion.id === transferencia.value[0].poblacion_id);
+        //formatear fecha
         for (let i = 0; i < data.length; i++) {
             data[i].fecha_inicio = formatDateVista(data[i].fecha_inicio);
             data[i].fecha_termino = formatDateVista(data[i].fecha_termino);
@@ -930,8 +972,8 @@ async function saveTransferenciaUpdate() {
 
         // Marcar el formulario como enviado y cerrar el diálogo
         submitted.value = true;
-        transferenciaDialog.value = false;
-        visibleDialogTransferencia.value = false;
+        // transferenciaDialog.value = false;
+        // visibleDialogTransferencia.value = false;
 
         // Limpiar los valores de la transferencia
         transferencia.value = {};
