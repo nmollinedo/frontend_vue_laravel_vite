@@ -969,14 +969,14 @@ async function saveTransferenciaUpdate() {
         const { data } = await transferenciaService.actualizarTranferencia(transferencia.value.id,transferenciaData);
         // Actualizar la lista de transferencias
         getTransferencias();
-
         // Marcar el formulario como enviado y cerrar el diálogo
         submitted.value = true;
+        alert(data);
         // transferenciaDialog.value = false;
         // visibleDialogTransferencia.value = false;
 
         // Limpiar los valores de la transferencia
-        transferencia.value = {};
+        // transferencia.value = {};
     } catch (error) {
         console.error("Error guardando la transferencia:", error);
         // Aquí puedes mostrar un mensaje de error al usuario si es necesario
