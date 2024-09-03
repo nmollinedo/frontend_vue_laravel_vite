@@ -40,7 +40,7 @@
                                 />
                             </g>
                         </svg> -->
-                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bienvenidos!</div>
+                        <div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bienvenidos TPP!</div>
                         <span class="text-muted-color font-medium">Para continuar Ingrese sus Datos</span>
                     </div>
 

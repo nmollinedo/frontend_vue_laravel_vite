@@ -46,7 +46,7 @@
                             <InputText placeholder="Buscar..." />
                         </IconField>
                     </div>
-                </template> {{ transferencia }} 
+                </template>
 
                 <Column field="id" header="COD" sortable style="min-width: 1rem"></Column>
                 <Column field="codigo_tpp" header="CODIGO" sortable style="min-width: 7rem"></Column>
@@ -67,7 +67,7 @@
             </DataTable>
         </div>
 
-        <Dialog v-model:visible="transferenciaDialog" :style="{ width: '650px' }" header="transferencias" :modal="true">
+        <Dialog v-model:visible="transferenciaDialog" :style="{ width: '650px' }" header="Nueva transferencias" :modal="true">
           <!-- {{ transferencia }}  -->
             <div class="flex flex-col gap-6">
                 <Fieldset legend="">
@@ -160,9 +160,9 @@
 
 
             <template #footer>
-                <Button label="Cancel" icon="pi pi-times" text @click="hideDialog"
+                <Button label="Cancelar" icon="pi pi-times" text @click="hideDialog"
                     style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
-                <Button label="Save" icon="pi pi-check" @click="validarFechas"
+                <Button label="Guardar" icon="pi pi-check" @click="validarFechas"
                     style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
             </template>
         </Dialog>
@@ -185,8 +185,8 @@
         <!--    <div class="p-6">
         <p>Codigo TPP: <span class="text-lg font-medium text-gray-900">{{  }}</span></p>
         <p>Nombre: <span class="text-lg font-medium text-gray-900">{{  }}</span></p>
-        </div>-->
-  {{ transferencia }}   
+        </div>
+  {{ transferencia }}   -->
         
 
         <div class="mt-6 mb-6 space-y-6" style="max-width: 750px; margin-top: 20px; margin-bottom: 20px;">
@@ -361,10 +361,10 @@
                             />
                         </Fieldset>
 
-                        <div>
+                    <!--    <div>
                             <label for="descripcion" class="block font-bold mb-3">Cobertura</label>
                             <InputNumber v-model="transferencia.cobertura" inputId="integeronly" fluid />
-                        </div>
+                        </div> -->
                         <div>
                             <label for="descripcion" class="block font-bold mb-3">Poblacion Beneficiada</label>
                             <InputNumber v-model="transferencia.poblacion" inputId="integeronly" fluid />
@@ -383,7 +383,7 @@
                         </div>
                     </basic-tab>
 
-
+            <!--        
                 <basic-tab title="Etapa - Componenete">
                     <div class="flex flex-col gap-4">
                         <InputText v-model="value1" type="text" size="small" placeholder="Componente" />
@@ -393,7 +393,7 @@
 
                         <Button label="Guardar4" severity="info" raised />
                     </div>
-                </basic-tab>
+                </basic-tab> -->
 
 
             </basic-tabs>
@@ -817,7 +817,7 @@ async function editTransferencia(transferenciaData) {
         transferencia.value.fecha_inicio=transferencia.value.fecha_inicio;
         selectedEntidad.value = entidades.value.find(ent => ent.id === transferencia.value[0].entidad_operadora_id);
         //selectedEntidad.value = entidades.value.find(ent => ent.nombre === transferencia.value[0].entidad_operadora);
-        selectedEntidadNombre.value = transferencia.value[0].entidad_ejecutora;
+        selectedEntidadNombre.value = transferencia.value.entidad_ejecutora;
         selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
         selectedPlan.value = planes.value.find(plan => plan.id === transferencia.value[0].plan_id);
         selectedPrograma.value = programas.value.find(programa => programa.id === transferencia.value[0].programa_id);

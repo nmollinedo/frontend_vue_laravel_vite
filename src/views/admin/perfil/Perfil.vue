@@ -9,7 +9,7 @@
 
         <h5>CREADO EN: {{ perfil.created_at }}</h5>
 
-        <h5>CREADO EN: {{  }}</h5>
+    
         <button @click="salir()">Salir</button>
 
         
