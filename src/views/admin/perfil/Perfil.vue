@@ -1,13 +1,18 @@
 <template>
     <div class="card">
 
-        <h5>NOMBRE: {{ perfil.name }}</h5>
+        <div>
+    <h1>Perfil del Usuario</h1>
+    <p><strong>Nombre:</strong> {{ perfil.name }}</p>
+    <p><strong>Email:</strong> {{ perfil.email }}</p>
+    <p><strong>Fecha de creación:</strong> {{ perfil.created_at }}</p>
 
-        
-
-        <h5>CORREO: {{ perfil.email }}</h5>
-
-        <h5>CREADO EN: {{ perfil.created_at }}</h5>
+    <h2>Entidad</h2>
+    <p><strong>Código de Entidad:</strong> {{ perfil.entidad.cod_entidad }}</p>
+    <p><strong>Sigla:</strong> {{ perfil.entidad.sigla }}</p>
+    <p><strong>Nombre de la Entidad:</strong> {{ perfil.entidad.entidad }}</p>
+  </div>
+  
 
     
         <button @click="salir()">Salir</button>
@@ -40,6 +45,7 @@ import { useRoute } from "vue-router";
     async function obtenerPerfil(){
         try {
             const {data} = await authService.perfil()
+            console.log("perfil",data);
             perfil.value = data;
             //console.log("entro::"+perfil.persona[1]);
             //persona = perfil.persona
