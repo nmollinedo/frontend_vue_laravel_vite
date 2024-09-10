@@ -499,6 +499,8 @@ const selectedDepartamento = ref({ id: null });
 const selectedMunicipio = ref({ id: null });
 const selectedPoblacion = ref({ id: null });
 const selectedEntidadNombre = ref('');
+const originalNombre = ref(''); // Para almacenar el nombre enviado de entidad Nombre
+const isEdit = ref({isEdit: false}); // Variable para saber si es editar o nuevo
 const deleteTransferenciaDialog = ref(false);
 const codigo_tpp1 = 'TPP';
 const codigo_tpp2 = '0047';
@@ -807,6 +809,7 @@ function funEditar(user) {
 
 async function editTransferencia(transferenciaData) {
     try {
+        isEdit.value = true;
         const { data } = await transferenciaService.show(transferenciaData.id);
         transferencia.value = data;
         //obtiene programas
@@ -818,7 +821,8 @@ async function editTransferencia(transferenciaData) {
         transferencia.value.fecha_inicio=transferencia.value.fecha_inicio;
         selectedEntidad.value = entidades.value.find(ent => ent.id === transferencia.value[0].entidad_operadora_id);
         //selectedEntidad.value = entidades.value.find(ent => ent.nombre === transferencia.value[0].entidad_operadora);
-        selectedEntidadNombre.value = transferencia.value.entidad_ejecutora;
+        selectedEntidadNombre.value = transferencia.value[0].entidad_ejecutora;
+        originalNombre.value = transferencia.value[0].entidad_ejecutora;
         selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
         selectedPlan.value = planes.value.find(plan => plan.id === transferencia.value[0].plan_id);
         selectedPrograma.value = programas.value.find(programa => programa.id === transferencia.value[0].programa_id);
@@ -833,7 +837,7 @@ async function editTransferencia(transferenciaData) {
     // Asignar el responsable de la operación basado en la entidad
     //selectedEntidad.value = entidades.value.find(ent => ent.nombre === transferencia.value.responsable_ejecucion);
     // Asignar el nombre de la entidad seleccionada
-        selectedEntidadNombre.value = data[0]["responsable_ejecucion"];
+        // selectedEntidadNombre.value = data[0]["responsable_ejecucion"];
         Object.assign(transferencia.value, data[0]);
         visibleDialogTransferencia.value = true;
     } catch (err) {
@@ -856,9 +860,14 @@ function hideDialog() {
 
 watch(selectedEntidad, (newVal) => {
     if (newVal) {
-        selectedEntidadNombre.value = newVal.nombre;
+        if(isEdit.value === true){
+            selectedEntidadNombre.value = originalNombre.value;
+            isEdit.value = false;
+        } else {
+            selectedEntidadNombre.value = newVal.nombre;
+        }
     } else {
-        selectedEntidadNombre.value = '';
+        selectedEntidadNombre.value = originalNombre.value;
     }
 });
 
