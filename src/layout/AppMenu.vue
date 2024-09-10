@@ -32,7 +32,7 @@ const model = ref([
             {
                 label: 'Formularios',
                 icon: 'pi pi-fw pi-file-edit',
-                to: '/pages/crud'
+                to: '/admin/formulario'
             }
         ]
     }

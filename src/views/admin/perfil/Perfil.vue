@@ -8,9 +8,16 @@
     <p><strong>Fecha de creación:</strong> {{ perfil.created_at }}</p>
 
     <h2>Entidad</h2>
-    <p><strong>Código de Entidad:</strong> {{ perfil.entidad.cod_entidad }}</p>
-    <p><strong>Sigla:</strong> {{ perfil.entidad.sigla }}</p>
-    <p><strong>Nombre de la Entidad:</strong> {{ perfil.entidad.entidad }}</p>
+      <!-- Comprobamos si la entidad está definida -->
+      <div v-if="perfil.entidad">
+        <p><strong>Código de Entidad:</strong> {{ perfil.entidad.cod_entidad }}</p>
+        <p><strong>Sigla:</strong> {{ perfil.entidad.sigla }}</p>
+        <p><strong>Nombre de la Entidad:</strong> {{ perfil.entidad.entidad }}</p>
+      </div>
+      <!-- Si no hay entidad, mostramos un mensaje o dejamos vacío -->
+      <div v-else>
+        <p>No hay información de entidad disponible.</p>
+      </div>
   </div>
   
 
@@ -30,6 +37,7 @@ import { useRoute } from "vue-router";
     const router = useRoute()
 
     const perfil = ref({});
+    const entidad = ref({});
     const persona = ref({});
 
     onMounted(() => {

@@ -54,6 +54,7 @@
                 
                 <Column field="fecha_inicio" header="FECHA INICIO"></Column>
                 <Column field="fecha_termino" header="FECHA TERMINO"></Column>
+                <Column field="estado" header="ESTADO"></Column>
 
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
