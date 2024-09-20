@@ -8,6 +8,7 @@ import Usuario from '../views/admin/usuario/Usuario.vue'
 import Persona from '../views/admin/usuario/Persona.vue'
 import Transferencia from '../views/admin/transferencia/Transferencia.vue'
 import Formulario from '../views/admin/formulario/formulario.vue'
+import Recurso from '../views/admin/recurso/recurso.vue'
 import NotFound from '../views/errors/NotFound.vue'
 
 import AppLayout from '@/layout/AppLayout.vue';
@@ -60,6 +61,13 @@ const router = createRouter({
                     path: 'formulario',
                     component: Formulario,
                     name: 'Formulario',
+                    meta: { requireAuth: true }
+        
+                },
+                {
+                    path: 'recurso',
+                    component: Recurso,
+                    name: 'Recurso',
                     meta: { requireAuth: true }
         
                 },

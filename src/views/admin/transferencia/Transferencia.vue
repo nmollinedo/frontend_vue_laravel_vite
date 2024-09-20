@@ -35,7 +35,7 @@
             <DataTable ref="dt" :value="transferencias" dataKey="id" :paginator="true" :rows="10"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[5, 10, 25]"
-                currentPageReportTemplate="Mostrando {first} al {last} de {totalRecords} transferenciaos">
+                currentPageReportTemplate="Mostrando {first} al {last} de {totalRecords} transferenciaos" >
                 <template #header>
                     <div class="flex flex-wrap gap-2 items-center justify-between">
                         <h4 class="m-0">Gestión Proyectos</h4>
@@ -46,6 +46,7 @@
                             <InputText placeholder="Buscar..." />
                         </IconField>
                     </div>
+                    
                 </template>
 
                 <Column field="id" header="COD" sortable style="min-width: 1rem"></Column>
@@ -130,9 +131,9 @@
                         integeronly fluid />
 
                 </div>
-                <td>
-                    <label for="Entidad" class="block font-bold mb-3">Área de Influencia</label>
-                </td>
+          
+                    <label for="Entidad" class="block font-bold mb-3">Area de Influencia</label>
+              
                 <div><!--{{areas}}-->
 
                     <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione una área"
@@ -153,7 +154,7 @@
                     <p><strong>Fecha Término Seleccionada:</strong> {{ fecha_termino }}</p>
                 </div>
             -->
-
+            
             </div>
             <div v-if="error" class="text-red-500">
                 {{ error }}
@@ -440,6 +441,16 @@ import departamentoService from "../../../services/departamento.service";
 import municipioService from "../../../services/municipio.service";
 import poblacionService from "../../../services/poblacion.service";
 
+//import { useStore } from 'vuex';
+
+//const store = useStore();
+//const entidadId = computed(() => store.state.entidadId);
+
+// Cambiar la entidad cuando el usuario selecciona una nueva
+function cambiarEntidad(nuevaEntidad) {
+  store.commit('setEntidadId', nuevaEntidad.id);
+}
+
 
 const selectedCity = ref();
 const cities = ref([
@@ -524,16 +535,19 @@ const nombreTpp = computed(() => {
 //const selectedEntidad = reactive({ id: null });
 onMounted(() => {
     obtenerEntidad();
-    getEntidades();
+    //getEntidades();
     getPlanes();
     getAreas();
     getTransferencias();
     cargarDepartamentos();
     cargarMunicipios();
     cargarPoblaciones();
+    obtenerEntidadEjecutora();
+    actualizarEntidadId();
     //fetchProgramas();
 });
-
+// Computed para obtener el valor reactivo desde el store
+const entidadId = ref([]);
 
 const planes = ref([]);
 const programas = ref([]);
@@ -757,13 +771,50 @@ watch(() => transferencia.value.municipio, (newMunicipio) => {
 function updateFechaInicio(value) {
     this.fecha_inicio = value;
 };
-
+/*
 const getEntidades = async () => {
     const { data } = await entidadService.index();
 
     entidades.value = data;
     //alert(entidades.value);
+};*/
+
+//const formKey = ref(0); // Clave reactiva que forzará la recarga del formulario
+// Función para obtener la entidad ejecutora desde el LocalStorage y el API
+const obtenerEntidadEjecutora = async () => {
+    const storedEntidadId = localStorage.getItem('entidad_id');
+    
+    if (storedEntidadId) {
+        entidadId.value = storedEntidadId;
+
+        try {
+            const { data } = await entidadService.show(entidadId.value);
+            entidades.value = data;
+        } catch (error) {
+            console.error('Error al obtener los datos de la entidad:', error);
+        }
+    } else {
+        console.warn('No se encontró entidad_id en el LocalStorage.');
+    }
 };
+
+// Función para actualizar el valor de entidadId, guardarlo en el LocalStorage y recargar el formulario
+const actualizarEntidadId = () => {
+    localStorage.setItem('entidad_id', entidadId.value); // Actualiza el LocalStorage
+   
+};
+
+// Función para actualizar el valor de entidadId y guardarlo en el LocalStorage
+const updateEntidadId = () => {
+    localStorage.setItem('entidad_id', entidadId.value); // Actualiza el LocalStorage
+};
+/*
+const obtenerEntidadEjecutora = async () => {
+    entidadId.value = localStorage.getItem('entidad_id');
+    const { data } = await entidadService.show(entidadId.value);
+
+    entidades.value = data;
+};*/
 
 function obtenerEntidad() {
     fetch("http://127.0.0.1:8000/api/entidad")

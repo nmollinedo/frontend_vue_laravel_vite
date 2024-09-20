@@ -35,7 +35,15 @@ const model = ref([
                 to: '/admin/formulario'
             }
         ]
-    }
+    },
+    {
+        label: 'Presupuesto',
+        items: [
+            { label: 'Recursos', icon: 'pi pi-fw pi-id-card', to: '/admin/recurso' },
+            { label: 'Programacion', icon: 'pi pi-fw pi-check-square', to: '/admin/programacion' },
+            
+        ]
+    },
 ]);
 </script>
 

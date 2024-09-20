@@ -59,15 +59,35 @@
                         <span>Profile</span>
                     </button>
                 </div>
-
+                
+<!-- <div v-if="isAdmin">--> 
+    <div>
+    <h1>Entidad seleccionada: {{ entidadId }}</h1>
+    <Dropdown 
+      v-model="entidadId" 
+      :options="entidades" 
+      optionLabel="nombre" 
+      optionValue="id" 
+      placeholder="Selecciona una entidad"
+      @change="updateEntidadId"
+    />
+  </div>
                 <!-- Profile Menu (Dropdown or Modal) -->
                 <div v-if="showProfileMenu" class="profile-menu">
                     <div class="profile-details">
                         <p><strong>Nombre:</strong> {{ perfil.name }}</p>
                         <p><strong>Email:</strong> {{ perfil.email }}</p>
+                        <p><strong>Entidad:</strong> {{ perfil.entidad.id }}</p>
+                        <p><strong>Sigla:</strong> {{ perfil.entidad.sigla }}</p>
+                        <p><strong>Nombre de la Entidad:</strong> {{ perfil.entidad.entidad }}</p>
+                        <p><strong>Codigo presupuestario:</strong> {{ perfil.entidad.codigo_presupuestario }}</p>
+                        <p><strong>Rol:</strong> {{ perfil.rol.rol }}</p>
                     </div>
                     <button class="logout-button" @click="salir">Cerrar Sesión</button>
                 </div>
+                <div>
+
+  </div>
             </div>
         </div>
     </div>
@@ -84,17 +104,53 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 // Estado del menú de perfil
 const showProfileMenu = ref(false);
 
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import authService from "../services/auth.service"
 import { useRoute } from "vue-router";
+import entidadService from '../services/entidad.service';
 
     const router = useRoute()
 
     const perfil = ref({});
     const persona = ref({});
 
+    //const isAdmin = store.state.user.role === 'admin';  // Verifica si el usuario es admin
+    const entidades = ref([]);
+    const selectedEntidad = ref(null);
+
+    import { store } from '../store/store';  // Importa el store desde donde lo creaste
+
+
+
+// Método para manejar el cambio
+function updateEntidadId() {
+    console.log("Id entidad",entidadId.value)
+  store.setEntidadId(entidadId.value);
+  console.log("Id entidad Codigo",codigoPresupuestario.value)
+  store.setCodigoPresupuestario(codigoPresupuestario.value);
+}    
+function updateEntidadCodigo() {
+    console.log("Id entidad Codigo",entidadCodigo.value)
+  store.setEntidadId(entidadCodigo.value);
+}  
+
+// Computed para obtener el valor reactivo desde el store
+const entidadId = computed({
+  get: () => store.entidad_id,
+  set: (value) => store.setEntidadId(value)
+});
+
+// Computed para obtener el valor reactivo desde el store
+const codigoPresupuestario = computed({
+  get: () => store.codigo_presupuestario,
+  set: (value) => store.setCodigoPresupuestario(value)
+});
+
     onMounted(() => {
-        obtenerPerfil()
+        obtenerPerfil();
+        getEntidades();
+         // Obtener el entidad_id de localStorage
+ // entidadId.value = localStorage.getItem('entidad_id');
         //recorrerArray()
     })
 
@@ -103,6 +159,21 @@ import { useRoute } from "vue-router";
 //        console.log(data[i]);
 //    }
 //}
+watch(selectedEntidad, (newEntidad) => {
+  if (newEntidad) {
+    localStorage.setItem('entidad_id', newEntidad.id);  // Almacenar el ID en localStorage
+  }
+});
+
+    const getEntidades = async () => {
+        const { data } = await entidadService.index();
+
+        entidades.value = data;
+        console.log("Lista entidad",entidades);
+      
+        //alert(entidades.value);
+    };
+
     async function obtenerPerfil(){
         try {
             const {data} = await authService.perfil()

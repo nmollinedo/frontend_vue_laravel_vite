@@ -10,9 +10,10 @@
     <h2>Entidad</h2>
       <!-- Comprobamos si la entidad está definida -->
       <div v-if="perfil.entidad">
-        <p><strong>Código de Entidad:</strong> {{ perfil.entidad.cod_entidad }}</p>
+        <p><strong>Código de Entidad:</strong> {{ perfil.entidad.id }}</p>
         <p><strong>Sigla:</strong> {{ perfil.entidad.sigla }}</p>
         <p><strong>Nombre de la Entidad:</strong> {{ perfil.entidad.entidad }}</p>
+        <p><strong>Codigo presupuestario:</strong> {{ perfil.entidad.codigo_presupuestario }}</p>
       </div>
       <!-- Si no hay entidad, mostramos un mensaje o dejamos vacío -->
       <div v-else>
