@@ -115,6 +115,7 @@
                 
                 <Column header="Ver" body="verTemplate"></Column>
                 <Column field="transferencia_id" body="Id"></Column>
+                <Column field="dictamen_id" body="Id"></Column>
                 <Column field="tipo_dictamen" header="Tipo de dictamen"></Column>
               <!--  <Column field="etapa" header="Etapa"></Column> -->
                 <Column field="fecha_dictamen" header="Fecha Dictamen"></Column>
@@ -127,7 +128,7 @@
                     <Button 
                       label="Editar" 
                       icon="pi pi-pencil" 
-                      @click="abrirModalEdit(slotProps.data.id)" 
+                      @click="abrirModalEdit(slotProps.data.dictamen_id)" 
                       class="p-button-text" />
                       <Button icon="pi pi-trash" outlined rounded severity="danger"
                             @click="confirmDeleteFormulario(slotProps.data)" />
@@ -155,13 +156,13 @@
         <label for="id">ID transferencia:</label>
         <input type="text" v-model="formId" readonly class="border rounded-md p-2">
       </div>
-      <div style="max-height: 70vh; overflow-y: auto;">
+    <div style="max-height: 70vh; overflow-y: auto;">
         <h2>Datos del Formulario</h2>
         
         <!-- Select para Etapa -->
         <div class="field">
           <label for="etapa">Etapa del Formulario</label>
-          <Dropdown v-model="form.etapa" :options="etapas" optionLabel="nombre" optionValue="id" placeholder="Seleccionar..."></Dropdown>
+          <Dropdown v-model="form.etapa" :options="etapas" optionLabel="descrip_tipo_dictamen" optionValue="id" placeholder="Seleccionar..."></Dropdown>
         </div>
 
         <!-- Fechas -->
@@ -182,11 +183,11 @@
         <div >  
               <p>1. ¿Los recursos asignados corresponden a un gasto para transferencias de capital "transferencia público privada"?</p>
               <label>
-                <input type="radio" :name="'pregunta_1'" value="Si" v-model="form.preguntas_1">
+                <input type="radio" :name="'pregunta_1'" value="1" v-model="form.pregunta_1">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_1'" value="No" v-model="form.preguntas_1">
+                <input type="radio" :name="'pregunta_1'" value="0" v-model="form.pregunta_1">
                 No
               </label>
               
@@ -196,11 +197,11 @@
         <div >  
               <p>2. ¿La transferencia público privada es para el financiamiento de un proyecto de inversión en especie?</p>
               <label>
-                <input type="radio" :name="'pregunta_2'" value="Si" v-model="form.preguntas_2">
+                <input type="radio" :name="'pregunta_2'" value="1" v-model="form.pregunta_2">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_2'" value="No" v-model="form.preguntas_2">
+                <input type="radio" :name="'pregunta_2'" value="0" v-model="form.pregunta_2">
                 No
               </label>
               
@@ -208,105 +209,110 @@
             <div >  
               <p>3. ¿La entidad o el área responsable, se encuentra autorizada para realizar transferencias público privadas?</p>
               <label>
-                <input type="radio" :name="'pregunta_3'" value="Si" v-model="form.preguntas_3">
+                <input type="radio" :name="'pregunta_3'" value="1" v-model="form.pregunta_3">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_3'" value="No" v-model="form.preguntas_3">
+                <input type="radio" :name="'pregunta_3'" value="0" v-model="form.pregunta_3">
                 No
               </label>
               <div>
                 <label for="respaldo_pregunta_3">Documento:</label>
-                <input type="text" class="border rounded-md p-2">
-                <label for="fecha_regunta_3">Fecha:</label>
-                <input type="date" class="border rounded-md p-2">
+                <InputText id="respaldo_pregunta_3" v-model="form.respaldo_pregunta_3" required="true"/>
+                
+                <label for="fecha_pregunta_3">Fecha:</label>
+                <Calendar v-model="form.fecha_pregunta_3" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
+
               </div>
             </div>
             <div >  
               <p>4. ¿Se cuenta con la Reglamentación para Transferencias público privadas aprobado por instancia competente?</p>
               <label>
-                <input type="radio" :name="'pregunta_4'" value="Si" v-model="form.preguntas_4">
+                <input type="radio" :name="'pregunta_4'" value="1" v-model="form.pregunta_4">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_4'" value="No" v-model="form.preguntas_4">
+                <input type="radio" :name="'pregunta_4'" value="0" v-model="form.pregunta_4">
                 No
               </label>
               <div>
                 <label for="respaldo_pregunta_4">Documento:</label>
-                <input type="text" class="border rounded-md p-2">
-                <label for="fecha_regunta_4">Fecha:</label>
-                <input type="date" class="border rounded-md p-2">
+                <InputText id="respaldo_pregunta_4" v-model="form.respaldo_pregunta_4" required="true"/>
+                
+                <label for="fecha_pregunta_3">Fecha:</label>
+                <Calendar v-model="form.fecha_pregunta_4" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
               </div>
             </div>  
             <div >  
               <p>5. ¿Se cuenta con el convenio vigente y está suscrito por autoridad competente?</p>
               <label>
-                <input type="radio" :name="'pregunta_5'" value="Si" v-model="form.preguntas_5">
+                <input type="radio" :name="'pregunta_5'" value="1" v-model="form.pregunta_5">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_5'" value="No" v-model="form.preguntas_5">
+                <input type="radio" :name="'pregunta_5'" value="0" v-model="form.pregunta_5">
                 No
               </label>
               <div>
                 <label for="respaldo_pregunta_5">Documento:</label>
-                <input type="text" class="border rounded-md p-2">
+                <InputText id="respaldo_pregunta_5" v-model="form.respaldo_pregunta_5" required="true"/>
+                
                 <label for="fecha_pregunta_5">Fecha:</label>
-                <input type="date" class="border rounded-md p-2">
+                <Calendar v-model="form.fecha_pregunta_5" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
               </div>
             </div> 
             <div >  
               <p>6. ¿Se cuenta con la Norma emitida por instancia competente que apruebe la transferencia público privada, estableciendo el importe, uso y destino de la misma?</p>
               <label>
-                <input type="radio" :name="'pregunta_6'" value="Si" v-model="form.preguntas_6">
+                <input type="radio" :name="'pregunta_6'" value="1" v-model="form.pregunta_6">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_6'" value="No" v-model="form.preguntas_6">
+                <input type="radio" :name="'pregunta_6'" value="0" v-model="form.pregunta_6">
                 No
               </label>
               <div>
                 <label for="respaldo_pregunta_6">Documento:</label>
-                <input type="text" class="border rounded-md p-2">
+                <InputText id="respaldo_pregunta_6" v-model="form.respaldo_pregunta_6" required="true"/>
+                
                 <label for="fecha_pregunta_6">Fecha:</label>
-                <input type="date" class="border rounded-md p-2">
+                <Calendar v-model="form.fecha_pregunta_6" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
               </div>
             </div> 
 
              <!-- Datos adicionales -->
              <div>
               <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
-              <input type="text" v-model="form.mae" class="border rounded-md p-2">
+              <InputText id="mae" v-model="form.mae" required="true"/>
             </div>
             <div>
               <label for="mae_cargo">Cargo MAE</label>
-              <input type="text" v-model="form.mae_cargo" class="border rounded-md p-2">
+              <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
             </div>
             <div>
               <label for="mae_ci">C.I. MAE</label>
-              <input type="text" v-model="form.mae_ci" class="border rounded-md p-2">
+              <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
             </div>
             <div>
               <label for="mae_documento_designacion">Documento de Designación MAE</label>
-              <input type="text" v-model="form.mae_documento_designacion" class="border rounded-md p-2">
+              <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
             </div>
 
             <div>
               <label for="responsable">Nombre Responsable del Proyecto</label>
-              <input type="text" v-model="form.responsable" class="border rounded-md p-2">
+              <InputText id="responsable" v-model="form.responsable" required="true"/>
             </div>
             <div>
               <label for="responsable_cargo">Cargo Responsable</label>
-              <input type="text" v-model="form.responsable_cargo" class="border rounded-md p-2">
+              <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
             </div>
             <div>
               <label for="responsable_unidad">Unidad Responsable</label>
-              <input type="text" v-model="form.responsable_unidad" class="border rounded-md p-2">
+              <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
             </div>
             <div>
-              <label for="respobsanle_ci">C.I. Responsable</label>
-              <input type="text" v-model="form.respobsanle_ci" class="border rounded-md p-2">
+              <label for="responsable_ci">C.I. Responsable</label>
+              <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
             </div>
       </div>
 
@@ -326,16 +332,20 @@
               <span>   </span>
               <span>   </span>
               <span>   </span>
+
         <Button icon="pi pi-times" @click="cerrarModalEdit" class="p-button-text"></Button>
       </template>
-      
+      <div>
+        <label for="dictamen_id">ID formulario:</label>
+        <input type="text" v-model="form.dictamen_id" readonly class="border rounded-md p-2">
+      </div>
       <div style="max-height: 70vh; overflow-y: auto;">
-        <h2>Datos del formulario</h2>
+        <h2>Datos del Formulario</h2>
         
         <!-- Select para Etapa -->
         <div class="field">
           <label for="etapa">Etapa del Formulario</label>
-          <Dropdown v-model="form.etapa" :options="etapas" optionLabel="nombre" optionValue="id" placeholder="Seleccionar..."></Dropdown>
+          <Dropdown v-model="form.etapa" :options="etapas" optionLabel="descrip_tipo_dictamen" optionValue="id" placeholder="Seleccionar..."></Dropdown>
         </div>
 
         <!-- Fechas -->
@@ -356,11 +366,11 @@
         <div >  
               <p>1. ¿Los recursos asignados corresponden a un gasto para transferencias de capital "transferencia público privada"?</p>
               <label>
-                <input type="radio" :name="'pregunta_1'" value="Si" v-model="form.pregunta_1">
+                <input type="radio" :name="'pregunta_1'" value="true" v-model="form.pregunta_1">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_1'" value="No" v-model="form.pregunta_1">
+                <input type="radio" :name="'pregunta_1'" value="false" v-model="form.pregunta_1">
                 No
               </label>
               
@@ -370,11 +380,11 @@
         <div >  
               <p>2. ¿La transferencia público privada es para el financiamiento de un proyecto de inversión en especie?</p>
               <label>
-                <input type="radio" :name="'pregunta_2'" value="Si" v-model="form.pregunta_2">
+                <input type="radio" :name="'pregunta_2'" value="true" v-model="form.pregunta_2">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_2'" value="No" v-model="form.pregunta_2">
+                <input type="radio" :name="'pregunta_2'" value="false" v-model="form.pregunta_2">
                 No
               </label>
               
@@ -382,110 +392,116 @@
             <div >  
               <p>3. ¿La entidad o el área responsable, se encuentra autorizada para realizar transferencias público privadas?</p>
               <label>
-                <input type="radio" :name="'pregunta_3'" value="Si" v-model="form.pregunta_3">
+                <input type="radio" :name="'pregunta_3'" value="true" v-model="form.pregunta_3">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_3'" value="No" v-model="form.pregunta_3">
+                <input type="radio" :name="'pregunta_3'" value="false" v-model="form.pregunta_3">
                 No
               </label>
-              <div>
+              <div class="field">
                 <label for="respaldo_pregunta_3">Documento:</label>
-                <input type="text" class="border rounded-md p-2">
-                <label for="fecha_regunta_3">Fecha:</label>
-                <input type="date" class="border rounded-md p-2">
+                <InputText id="respaldo_pregunta_3" v-model="form.respaldo_pregunta_3" required="true"/>
+                
+                <label>Fecha:</label>
+                <Calendar v-model="form.fecha_pregunta_3" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
+
               </div>
             </div>
             <div >  
               <p>4. ¿Se cuenta con la Reglamentación para Transferencias público privadas aprobado por instancia competente?</p>
               <label>
-                <input type="radio" :name="'pregunta_4'" value="Si" v-model="form.pregunta_3">
+                <input type="radio" :name="'pregunta_4'" value="true" v-model="form.pregunta_4">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_4'" value="No" v-model="form.pregunta_3">
+                <input type="radio" :name="'pregunta_4'" value="false" v-model="form.pregunta_4">
                 No
               </label>
               <div>
                 <label for="respaldo_pregunta_4">Documento:</label>
-                <input type="text" class="border rounded-md p-2">
-                <label for="fecha_regunta_4">Fecha:</label>
-                <input type="date" class="border rounded-md p-2">
+                <InputText id="respaldo_pregunta_4" v-model="form.respaldo_pregunta_4" required="true"/>
+                
+                <label for="fecha_pregunta_3">Fecha:</label>
+                <Calendar v-model="form.fecha_pregunta_4" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
               </div>
             </div>  
             <div >  
               <p>5. ¿Se cuenta con el convenio vigente y está suscrito por autoridad competente?</p>
               <label>
-                <input type="radio" :name="'pregunta_5'" value="Si" v-model="form.pregunta_5">
+                <input type="radio" :name="'pregunta_5'" value="true" v-model="form.pregunta_5">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_5'" value="No" v-model="form.pregunta_5">
+                <input type="radio" :name="'pregunta_5'" value="false" v-model="form.pregunta_5">
                 No
               </label>
               <div>
                 <label for="respaldo_pregunta_5">Documento:</label>
-                <input type="text" class="border rounded-md p-2">
+                <InputText id="respaldo_pregunta_5" v-model="form.respaldo_pregunta_5" required="true"/>
+                
                 <label for="fecha_pregunta_5">Fecha:</label>
-                <input type="date" class="border rounded-md p-2">
+                <Calendar v-model="form.fecha_pregunta_5" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
               </div>
             </div> 
             <div >  
               <p>6. ¿Se cuenta con la Norma emitida por instancia competente que apruebe la transferencia público privada, estableciendo el importe, uso y destino de la misma?</p>
               <label>
-                <input type="radio" :name="'pregunta_6'" value="Si" v-model="form.pregunta_6">
+                <input type="radio" :name="'pregunta_6'" value="true" v-model="form.pregunta_6">
                 Sí
               </label>
               <label>
-                <input type="radio" :name="'pregunta_6'" value="No" v-model="form.pregunta_6">
+                <input type="radio" :name="'pregunta_6'" value="false" v-model="form.pregunta_6">
                 No
               </label>
               <div>
                 <label for="respaldo_pregunta_6">Documento:</label>
-                <input type="text" class="border rounded-md p-2">
+                <InputText id="respaldo_pregunta_6" v-model="form.respaldo_pregunta_6" required="true"/>
+                
                 <label for="fecha_pregunta_6">Fecha:</label>
-                <input type="date" class="border rounded-md p-2">
+                <Calendar v-model="form.fecha_pregunta_6" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
               </div>
             </div> 
 
              <!-- Datos adicionales -->
              <div>
               <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
-              <input type="text" v-model="form.mae" class="border rounded-md p-2">
+              <InputText id="mae" v-model="form.mae" required="true"/>
             </div>
             <div>
               <label for="mae_cargo">Cargo MAE</label>
-              <input type="text" v-model="form.cargoMae" class="border rounded-md p-2">
+              <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
             </div>
             <div>
               <label for="mae_ci">C.I. MAE</label>
-              <input type="text" v-model="form.ciMae" class="border rounded-md p-2">
+              <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
             </div>
             <div>
               <label for="mae_documento_designacion">Documento de Designación MAE</label>
-              <input type="text" v-model="form.docMae" class="border rounded-md p-2">
+              <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
             </div>
 
             <div>
               <label for="responsable">Nombre Responsable del Proyecto</label>
-              <input type="text" v-model="form.mae" class="border rounded-md p-2">
+              <InputText id="responsable" v-model="form.responsable" required="true"/>
             </div>
             <div>
               <label for="responsable_cargo">Cargo Responsable</label>
-              <input type="text" v-model="form.cargoMae" class="border rounded-md p-2">
+              <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
             </div>
             <div>
               <label for="responsable_unidad">Unidad Responsable</label>
-              <input type="text" v-model="form.ciMae" class="border rounded-md p-2">
+              <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
             </div>
             <div>
-              <label for="respobsanle_ci">C.I. Responsable</label>
-              <input type="text" v-model="form.docMae" class="border rounded-md p-2">
+              <label for="responsable_ci">C.I. Responsable</label>
+              <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
             </div>
-      </div>
+      </div>  
+    
 
       <template v-slot:footer>
-        <Button label="Grabar" icon="pi pi-check" @click="guardarFormulario()" class="p-button-primary"></Button>
+        <Button label="Grabar" icon="pi pi-check" @click="guardarFormulario(form.dictamen_id)" class="p-button-primary"></Button>
         <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalEdit" class="p-button-secondary"></Button>
       </template>
     </Dialog>
@@ -507,10 +523,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, Text, reactive } from 'vue';
 import Fieldset from "primevue/fieldset";
 
-import { useToast } from "primevue/usetoast";
+//import { useToast } from "primevue/usetoast";
 //import { Dialog } from 'primevue/dialog';
 //import { Dropdown } from 'primevue/dropdown';
 //import { Calendar } from 'primevue/calendar';
@@ -519,6 +535,7 @@ import { useToast } from "primevue/usetoast";
 import axios from 'axios';
 import transferenciaService from '../../../services/transferencia.service';
 import dictamenService from '../../../services/dictamen.service';
+import tipoDictamenService from '../../../services/tipoDictamen.service';
 
 
 // Variables reactivas
@@ -553,35 +570,35 @@ etapa: '',
 fechaInicio: '',
 fechaTermino: '',
 fechaRegistro: '',
-preguntas: '',
-documentos: '',
-numero: '',
+pregunta_1: '',
+pregunta_2: '',
+pregunta_3: '',
+respaldo_pregunta_3: '', // Asegúrate de que tenga valor por defecto
+fecha_pregunta_3:'',
+pregunta_4: '',
+respaldo_pregunta_4: '', 
+fecha_pregunta_4:'',
+pregunta_5: '',
+respaldo_pregunta_5: '', 
+fecha_pregunta_5:'',
+pregunta_6: '',
+respaldo_pregunta_6: '', 
+fecha_pregunta_6:'',
 mae: '',
-cargoMae: '',
-ciMae: '',
+mae_cargo: '',
+mae_ci: '',
+mae_documento_designacion: '',
+responsable: '',
+responsable_ci: '',
+responsable_cargo: '',
+responsable_unidad: ''
 // otros campos
 });
 
-const etapas = ref([
-{ id: 1, nombre: 'Inicio de Etapa' },
-{ id: 2, nombre: 'Etapa 2' },
-// Añadir más etapas aquí
-]);
-/*
-const dictamenes = ref([
-{ id: 1, nombre: 'Dictamenes 1' },
-{ id: 2, nombre: 'Dictamenes 2' },
-// Añadir más etapas aquí
-]);*/
 
-const preguntas = ref([
-{ texto: '1. ¿Los recursos asignados corresponden a un gasto para transferencias de capital "transferencia público privada"?' },
-{ texto: '2. ¿La transferencia público privada es para el financiamiento de un proyecto de inversión en especie?' },
-{ texto: '3. ¿La entidad o el área responsable, se encuentra autorizada para realizar transferencias público privadas?' },
-{ texto: '4. ¿Se cuenta con la Reglamentación para Transferencias público privadas aprobado por instancia competente?' },
-{ texto: '5. ¿Se cuenta con el convenio vigente y está suscrito por autoridad competente?' },
-{ texto: '6. ¿Se cuenta con la Norma emitida por instancia competente que apruebe la transferencia público privada, estableciendo el importe, uso y destino de la misma?' },
-]);
+
+const etapas = ref([]);
+
 
 const estados = ref([
 { id: 1, descripcion: 'En registro' },
@@ -595,31 +612,89 @@ const filtrarProyectos = () => {
 console.log('Filtrar proyectos por estado:', estadoSeleccionado.value);
 };*/
 
+const limpiarFormulario = () => {
+  formData.etapa = '';
+  formData.fechaInicio = '';
+  formData.fechaTermino = '';
+  formData.fechaRegistro = '';
+  formData.pregunta_1 = '';
+  formData.pregunta_2 = '';
+  formData.pregunta_3 = '';
+  formData.respaldo_pregunta_3 = '';
+  formData.fecha_pregunta_3 = '';
+  formData.pregunta_4 = '';
+  formData.respaldo_pregunta_4 = '';
+  formData.fecha_pregunta_4 = '';
+  formData.pregunta_5 = '';
+  formData.respaldo_pregunta_5 = '';
+  formData.fecha_pregunta_5 = '';
+  formData.pregunta_6 = '';
+  formData.respaldo_pregunta_6 = '';
+  formData.fecha_pregunta_6 = '';
+  formData.mae = '';
+  formData.mae_cargo = '';
+  formData.mae_ci = '';
+  formData.mae_documento_designacion = '';
+  formData.responsable = '';
+  formData.responsable_ci = '';
+  formData.responsable_cargo = '';
+  formData.responsable_unidad = '';
+  // Limpiar otros campos
+};
+
 const guardar = async () => {
   console.log('ID entro:', formId.value);
+  console.log('ID entro Form:', form.value.respaldo_pregunta_3);
   if (!formId.value) {
     console.error('No se ha seleccionado un ID');
     return;
   }
 
   // Prepare the form data
-  const formData = {
+  const formData = reactive({
     id: formId.value, // Ensure the ID is sent
     etapa: form.value.etapa,
     fecha_registro: formatDate(form.value.fechaRegistro),
    
     fecha_inicio: formatDate(form.value.fechaInicio),
     fecha_termino: formatDate(form.value.fechaTermino),
-    preguntas1: form.value.preguntas1,
+    pregunta_1: form.value.pregunta_1,
+    pregunta_2: form.value.pregunta_2,
+    pregunta_3: form.value.pregunta_3,
+    respaldo_pregunta_3: form.value.respaldo_pregunta_3,
+    fecha_pregunta_3: formatDate(form.value.fecha_pregunta_3),
+    pregunta_4: form.value.pregunta_4,
+    respaldo_pregunta_4: form.value.respaldo_pregunta_4,
+    fecha_pregunta_4: formatDate(form.value.fecha_pregunta_4),
+    pregunta_5: form.value.pregunta_5,
+    respaldo_pregunta_5: form.value.respaldo_pregunta_5,
+    fecha_pregunta_5: formatDate(form.value.fecha_pregunta_5),
+    pregunta_6: form.value.pregunta_6,
+    respaldo_pregunta_6: form.value.respaldo_pregunta_6,
+    fecha_pregunta_6: formatDate(form.value.fecha_pregunta_6),
+    mae: form.value.mae,
+    mae_cargo: form.value.mae_cargo,
+    mae_ci: form.value.mae_ci,
+    mae_documento_designacion: form.value.mae_documento_designacion,
+    responsable: form.value.responsable,
+    responsable_cargo: form.value.responsable_cargo,
+    responsable_unidad: form.value.responsable_unidad,
+    responsable_ci: form.value.responsable_ci
     // Add other form fields here
-  };
+  });
   try {
     console.log("datos form",formData);
     const response = await dictamenService.guadarForm(formData.id,formData);
     //dictamenes.value = data;
     console.log('Formulario guardado con éxito:', response.data);
+    //if (response.status === 200) {
+      // Si la API responde exitosamente, limpiar el formulario
+      //limpiarFormulario();
+   // }
+   //formData.value.reset();
     cerrarModal();
   } catch (error) {
+    //console.log(error.response.data);
     console.error('Error al guardar el formulario:', error);
   }
 };
@@ -631,7 +706,7 @@ const year = d.getFullYear();
 const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
 const day = String(d.getDate()).padStart(2, '0');
 
-return `${year}-${month}-${day}`;
+return `${day}/${month}/${year}`;
 }
 
 function cerrar() {
@@ -643,6 +718,7 @@ console.log("Formulario cerrado");
 // Cargar proyectos al montar el componente
 onMounted(async () => {
   await cargarProyectos();
+  cargarTipoDictamen();
   //await getTransferencias();
 });
 
@@ -711,8 +787,35 @@ mostrarModalVer.value = false;
 };
 
 // Función para abrir el modal
-const abrirModalEdit = () => {
-mostrarModalEdit.value = true;
+const abrirModalEdit = async(id) => {
+  try {
+  
+    const { data } = await dictamenService.mostrarForm(id);
+    form.value = data;
+    console.log("Edit",form.value);
+    console.log("Edit",form.value[0].fecha_registro);
+    form.value.dictamen_id = form.value[0].dictamen_id,
+    form.etapa = form.value[0].etapa_id,
+    form.value.fechaRegistro = formatDate(form.value[0].fecha_registro),
+   
+    form.value.fechaInicio = formatDate(form.value[0].etapa_fecha_inicio),
+    form.value.fechaTermino = formatDate(form.value[0].etapa_fecha_fin),
+    form.value.pregunta_1 =Boolean(form.value[0].pregunta_1),
+    form.pregunta_2 = form.value[0].pregunta_2,
+    form.pregunta_3 = form.value[0].pregunta_3,
+    form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
+    form.value.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
+    console.log("fecha",form.value.fechaInicio);
+    Object.assign(form.value, data[0]);
+
+    console.log("Formulario para edición:", form.value);
+    mostrarModalEdit.value = true;
+    // Rellenar otros campos...
+  } catch (error) {
+    console.error('Error al cargar los datos del formulario', error);
+  }
+
+
 };
 
 // Función para cerrar el modal
@@ -734,12 +837,52 @@ mostrarModal.value = false;
 };
 
 // Función para guardar el nuevo dictamen
-const guardarFormulario = async (id) => {
-  console.log("Formulario",id)
+const guardarFormulario = async (dictamen_id) => {
+  console.log("Formulario",form.value.fechaRegistro)
+  const formData = reactive({
+    id: formId.value, // Ensure the ID is sent
+    dictamen_id: form.value.dictamen_id,
+    etapa: form.value.etapa,
+    fecha_registro: formatDate(form.value.fechaRegistro),
+   
+    fecha_inicio: formatDate(form.value.fechaInicio),
+    fecha_termino: formatDate(form.value.fechaTermino),
+    pregunta_1: form.value.pregunta_1,
+    pregunta_2: form.value.pregunta_2,
+    pregunta_3: form.value.pregunta_3,
+    respaldo_pregunta_3: form.value.respaldo_pregunta_3,
+    fecha_pregunta_3: formatDate(form.value.fecha_pregunta_3),
+    pregunta_4: form.value.pregunta_4,
+    respaldo_pregunta_4: form.value.respaldo_pregunta_4,
+    fecha_pregunta_4: formatDate(form.value.fecha_pregunta_4),
+    pregunta_5: form.value.pregunta_5,
+    respaldo_pregunta_5: form.value.respaldo_pregunta_5,
+    fecha_pregunta_5: formatDate(form.value.fecha_pregunta_5),
+    pregunta_6: form.value.pregunta_6,
+    respaldo_pregunta_6: form.value.respaldo_pregunta_6,
+    fecha_pregunta_6: formatDate(form.value.fecha_pregunta_6),
+    mae: form.value.mae,
+    mae_cargo: form.value.mae_cargo,
+    mae_ci: form.value.mae_ci,
+    mae_documento_designacion: form.value.mae_documento_designacion,
+    responsable: form.value.responsable,
+    responsable_cargo: form.value.responsable_cargo,
+    responsable_unidad: form.value.responsable_unidad,
+    responsable_ci: form.value.responsable_ci
+    // Add other form fields here
+  });
+
 try {
-  await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
-  await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
-  cerrarModal();  // Cerrar el modal después de guardar
+  //await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
+  //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
+  console.log("datos form",formData);
+    const response = await dictamenService.modificarForm(form.value.dictamen_id,formData);
+    //dictamenes.value = data;
+    console.log('Formulario guardado con éxito:', response.data);
+
+
+
+  cerrarModalEdit();  // Cerrar el modal después de guardar
 } catch (error) {
   console.error('Error al agregar el dictamen:', error);
 }
@@ -785,6 +928,15 @@ async function deleteFormulario() {
         console.error("Error al eliminar el dictamen", error);
         Toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el dictamen', life: 3000 });
     }
+}
+
+async function cargarTipoDictamen() {
+  try {
+    const { data } = await tipoDictamenService.index();
+    etapas.value = data;
+  } catch (error) {
+    console.error("Error al cargar los departamentos:", error);
+  }
 }
 
 // Función para agregar un nuevo dictamen

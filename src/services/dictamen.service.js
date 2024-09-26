@@ -19,5 +19,11 @@ export default {
     guadarForm: (id,datos) => {
         return Api().post(`/guardar-dictamen/${id}`, datos);
     },
+    mostrarForm: (id) => {
+        return Api().get(`/dictamen-mostrar/${id}`);
+    },
+    modificarForm: (id,datos) => {
+        return Api().post(`/modificar-dictamen/${id}`, datos);
+    },
   
 }
