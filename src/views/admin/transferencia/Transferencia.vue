@@ -897,6 +897,8 @@ async function editTransferencia(transferenciaData) {
 }
 
 function openNew() {
+    //obtiene entidad segun el id de entidad
+    obtenerEntidadEjecutora();
     transferencia.value = {};
     selectedEntidad.value = {};
     selectedArea.value = {};
