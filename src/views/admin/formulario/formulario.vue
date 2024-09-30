@@ -345,7 +345,9 @@
         <!-- Select para Etapa -->
         <div class="field">
           <label for="etapa">Etapa del Formulario</label>
-          <Dropdown v-model="form.etapa" :options="etapas" optionLabel="descrip_tipo_dictamen" optionValue="id" placeholder="Seleccionar..."></Dropdown>
+          <Dropdown v-model="etapaSeleccionada" :options="etapas" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
+                        class="w-full md:w-14rem" />
+          <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
         </div>
 
         <!-- Fechas -->
@@ -551,7 +553,7 @@ const proyectosFiltrados = ref([]);
 //const estadoSeleccionado = ref('en-registro');
 const deleteFormularioDialog = ref(false);
 const proyectoSeleccionado = ref(null);
-const etapaSeleccionada = ref('');
+const etapaSeleccionada = ref(null);
 const mostrarModal = ref(false);  // Controla la visibilidad del modal
 const mostrarModalVer = ref(false);  // Controla la visibilidad del modal
 const mostrarModalEdit = ref(false);  // Controla la visibilidad del modal
@@ -807,7 +809,8 @@ const abrirModalEdit = async(id) => {
     form.value.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
     console.log("fecha",form.value.fechaInicio);
     Object.assign(form.value, data[0]);
-
+            // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
+    etapaSeleccionada.value = etapas.value.find(etapa => etapa.id === form.value[0].etapa_id);
     console.log("Formulario para edición:", form.value);
     mostrarModalEdit.value = true;
     // Rellenar otros campos...
@@ -842,7 +845,7 @@ const guardarFormulario = async (dictamen_id) => {
   const formData = reactive({
     id: formId.value, // Ensure the ID is sent
     dictamen_id: form.value.dictamen_id,
-    etapa: form.value.etapa,
+    etapa: etapaSeleccionada.value.id,
     fecha_registro: formatDate(form.value.fechaRegistro),
    
     fecha_inicio: formatDate(form.value.fechaInicio),
