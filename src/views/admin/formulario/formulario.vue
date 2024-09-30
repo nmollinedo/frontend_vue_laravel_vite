@@ -1,5 +1,5 @@
 <template>
-  <div class="dictamen-container">
+  <div >
   <h2>Lista de Transferencias</h2>
 
   <!-- Filtro por estado de los proyectos usando PrimeVue Dropdown -->
@@ -25,10 +25,11 @@
     paginator 
     :rows="5" 
     :rowsPerPageOptions="[5, 10, 20]" 
-    responsiveLayout="scroll">
+    responsiveLayout="scroll"
+    style="width: 100%; max-width: 1500px;">
     
-    <template #header>
-      <div class="table-header">
+    <template>
+      <div >
         <h2>Transferencias</h2> 
       </div>
     </template>
@@ -140,7 +141,7 @@
       </Dialog>
 
       <!-- Modal para agregar formulario -->
-          <Dialog :visible="mostrarModal" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
+  <Dialog :visible="mostrarModal" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
       <template v-slot:header>
         <span>Agregar Formulario</span>
         <span>   </span>
@@ -156,7 +157,7 @@
         <label for="id">ID transferencia:</label>
         <input type="text" v-model="formId" readonly class="border rounded-md p-2">
       </div>
-    <div style="max-height: 70vh; overflow-y: auto;">
+    <div style="max-height: 70vh;">
         <h2>Datos del Formulario</h2>
         
         <!-- Select para Etapa -->
@@ -218,7 +219,7 @@
               </label>
               <div>
                 <label for="respaldo_pregunta_3">Documento:</label>
-                <InputText id="respaldo_pregunta_3" v-model="form.respaldo_pregunta_3" required="true"/>
+                <InputText id="respaldo_pregunta_3" v-model="form.respaldo_pregunta_3" required="true" />
                 
                 <label for="fecha_pregunta_3">Fecha:</label>
                 <Calendar v-model="form.fecha_pregunta_3" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
@@ -237,7 +238,7 @@
               </label>
               <div>
                 <label for="respaldo_pregunta_4">Documento:</label>
-                <InputText id="respaldo_pregunta_4" v-model="form.respaldo_pregunta_4" required="true"/>
+                <InputText id="respaldo_pregunta_4" v-model="form.respaldo_pregunta_4" required="true" />
                 
                 <label for="fecha_pregunta_3">Fecha:</label>
                 <Calendar v-model="form.fecha_pregunta_4" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
@@ -320,7 +321,7 @@
         <Button label="Grabar" icon="pi pi-check" @click="guardar()" class="p-button-primary"></Button>
         <Button label="Cerrar" icon="pi pi-times" @click="cerrarModal" class="p-button-secondary"></Button>
       </template>
-    </Dialog>
+  </Dialog>
 
   <!-- Modal para editar formulario -->
     <Dialog :visible="mostrarModalEdit" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
@@ -339,7 +340,7 @@
         <label for="dictamen_id">ID formulario:</label>
         <input type="text" v-model="form.dictamen_id" readonly class="border rounded-md p-2">
       </div>
-      <div style="max-height: 70vh; overflow-y: auto;">
+      <div style="max-height: 70vh;">
         <h2>Datos del Formulario</h2>
         
         <!-- Select para Etapa -->
@@ -527,7 +528,7 @@
 <script setup>
 import { ref, onMounted, Text, reactive } from 'vue';
 import Fieldset from "primevue/fieldset";
-
+import { useToast } from 'primevue/usetoast';
 //import { useToast } from "primevue/usetoast";
 //import { Dialog } from 'primevue/dialog';
 //import { Dropdown } from 'primevue/dropdown';
@@ -539,7 +540,7 @@ import transferenciaService from '../../../services/transferencia.service';
 import dictamenService from '../../../services/dictamen.service';
 import tipoDictamenService from '../../../services/tipoDictamen.service';
 
-
+const toast = useToast();
 // Variables reactivas
 const proyectos = ref([]);
 const transferencias = ref([]);
@@ -566,7 +567,7 @@ fechaInicio: '',
 fechaTermino: '',
 // Otros campos adicionales...
 });
-
+/*
 const form = ref({
 etapa: '',
 fechaInicio: '',
@@ -596,7 +597,7 @@ responsable_cargo: '',
 responsable_unidad: ''
 // otros campos
 });
-
+*/
 
 
 const etapas = ref([]);
@@ -614,74 +615,113 @@ const filtrarProyectos = () => {
 console.log('Filtrar proyectos por estado:', estadoSeleccionado.value);
 };*/
 
-const limpiarFormulario = () => {
-  formData.etapa = '';
-  formData.fechaInicio = '';
-  formData.fechaTermino = '';
-  formData.fechaRegistro = '';
-  formData.pregunta_1 = '';
-  formData.pregunta_2 = '';
-  formData.pregunta_3 = '';
-  formData.respaldo_pregunta_3 = '';
-  formData.fecha_pregunta_3 = '';
-  formData.pregunta_4 = '';
-  formData.respaldo_pregunta_4 = '';
-  formData.fecha_pregunta_4 = '';
-  formData.pregunta_5 = '';
-  formData.respaldo_pregunta_5 = '';
-  formData.fecha_pregunta_5 = '';
-  formData.pregunta_6 = '';
-  formData.respaldo_pregunta_6 = '';
-  formData.fecha_pregunta_6 = '';
-  formData.mae = '';
-  formData.mae_cargo = '';
-  formData.mae_ci = '';
-  formData.mae_documento_designacion = '';
-  formData.responsable = '';
-  formData.responsable_ci = '';
-  formData.responsable_cargo = '';
-  formData.responsable_unidad = '';
-  // Limpiar otros campos
+const defaultForm = {
+  etapa: null,
+  fechaInicio: null,
+  fechaTermino: null,
+  fechaRegistro: null,
+  pregunta_1: null,
+  pregunta_2: null,
+  pregunta_3: null,
+  respaldo_pregunta_3: '',
+  fecha_pregunta_3: null,
+  pregunta_4: null,
+  respaldo_pregunta_4: '',
+  fecha_pregunta_4: null,
+  pregunta_5: null,
+  respaldo_pregunta_5: '',
+  fecha_pregunta_5: null,
+  pregunta_6: null,
+  respaldo_pregunta_6: '',
+  fecha_pregunta_6: null,
+  mae: '',
+  mae_cargo: '',
+  mae_ci: '',
+  mae_documento_designacion: '',
+  responsable: '',
+  responsable_cargo: '',
+  responsable_unidad: '',
+  responsable_ci: ''
 };
+
+function validarFormulario() {
+  // Array de errores
+  let errores = [];
+
+  // Validar campos obligatorios
+  if (!form.etapa) errores.push('Etapa es requerida.');
+  if (!form.fechaInicio) errores.push('Fecha de inicio es requerida.');
+  if (!form.fechaTermino) errores.push('Fecha de término es requerida.');
+  if (!form.fechaRegistro) errores.push('Fecha de registro es requerida.');
+  if (!form.pregunta_1) errores.push('La respuesta a la pregunta 1 es requerida.');
+  if (!form.mae) errores.push('El nombre de la MAE es requerido.');
+  if (!form.mae_cargo) errores.push('El cargo de la MAE es requerido.');
+  if (!form.mae_ci) errores.push('El C.I. de la MAE es requerido.');
+  if (!form.mae_documento_designacion) errores.push('El documento de designación de la MAE es requerido.');
+  if (!form.responsable) errores.push('El nombre del responsable del proyecto es requerido.');
+  if (!form.responsable_cargo) errores.push('El cargo del responsable del proyecto es requerido.');
+  if (!form.responsable_unidad) errores.push('La unidad del responsable es requerida.');
+  if (!form.responsable_ci) errores.push('El C.I. del responsable es requerido.');
+
+  // Devolver los errores
+  return errores;
+}
+// Clonar el estado inicial del formulario para usarlo
+let form = reactive({ ...defaultForm  });
+
+// Función para limpiar el formulario
+function limpiarFormulario() {
+  form = reactive({ ...defaultForm  });
+}
+
+
 
 const guardar = async () => {
   console.log('ID entro:', formId.value);
-  console.log('ID entro Form:', form.value.respaldo_pregunta_3);
+  //console.log('ID entro Form:', form.value.respaldo_pregunta_3);
   if (!formId.value) {
     console.error('No se ha seleccionado un ID');
     return;
   }
 
+  const errores = validarFormulario();
+
+  if (errores.length > 0) {
+    // Mostrar errores usando PrimeVue Toast
+    errores.forEach(error => {
+      toast.add({ severity: 'error', summary: 'Error de validación', detail: error });
+    });
+    return; // No guardar si hay errores
+  }
+
   // Prepare the form data
   const formData = reactive({
     id: formId.value, // Ensure the ID is sent
-    etapa: form.value.etapa,
-    fecha_registro: formatDate(form.value.fechaRegistro),
+    etapa: form.etapa,
+    fecha_registro: formatDate(form.fechaRegistro),
    
-    fecha_inicio: formatDate(form.value.fechaInicio),
-    fecha_termino: formatDate(form.value.fechaTermino),
-    pregunta_1: form.value.pregunta_1,
-    pregunta_2: form.value.pregunta_2,
-    pregunta_3: form.value.pregunta_3,
-    respaldo_pregunta_3: form.value.respaldo_pregunta_3,
-    fecha_pregunta_3: formatDate(form.value.fecha_pregunta_3),
-    pregunta_4: form.value.pregunta_4,
-    respaldo_pregunta_4: form.value.respaldo_pregunta_4,
-    fecha_pregunta_4: formatDate(form.value.fecha_pregunta_4),
-    pregunta_5: form.value.pregunta_5,
-    respaldo_pregunta_5: form.value.respaldo_pregunta_5,
-    fecha_pregunta_5: formatDate(form.value.fecha_pregunta_5),
-    pregunta_6: form.value.pregunta_6,
-    respaldo_pregunta_6: form.value.respaldo_pregunta_6,
-    fecha_pregunta_6: formatDate(form.value.fecha_pregunta_6),
-    mae: form.value.mae,
-    mae_cargo: form.value.mae_cargo,
-    mae_ci: form.value.mae_ci,
-    mae_documento_designacion: form.value.mae_documento_designacion,
-    responsable: form.value.responsable,
-    responsable_cargo: form.value.responsable_cargo,
-    responsable_unidad: form.value.responsable_unidad,
-    responsable_ci: form.value.responsable_ci
+    fecha_inicio: formatDate(form.fechaInicio),
+    fecha_termino: formatDate(form.fechaTermino),
+    pregunta_1: form.pregunta_1,
+    pregunta_2: form.pregunta_2,
+    pregunta_3: form.pregunta_3,
+    respaldo_pregunta_3: form.respaldo_pregunta_3,
+    fecha_pregunta_3: formatDate(form.fecha_pregunta_3),
+    pregunta_4: form.pregunta_4,
+    respaldo_pregunta_4: form.respaldo_pregunta_4,
+    fecha_pregunta_4: formatDate(form.fecha_pregunta_4),
+    pregunta_5: form.pregunta_5,
+    respaldo_pregunta_5: form.respaldo_pregunta_5,
+    fecha_pregunta_5: formatDate(form.fecha_pregunta_5),
+    pregunta_6: form.pregunta_6,
+    respaldo_pregunta_6: form.respaldo_pregunta_6,
+    fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
+    mae: form.mae_ci,
+    mae_documento_designacion: form.mae_documento_designacion,
+    responsable: form.responsable,
+    responsable_cargo: form.responsable_cargo,
+    responsable_unidad: form.responsable_unidad,
+    responsable_ci: form.responsable_ci
     // Add other form fields here
   });
   try {
@@ -796,17 +836,17 @@ const abrirModalEdit = async(id) => {
     form.value = data;
     console.log("Edit",form.value);
     console.log("Edit",form.value[0].fecha_registro);
-    form.value.dictamen_id = form.value[0].dictamen_id,
+    form.dictamen_id = form.value[0].dictamen_id,
     form.etapa = form.value[0].etapa_id,
-    form.value.fechaRegistro = formatDate(form.value[0].fecha_registro),
+    form.fechaRegistro = formatDate(form.value[0].fecha_registro),
    
-    form.value.fechaInicio = formatDate(form.value[0].etapa_fecha_inicio),
-    form.value.fechaTermino = formatDate(form.value[0].etapa_fecha_fin),
-    form.value.pregunta_1 =Boolean(form.value[0].pregunta_1),
+    form.fechaInicio = formatDate(form.value[0].etapa_fecha_inicio),
+    form.fechaTermino = formatDate(form.value[0].etapa_fecha_fin),
+    form.pregunta_1 =Boolean(form.value[0].pregunta_1),
     form.pregunta_2 = form.value[0].pregunta_2,
     form.pregunta_3 = form.value[0].pregunta_3,
     form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
-    form.value.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
+    form.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
     console.log("fecha",form.value.fechaInicio);
     Object.assign(form.value, data[0]);
             // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
@@ -831,6 +871,7 @@ mostrarModalEdit.value = false;
 const abrirModal = (id) => {
   formId.value = id; // Store the ID
   console.log("ID",formId.value);
+  limpiarFormulario(); // Limpiar el formulario antes de abrir el modal
   mostrarModal.value = true; // Open the modal
 };
 
@@ -841,37 +882,37 @@ mostrarModal.value = false;
 
 // Función para guardar el nuevo dictamen
 const guardarFormulario = async (dictamen_id) => {
-  console.log("Formulario",form.value.fechaRegistro)
+  console.log("Formulario",form.fechaRegistro)
   const formData = reactive({
     id: formId.value, // Ensure the ID is sent
     dictamen_id: form.value.dictamen_id,
     etapa: etapaSeleccionada.value.id,
     fecha_registro: formatDate(form.value.fechaRegistro),
    
-    fecha_inicio: formatDate(form.value.fechaInicio),
-    fecha_termino: formatDate(form.value.fechaTermino),
-    pregunta_1: form.value.pregunta_1,
-    pregunta_2: form.value.pregunta_2,
-    pregunta_3: form.value.pregunta_3,
-    respaldo_pregunta_3: form.value.respaldo_pregunta_3,
-    fecha_pregunta_3: formatDate(form.value.fecha_pregunta_3),
-    pregunta_4: form.value.pregunta_4,
-    respaldo_pregunta_4: form.value.respaldo_pregunta_4,
-    fecha_pregunta_4: formatDate(form.value.fecha_pregunta_4),
-    pregunta_5: form.value.pregunta_5,
-    respaldo_pregunta_5: form.value.respaldo_pregunta_5,
-    fecha_pregunta_5: formatDate(form.value.fecha_pregunta_5),
-    pregunta_6: form.value.pregunta_6,
-    respaldo_pregunta_6: form.value.respaldo_pregunta_6,
-    fecha_pregunta_6: formatDate(form.value.fecha_pregunta_6),
-    mae: form.value.mae,
-    mae_cargo: form.value.mae_cargo,
-    mae_ci: form.value.mae_ci,
-    mae_documento_designacion: form.value.mae_documento_designacion,
-    responsable: form.value.responsable,
-    responsable_cargo: form.value.responsable_cargo,
-    responsable_unidad: form.value.responsable_unidad,
-    responsable_ci: form.value.responsable_ci
+    fecha_inicio: formatDate(form.fechaInicio),
+    fecha_termino: formatDate(form.fechaTermino),
+    pregunta_1: form.pregunta_1,
+    pregunta_2: form.pregunta_2,
+    pregunta_3: form.pregunta_3,
+    respaldo_pregunta_3: form.respaldo_pregunta_3,
+    fecha_pregunta_3: formatDate(form.fecha_pregunta_3),
+    pregunta_4: form.pregunta_4,
+    respaldo_pregunta_4: form.respaldo_pregunta_4,
+    fecha_pregunta_4: formatDate(form.fecha_pregunta_4),
+    pregunta_5: form.pregunta_5,
+    respaldo_pregunta_5: form.respaldo_pregunta_5,
+    fecha_pregunta_5: formatDate(form.fecha_pregunta_5),
+    pregunta_6: form.pregunta_6,
+    respaldo_pregunta_6: form.respaldo_pregunta_6,
+    fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
+    mae: form.mae,
+    mae_cargo: form.mae_cargo,
+    mae_ci: form.mae_ci,
+    mae_documento_designacion: form.mae_documento_designacion,
+    responsable: form.responsable,
+    responsable_cargo: form.responsable_cargo,
+    responsable_unidad: form.responsable_unidad,
+    responsable_ci: form.responsable_ci
     // Add other form fields here
   });
 
@@ -879,7 +920,7 @@ try {
   //await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
   //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
   console.log("datos form",formData);
-    const response = await dictamenService.modificarForm(form.value.dictamen_id,formData);
+    const response = await dictamenService.modificarForm(form.dictamen_id,formData);
     //dictamenes.value = data;
     console.log('Formulario guardado con éxito:', response.data);
 

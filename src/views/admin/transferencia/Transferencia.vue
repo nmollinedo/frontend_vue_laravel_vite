@@ -1071,14 +1071,18 @@ function actulizarTransferencia() {
 
 
 async function saveTransferencia() {
+    // Recuperar el codigo_presupuestario desde localStorage
+    const codigoPresupuestario = localStorage.getItem('codigo_presupuestario');
     try {
         // Asignación de los valores a la transferencia
         transferencia.value.nombre_tpp = nombreTpp.value;
+        transferencia.value.entidad_operadora_id = selectedEntidad.value.id;
         transferencia.value.entidad_operadora = selectedEntidad.value.nombre;
         transferencia.value.id_area = selectedArea.value.id;
         //transferencia.value.localizacion = localizacion;
         transferencia.value.fecha_inicio = fecha_inicio;
         transferencia.value.fecha_termino = fecha_termino;
+        transferencia.value.codigo_presupuestario = codigoPresupuestario
         //alert("ggggg"+transferencia.value);
         console.log("DDDDDDDDDDDDDDDDDDDDDDDD",transferencia.value);
         // Envío de la solicitud al servicio
