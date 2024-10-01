@@ -55,6 +55,7 @@
                 
                 <Column field="fecha_inicio" header="FECHA INICIO"></Column>
                 <Column field="fecha_termino" header="FECHA TERMINO"></Column>
+                <Column field="entidad" header="ENTIDAD"></Column>
                 <Column field="estado" header="ESTADO"></Column>
 
                 <Column :exportable="false" style="min-width: 12rem">
@@ -126,10 +127,15 @@
                 </div>
 
                 <div>
-                    <label for="denominacion_convenio">Denominación del convenio</label>
-                    <Textarea id="denominacion_convenio" v-model="transferencia.denominacion_convenio" rows="4"
-                        integeronly fluid />
-
+                    <label for="denominacion_convenio" class="block font-bold mb-3">Denominación del Convenio</label>
+                    <Textarea 
+                    id="denominacion_convenio" 
+                    v-model="transferencia.denominacion_convenio" 
+                    rows="4" 
+                    fluid 
+                    @input="validateDenominacion"
+                    />
+                    <span v-if="denominacionError" class="text-red-500">Máximo 110 caracteres permitidos</span>
                 </div>
           
                     <label for="Entidad" class="block font-bold mb-3">Area de Influencia</label>
@@ -249,10 +255,15 @@
                             <InputText id="nombre_tpp" :value="nombreTpp" readonly fluid />
                         </div>
                         <div>
-                            <label for="denominacion_convenio" class="block font-bold mb-3">Denominación del
-                                Convenio</label>
-                            <Textarea id="denominacion_convenio" v-model="transferencia.denominacion_convenio" rows="4"
-                                fluid />
+                            <label for="denominacion_convenio" class="block font-bold mb-3">Denominación del Convenio</label>
+                            <Textarea 
+                            id="denominacion_convenio" 
+                            v-model="transferencia.denominacion_convenio" 
+                            rows="4" 
+                            fluid 
+                            @input="validateDenominacion"
+                            />
+                            <span v-if="denominacionError" class="text-red-500">Máximo 110 caracteres permitidos</span>
                         </div>
 
                         <div><!--{{areas}}-->
@@ -500,6 +511,9 @@ const transferencia = ref({
     cobertura: '',
     poblacion: ''
     });
+
+// Inicializa el objeto transferencia con la propiedad denominacion_convenio
+   
 const areas = ref([]);
 const selectedCountry = ref(null);
 const selectedArea = ref({ id: null });
@@ -959,7 +973,20 @@ function validarFechasYGuardar() {
 
 }
 
+const denominacionError = ref(false);
+
+const validateDenominacion = () => {
+  denominacionError.value = transferencia.denominacion_convenio.length > 110;
+  if (denominacionError.value) {
+    transferencia.denominacion_convenio = transferencia.denominacion_convenio.slice(0, 110);
+  }
+};
+
+
+
 async function saveTransferenciaUpdate() {
+
+
     try {
         // Asignación de los valores a la transferencia
         transferencia.value.nombre_tpp = nombreTpp.value;
@@ -994,11 +1021,11 @@ async function saveTransferenciaUpdate() {
 }
 
 function validarFechas() {
-    alert(fecha_inicio.value);
+    //alert(fecha_inicio.value);
     const fechaInicio = formatDate(fecha_inicio.value);
     const fechaTermino = formatDate(fecha_termino.value);
-    alert(fechaInicio);
-    alert(fechaTermino);
+    //alert(fechaInicio);
+    //alert(fechaTermino);
     if (!fecha_inicio.value || !fecha_termino.value) {
         error.value = 'Ambas fechas son obligatorias.';
         return;
@@ -1100,7 +1127,22 @@ async function saveTransferencia() {
 
     } catch (error) {
         console.error("Error guardando la transferencia:", error);
-        // Aquí puedes mostrar un mensaje de error al usuario si es necesario
+
+        // Comprobar si el error tiene una respuesta del servidor (caso común en Axios)
+        if (error.response) {
+            console.error("Respuesta del servidor:", error.response);
+            console.error("Datos del error:", error.response.data);
+            console.error("Estado del error:", error.response.status);
+        } else if (error.request) {
+            // El cliente hizo la solicitud pero no recibió respuesta
+            console.error("No hubo respuesta del servidor:", error.request);
+        } else {
+            // Algo ocurrió al configurar la solicitud
+            console.error("Error al configurar la solicitud:", error.message);
+        }
+
+        // Mostrar un mensaje de error al usuario
+        alert('Ocurrió un error al guardar la transferencia. Por favor, intenta nuevamente denominacion tiene mas de 110 caracteres.');
     }
 }
 

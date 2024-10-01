@@ -15,7 +15,7 @@
                 <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
                     <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
                 </button>
-                <div class="relative">
+        <!--        <div class="relative">
                     <button
                         v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
                         type="button"
@@ -24,26 +24,17 @@
                         <i class="pi pi-palette"></i>
                     </button>
                     <AppConfigurator />
-                </div>
+                </div> -->
             </div>
 
-            <button
+           <button
                 class="layout-topbar-menu-button layout-topbar-action"
                 v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'animate-scalein', leaveToClass: 'hidden', leaveActiveClass: 'animate-fadeout', hideOnOutsideClick: true }"
             >
                 <i class="pi pi-ellipsis-v"></i>
-            </button>
-
-            <div class="layout-topbar-menu hidden lg:block">
-                <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action" @click="toggleProfileMenu">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
-                </div>
-
-                <!-- Sección para seleccionar la entidad y el código presupuestario -->
-                <div>
+            </button> 
+            <!-- Sección para seleccionar la entidad y el código presupuestario -->
+            <div>
                     <h1>Entidad seleccionada: {{ entidadId }}</h1>
                     <Dropdown 
                         v-model="entidadId" 
@@ -56,6 +47,16 @@
                     <!-- Mostrar el código presupuestario automáticamente basado en la entidad seleccionada -->
                     <p>Código presupuestario: {{ codigoPresupuestario }}</p>
                 </div>
+
+            <div class="layout-topbar-menu hidden lg:block">
+                <div class="layout-topbar-menu-content">
+                    <button type="button" class="layout-topbar-action" @click="toggleProfileMenu">
+                        <i class="pi pi-user"></i>
+                        <span>Profile</span>
+                    </button>
+                </div>
+
+                
                 
                 <!-- Mostrar perfil del usuario -->
                 <div v-if="showProfileMenu" class="profile-menu">
@@ -176,7 +177,7 @@ watch(entidadId, (newEntidad) => {
 
 <style scoped>
 .profile-menu {
-    background-color: white;
+    background-color: #125686;
     border: 1px solid #ddd;
     padding: 1rem;
     position: absolute;

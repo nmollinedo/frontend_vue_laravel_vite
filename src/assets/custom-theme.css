@@ -1,0 +1,14 @@
+body {
+    background-color: #F0F0F0; /* Fondo de la página */
+  }
+  
+  .p-button {
+    background-color: #123456; /* Fondo del botón */
+    color: #FFFFFF;            /* Color del texto del botón */
+  }
+  
+  /* Cambia el fondo de los paneles */
+  .p-panel {
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+  }

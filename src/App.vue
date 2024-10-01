@@ -8,3 +8,7 @@
   <router-view></router-view>
   
 </template>
+<script setup>
+// Importa el archivo CSS personalizado
+import './assets/custom-theme.css';
+</script>

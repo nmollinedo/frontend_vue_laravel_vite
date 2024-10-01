@@ -59,8 +59,8 @@
                             <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary" style="border-color: #1e88e5; color: #1e88e5;">¿Olvidaste tu contraseña?</span>
                         </div>
 
+                    <!--    <Button type="button" label="Ingresar" class="w-full" @click="funIngresar()" ></Button>-->
                         <Button type="button" label="Ingresar" class="w-full" @click="funIngresar()" style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;"></Button>
-                        
                     </div>
                 </div>
             </div>

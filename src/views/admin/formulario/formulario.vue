@@ -360,7 +360,7 @@
 
         <div class="field">
           <label>Fecha de registro del Formulario</label>
-          <Calendar v-model="form.fechaRegistro" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
+          <Calendar v-model="form.fecha_dictamen" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
         </div>
 
         <h2>Justificación y Respaldo</h2>
@@ -761,6 +761,7 @@ console.log("Formulario cerrado");
 onMounted(async () => {
   await cargarProyectos();
   cargarTipoDictamen();
+
   //await getTransferencias();
 });
 
@@ -836,10 +837,12 @@ const abrirModalEdit = async(id) => {
     form.value = data;
     console.log("Edit",form.value);
     console.log("Edit",form.value[0].fecha_registro);
+    console.log("Trans ID",form.value[0].transferencia_id);
     form.dictamen_id = form.value[0].dictamen_id,
+    form.transferencia_id = form.value[0].transferencia_id,
     form.etapa = form.value[0].etapa_id,
     form.fechaRegistro = formatDate(form.value[0].fecha_registro),
-   
+    form.fecha_dictamen = formatDate(form.value[0].fecha_dictamen),
     form.fechaInicio = formatDate(form.value[0].etapa_fecha_inicio),
     form.fechaTermino = formatDate(form.value[0].etapa_fecha_fin),
     form.pregunta_1 =Boolean(form.value[0].pregunta_1),
@@ -847,8 +850,8 @@ const abrirModalEdit = async(id) => {
     form.pregunta_3 = form.value[0].pregunta_3,
     form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
     form.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
-    console.log("fecha",form.value.fechaInicio);
-    Object.assign(form.value, data[0]);
+    console.log("fecha",form.fechaInicio);
+    Object.assign(form, data[0]);
             // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
     etapaSeleccionada.value = etapas.value.find(etapa => etapa.id === form.value[0].etapa_id);
     console.log("Formulario para edición:", form.value);
@@ -882,12 +885,15 @@ mostrarModal.value = false;
 
 // Función para guardar el nuevo dictamen
 const guardarFormulario = async (dictamen_id) => {
-  console.log("Formulario",form.fechaRegistro)
+  console.log("Formulario Re",form.fechaRegistro)
+  console.log("Formulario IN",form.fechaInicio)
+  console.log("Formulario ID",formId)
   const formData = reactive({
-    id: formId.value, // Ensure the ID is sent
-    dictamen_id: form.value.dictamen_id,
+    //id: formId, // Ensure the ID is sent
+    id:form.transferencia_id,
+    dictamen_id: form.dictamen_id,
     etapa: etapaSeleccionada.value.id,
-    fecha_registro: formatDate(form.value.fechaRegistro),
+    fecha_registro: formatDate(form.fecha_dictamen),
    
     fecha_inicio: formatDate(form.fechaInicio),
     fecha_termino: formatDate(form.fechaTermino),
@@ -921,6 +927,7 @@ try {
   //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
   console.log("datos form",formData);
     const response = await dictamenService.modificarForm(form.dictamen_id,formData);
+    abrirModalVer(form.transferencia_id);
     //dictamenes.value = data;
     console.log('Formulario guardado con éxito:', response.data);
 

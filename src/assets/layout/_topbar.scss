@@ -1,6 +1,13 @@
 .layout-topbar {
+
+    background-image: url('@/assets/images/docs-divider-mpd.png');
+    background-size: cover; /* Asegura que la imagen cubra todo el topbar */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-position: center; /* Centra la imagen en el topbar */
+    height: 5rem; /* Ajusta la altura según lo necesites */
+
     position: fixed;
-    height: 4rem;
+    height: 5rem;
     z-index: 997;
     left: 0;
     top: 0;
