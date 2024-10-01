@@ -60,10 +60,14 @@
 
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
-                        <Button icon="pi pi-pencil" outlined rounded class="mr-2"
+                        <Button
+                            v-if="slotProps.data.estado_id===1"  
+                           icon="pi pi-pencil" outlined rounded class="mr-2"
                             @click="editTransferencia(slotProps.data)"
                             style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
-                        <Button icon="pi pi-trash" outlined rounded severity="danger"
+                        <Button
+                        v-if="slotProps.data.estado_id===1"  
+                        icon="pi pi-trash" outlined rounded severity="danger"
                             @click="confirmDeleteTransferencia(slotProps.data)" />
                     </template>
                 </Column>
@@ -838,7 +842,10 @@ function obtenerEntidad() {
 
 //listar transferencias
 const getTransferencias = async () => {
-    const { data } = await transferenciaService.index();
+    // Obtener entidad_id desde el localStorage
+    const entidadId = ref(localStorage.getItem('entidad_id'));
+  
+    const { data } = await transferenciaService.index(entidadId.value);
 
     for (let i = 0; i < data.length; i++) {
         data[i].fecha_inicio = formatDateVista(data[i].fecha_inicio);

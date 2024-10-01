@@ -21,45 +21,73 @@
     <div>
   <!-- DataTable de PrimeVue con paginación -->
   <DataTable 
-    :value="transferencias" 
-    paginator 
-    :rows="5" 
-    :rowsPerPageOptions="[5, 10, 20]" 
-    responsiveLayout="scroll"
-    style="width: 100%; max-width: 1500px;">
-    
-    <template>
-      <div >
-        <h2>Transferencias</h2> 
+  :value="transferencias" 
+  paginator 
+  :rows="5" 
+  :rowsPerPageOptions="[5, 10, 20]" 
+  responsiveLayout="scroll"
+  style="width: 100%; max-width: 1500px;"
+>
+  <!-- Encabezado personalizado -->
+  <template #header>
+    <div>
+      <h2>Transferencias</h2> 
+    </div>
+  </template>
+
+  <Column field="codigo_tpp" header="CÓDIGO TPP" sortable></Column>
+  <Column field="nombre_formal" header="Nombre" sortable></Column>
+  <Column field="fecha_inicio" header="Fecha Inicio" sortable></Column>
+  <Column field="fecha_termino" header="Fecha Término" sortable></Column>
+  <Column field="clasificacion" header="Clasificación" sortable></Column>
+  <Column field="bloqueo_proyecto" header="Clasificación" sortable></Column>
+  <Column field="entidad" header="Ent." sortable></Column>
+  <Column field="estado" header="Estado" sortable></Column>
+
+  <Column header="Acciones">
+    <!-- Template para definir las acciones dentro de cada fila -->
+    <template #body="slotProps">
+      <!-- Mostrar el valor de la función hasTransferencia -->
+      <div>
+        <p>Has transferencia: {{ transferenciaStatus[slotProps.data.id] }}</p>
       </div>
+      
+      <!-- Botón "Ver Formulario" siempre disponible -->
+      <Button 
+        label="Ver Formulario" 
+        icon="pi pi-eye" 
+        @click="abrirModalVer(slotProps.data.id,slotProps.data)" 
+        class="p-button-text" 
+      />
+
+      <!-- Lógica para mostrar "Agregar" o "Activar" para cada fila -->
+      <Button 
+        v-if="!transferenciaStatus[slotProps.data.id]" 
+        label="Agregar" 
+        icon="pi pi-plus" 
+        @click="abrirModal(slotProps.data.id,slotProps.data)" 
+        class="p-button-text" 
+      />
+      <Button 
+        v-if="slotProps.data.estado_id===2" 
+        label="Agregar modificacion" 
+        icon="pi pi-plus" 
+        @click="abrirModal(slotProps.data.id,slotProps.data)" 
+        class="p-button-text" 
+         style="color: blue"
+      />
+      
+      <!-- Botón "Activar" cuando ya existe un registro  para analista
+      <Button 
+        v-else-if="slotProps.data.bloqueo_proyecto===1" 
+        label="Activar" 
+        icon="pi pi-unlock" 
+        @click="activarCierre(slotProps.data.id)" 
+        class="p-button-text" 
+      />-->
     </template>
-    
-    <Column field="codigo_tpp" header="CÓDIGO TPP" sortable></Column>
-    <Column field="nombre_formal" header="Nombre" sortable></Column>
-    <Column field="fecha_inicio" header="Fecha Inicio" sortable></Column>
-    <Column field="fecha_termino" header="Fecha Término" sortable></Column>
-    <Column field="clasificacion" header="Clasificación" sortable></Column>
-    <Column field="entidad" header="Ent." sortable></Column>
-    <Column field="estado" header="Estado" sortable></Column>
-
-    <Column header="Acciones">
-      <template #body="slotProps">
-        <Button 
-          label="Ver Fomulario" 
-          icon="pi pi-eye" 
-          @click="abrirModalVer(slotProps.data.id)" 
-          class="p-button-text" />
-     
-        <Button 
-          label="Agregar Formulario" 
-          icon="pi pi-plus" 
-          @click="abrirModal(slotProps.data.id)" 
-          class="p-button-text" />
-      </template>
-
-    </Column>
-
-  </DataTable>
+  </Column>
+</DataTable>
 </div>
 
     <!-- Sección de Dictámenes por Etapa -->
@@ -117,9 +145,9 @@
                 <Column header="Ver" body="verTemplate"></Column>
                 <Column field="transferencia_id" body="Id"></Column>
                 <Column field="dictamen_id" body="Id"></Column>
-                <Column field="tipo_dictamen" header="Tipo de dictamen"></Column>
+                <Column field="tipo_dictamen" header="Tipo de formulario"></Column>
               <!--  <Column field="etapa" header="Etapa"></Column> -->
-                <Column field="fecha_dictamen" header="Fecha Dictamen"></Column>
+                <Column field="fecha_dictamen" header="Fecha formulario"></Column>
                 <Column field="etapa_fecha_inicio" header="Fecha Inicio Etapa"></Column>
                 <Column field="etapa_fecha_fin" header="Fecha Termino Etapa"></Column>
                 <Column field="usuario_cierre" header="Usuario Cierre"></Column>
@@ -127,11 +155,27 @@
                 <Column header="Acciones">
                   <template #body="slotProps">
                     <Button 
+                    v-if="slotProps.data.cierre_entidad!==1"
                       label="Editar" 
                       icon="pi pi-pencil" 
                       @click="abrirModalEdit(slotProps.data.dictamen_id)" 
                       class="p-button-text" />
-                      <Button icon="pi pi-trash" outlined rounded severity="danger"
+                      <Button 
+                            v-if="slotProps.data.bloqueo_proyecto===0" 
+                            label="Cierra Form"
+                            icon="pi pi-lock-open" 
+                            @click="confirmCierreFormulario(slotProps.data)"
+                            class="p-button-text" />
+                            
+                            <Button 
+                            v-if="slotProps.data.cierre_entidad!==1"
+                            label="Cierra Form"
+                            icon="pi pi-lock-open" 
+                            @click="confirmCierreFormulario(slotProps.data)"
+                            class="p-button-text" />      
+                      <Button 
+                            v-if="slotProps.data.cierre_entidad!==1"
+                            icon="pi pi-trash" outlined rounded severity="danger"
                             @click="confirmDeleteFormulario(slotProps.data)" />
                   </template>
                 </Column>
@@ -156,26 +200,27 @@
        <div>
         <label for="id">ID transferencia:</label>
         <input type="text" v-model="formId" readonly class="border rounded-md p-2">
+        
       </div>
     <div style="max-height: 70vh;">
-        <h2>Datos del Formulario</h2>
+        <h2>Datos del Formulario</h2> 
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario</label>
+          <label for="etapa">Tipo de Formulario</label>
           <Dropdown v-model="form.etapa" :options="etapas" optionLabel="descrip_tipo_dictamen" optionValue="id" placeholder="Seleccionar..."></Dropdown>
         </div>
 
         <!-- Fechas -->
         <div class="field">
           <label>Duración (Inicio y Término de Etapa)</label>
-          <Calendar v-model="form.fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio"></Calendar>
-          <Calendar v-model="form.fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término"></Calendar>
+          <Calendar v-model="fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio" :disabled="true"></Calendar>
+          <Calendar v-model="fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término" :disabled="true"></Calendar>
         </div>
 
         <div class="field">
           <label>Fecha de registro del Formulario</label>
-          <Calendar v-model="form.fechaRegistro" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
+          <Calendar v-model="form.fechaRegistro" dateFormat="dd/mm/yy" placeholder="Fecha Registro" :disabled="true"></Calendar>
         </div>
 
         <h2>Justificación y Respaldo</h2>
@@ -354,13 +399,13 @@
         <!-- Fechas -->
         <div class="field">
           <label>Duración (Inicio y Término de Etapa)</label>
-          <Calendar v-model="form.fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio"></Calendar>
-          <Calendar v-model="form.fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término"></Calendar>
+          <Calendar v-model="fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio" :disabled="true"></Calendar>
+          <Calendar v-model="fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término" :disabled="true"></Calendar>
         </div>
 
         <div class="field">
           <label>Fecha de registro del Formulario</label>
-          <Calendar v-model="form.fecha_dictamen" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
+          <Calendar v-model="form.fecha_dictamen" dateFormat="dd/mm/yy" placeholder="Fecha Registro" :disabled="true"></Calendar>
         </div>
 
         <h2>Justificación y Respaldo</h2>
@@ -539,7 +584,7 @@ import axios from 'axios';
 import transferenciaService from '../../../services/transferencia.service';
 import dictamenService from '../../../services/dictamen.service';
 import tipoDictamenService from '../../../services/tipoDictamen.service';
-
+import { useRouter } from 'vue-router';
 const toast = useToast();
 // Variables reactivas
 const proyectos = ref([]);
@@ -560,13 +605,10 @@ const mostrarModalVer = ref(false);  // Controla la visibilidad del modal
 const mostrarModalEdit = ref(false);  // Controla la visibilidad del modal
 // ID for the selected form
 const formId = ref(null);
+const fechaInicio = ref(null);
+const fechaTermino = ref(null);
 const id = null;
-const nuevoDictamen = ref({
-etapa: '',
-fechaInicio: '',
-fechaTermino: '',
-// Otros campos adicionales...
-});
+
 /*
 const form = ref({
 etapa: '',
@@ -650,9 +692,9 @@ function validarFormulario() {
 
   // Validar campos obligatorios
   if (!form.etapa) errores.push('Etapa es requerida.');
-  if (!form.fechaInicio) errores.push('Fecha de inicio es requerida.');
-  if (!form.fechaTermino) errores.push('Fecha de término es requerida.');
-  if (!form.fechaRegistro) errores.push('Fecha de registro es requerida.');
+  //if (!form.fechaInicio) errores.push('Fecha de inicio es requerida.');
+  //if (!form.fechaTermino) errores.push('Fecha de término es requerida.');
+  //if (!form.fechaRegistro) errores.push('Fecha de registro es requerida.');
   if (!form.pregunta_1) errores.push('La respuesta a la pregunta 1 es requerida.');
   if (!form.mae) errores.push('El nombre de la MAE es requerido.');
   if (!form.mae_cargo) errores.push('El cargo de la MAE es requerido.');
@@ -716,7 +758,9 @@ const guardar = async () => {
     pregunta_6: form.pregunta_6,
     respaldo_pregunta_6: form.respaldo_pregunta_6,
     fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
-    mae: form.mae_ci,
+    mae:form.mae,
+    mae_cargo:form.mae_cargo,
+    mae_ci: form.mae_ci,
     mae_documento_designacion: form.mae_documento_designacion,
     responsable: form.responsable,
     responsable_cargo: form.responsable_cargo,
@@ -729,11 +773,9 @@ const guardar = async () => {
     const response = await dictamenService.guadarForm(formData.id,formData);
     //dictamenes.value = data;
     console.log('Formulario guardado con éxito:', response.data);
-    //if (response.status === 200) {
-      // Si la API responde exitosamente, limpiar el formulario
-      //limpiarFormulario();
-   // }
-   //formData.value.reset();
+    //await cargarTransferencias(); 
+    await cargarProyectos(); //****
+    refrescarRuta(); 
     cerrarModal();
   } catch (error) {
     //console.log(error.response.data);
@@ -761,15 +803,18 @@ console.log("Formulario cerrado");
 onMounted(async () => {
   await cargarProyectos();
   cargarTipoDictamen();
-
+  transferencias.value.forEach(transferencia => {
+    verificarTransferencia(transferencia.id);
+  });
   //await getTransferencias();
 });
 
 // Función para cargar proyectos desde la API //listar transferencias
 const cargarProyectos = async () => {
   try {
-    //const response = await axios.get('/api/proyectos'); 
-    const { data } = await transferenciaService.index();
+     // Obtener entidad_id desde el localStorage
+     const entidadId = ref(localStorage.getItem('entidad_id'));
+    const { data } = await transferenciaService.index(entidadId.value);
     transferencias.value = data;
     //proyectos.value = response.data;
     filtrarProyectos();
@@ -806,15 +851,10 @@ const toggleDictamen = async (id) => {
 };
 
 // Función para abrir el modal
-const abrirModalVer = async (id) => {
+const abrirModalVer = async (id, datos) => {
   try {
-    // Buscar el proyecto seleccionado
-  /*  proyectoSeleccionado.value = proyectos.value.find(
-      (proyecto) => proyecto.id === id
-    );*/
-
-    // Cargar dictámenes para el proyecto seleccionado
-    //const response = await axios.get(`/api/dictamen/${id}`);
+    fechaInicio.value = datos.fecha_inicio;  // fechas guardadas en transferencias
+  fechaTermino.value = datos.fecha_termino;    // fechas guardadas en transferencias
     const { data } = await dictamenService.show(id);
     dictamenes.value = data;
     //dictamenes.value = response;
@@ -871,11 +911,62 @@ mostrarModalEdit.value = false;
 
 // Función para abrir el modal
 // Function to open the modal and receive the ID
-const abrirModal = (id) => {
-  formId.value = id; // Store the ID
+const abrirModal = (id,datos) => {
+  formId.value = id;
+  console.log("datos", datos);
+  console.log("datos", datos.fecha_termino);
+    // Si las fechas vienen en formato de cadena (YYYY-MM-DD), convertirlas a objetos Date
+  fechaInicio.value = datos.fecha_inicio;  // fechas guardadas en transferencias
+  fechaTermino.value = datos.fecha_termino;    // fechas guardadas en transferencias
+  // Store the ID
   console.log("ID",formId.value);
   limpiarFormulario(); // Limpiar el formulario antes de abrir el modal
   mostrarModal.value = true; // Open the modal
+};
+
+ const activarCierre = async(id) => {
+  formId.value = id; // Store the ID
+  console.log("ID",formId.value);
+  try {
+
+
+    const response = await transferenciaService.activarCierre(formId.value);
+    //abrirModalVer(form.transferencia_id);
+    //dictamenes.value = data;
+    console.log('Cierre activado con éxito:', response.data);
+
+} catch (error) {
+  console.error('Error al Cierre activado:', error);
+}
+};
+
+// Crear un objeto reactivo para almacenar el estado de cada transferencia
+const transferenciaStatus = ref({});
+// Función para verificar si ya existe una transferencia por ID y actualizar el estado
+const verificarTransferencia = async (id) => {
+  const resultado = await hasTransferencia(id);
+  transferenciaStatus.value[id] = resultado;
+};
+
+// Variable reactiva para controlar el estado del botón "Agregar"
+const hasTransferencia = async (id) => {
+  try {
+    const { data } = await dictamenService.show(id);
+    dictamenes.value = data;
+    
+    if (dictamenes.value && dictamenes.value.length > 0) {
+      const transferenciaId = dictamenes.value[0].transferencia_id;
+      console.log("if",transferenciaId);
+      // Comprobar si ya existe una transferencia con ese ID
+      return transferenciaId//transferencias.value.some(transferencia => transferencia.id === transferenciaId);
+    } else {
+      console.log("else",dictamenes.value);
+      return 0; // No hay registros válidos
+    }
+  } catch (error) {
+    console.error("Error al verificar transferencia:", error);
+    return false;
+  }
 };
 
 // Función para cerrar el modal
@@ -939,6 +1030,27 @@ try {
 }
 };
 
+const refrescarPagina = () => {
+  window.location.reload();
+};
+async function confirmCierreFormulario(prod) {
+    // Verificar que el objeto prod tenga el id y transferencia_id necesarios
+    if (prod && prod.id && prod.transferencia_id) {
+        dictamenes.value = prod;
+        console.log("ID transferencia", dictamenes.value.transferencia_id);
+              try {
+              const { data } = await transferenciaService.cierreFormulario(dictamenes.value.transferencia_id);
+              //etapas.value = data;
+              //refrescarRuta(); 
+              refrescarPagina();
+            } catch (error) {
+              console.error("Error al cerrar:", error);
+            }
+    } else {
+        console.error("Datos inválidos para cerrar formulario");
+    }
+}
+
 function confirmDeleteFormulario(prod) {
     // Verificar que el objeto prod tenga el id y transferencia_id necesarios
     if (prod && prod.id && prod.transferencia_id) {
@@ -951,6 +1063,12 @@ function confirmDeleteFormulario(prod) {
         console.error("Datos inválidos para eliminar el dictamen");
     }
 }
+
+const router = useRouter();
+
+const refrescarRuta = () => {
+  router.push({ path: router.currentRoute.value.path })  // Empuja la ruta actual para refrescarla
+};
 
 async function deleteFormulario() {
     try {
@@ -970,14 +1088,14 @@ async function deleteFormulario() {
             
             // Recargar la lista usando el transferencia_id guardado
             toggleDictamen(transferenciaId);  
-            
-            Toast.add({ severity: 'success', summary: 'Successful', detail: 'Dictamen eliminado', life: 3000 });
+            refrescarRuta(); 
+            //Toast.add({ severity: 'success', summary: 'Successful', detail: 'Dictamen eliminado', life: 3000 });
         } else {
             console.error("No hay dictamen válido para eliminar. dictamenes.value:", dictamenes.value);
         }
     } catch (error) {
         console.error("Error al eliminar el dictamen", error);
-        Toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el dictamen', life: 3000 });
+        //Toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el dictamen', life: 3000 });
     }
 }
 

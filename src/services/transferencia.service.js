@@ -1,8 +1,8 @@
 import { Api } from "./ApiService";
 
 export default {
-    index: () => {
-        return Api().get("/transferencia");
+    index: (id) => {
+        return Api().get(`/listar-transferencia/${id}`);
     },
     store: (datos) => {
         return Api().post("/registrar-transferencia", datos);
@@ -14,7 +14,7 @@ export default {
         return Api().put(`/transferencia/${id}`, datos);
     },
     destroy: (id) => {
-        return Api().delete(`/transferencia/${id}`);
+        return Api().delete(`/eliminar-transferencia/${id}`);
     },
     actualizarTranferencia: (id,datos) => {
         return Api().post(`/modificar-transferencia/${id}`, datos);
@@ -24,5 +24,11 @@ export default {
     },
     guardarLocalizacion: (id,datos) => {
         return Api().post(`/guardar-localizacion/${id}`, datos);
+    },
+    activarCierre: (id) => {
+        return Api().get(`/activar-cierre/${id}`);
+    },
+    cierreFormulario: (id) => {
+        return Api().get(`/cierre-formulario/${id}`);
     }
 }

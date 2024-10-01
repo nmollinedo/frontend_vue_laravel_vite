@@ -40,7 +40,7 @@ const model = ref([
         label: 'Presupuesto',
         items: [
             { label: 'Recursos', icon: 'pi pi-fw pi-id-card', to: '/admin/recurso' },
-            { label: 'Programacion', icon: 'pi pi-fw pi-check-square', to: '/admin/programacion' },
+        //    { label: 'Programacion', icon: 'pi pi-fw pi-check-square', to: '/admin/programacion' },
             
         ]
     },

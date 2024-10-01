@@ -34,7 +34,7 @@
                 <i class="pi pi-ellipsis-v"></i>
             </button> 
             <!-- Sección para seleccionar la entidad y el código presupuestario -->
-            <div>
+        <!--    <div>
                     <h1>Entidad seleccionada: {{ entidadId }}</h1>
                     <Dropdown 
                         v-model="entidadId" 
@@ -44,10 +44,10 @@
                         placeholder="Selecciona una entidad"
                         @change="updateEntidadId"
                     />
-                    <!-- Mostrar el código presupuestario automáticamente basado en la entidad seleccionada -->
+                    
                     <p>Código presupuestario: {{ codigoPresupuestario }}</p>
                 </div>
-
+            -->
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
                     <button type="button" class="layout-topbar-action" @click="toggleProfileMenu">
