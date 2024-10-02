@@ -108,7 +108,7 @@
                     </div>
                     <div class="col-span-2">
                         <label for="codigo_tpp2" class="block font-bold mb-2"></label>
-                        <InputText id="codigo_tpp2" value='0047' integeronly fluid disabled />
+                        <InputText id="codigo_tpp2" value='0000' integeronly fluid disabled />
                     </div>
                     <div class="col-span-2">
                         <label for="codigo_tpp" class="block font-bold mb-2"></label>
@@ -1111,14 +1111,15 @@ async function saveTransferencia() {
         // Asignación de los valores a la transferencia
         transferencia.value.nombre_tpp = nombreTpp.value;
         transferencia.value.entidad_operadora_id = selectedEntidad.value.id;
-        transferencia.value.entidad_operadora = selectedEntidad.value.nombre;
+        console.log("Entidad Ejecutora:",selectedEntidad.value.nombre);
+        transferencia.value.entidad_ejecutora = selectedEntidad.value.nombre;
         transferencia.value.id_area = selectedArea.value.id;
         //transferencia.value.localizacion = localizacion;
         transferencia.value.fecha_inicio = fecha_inicio;
         transferencia.value.fecha_termino = fecha_termino;
         transferencia.value.codigo_presupuestario = codigoPresupuestario
         //alert("ggggg"+transferencia.value);
-        console.log("DDDDDDDDDDDDDDDDDDDDDDDD",transferencia.value);
+        console.log("Guardar transferencia",transferencia.value);
         // Envío de la solicitud al servicio
         const { data } = await transferenciaService.store(transferencia.value);
 

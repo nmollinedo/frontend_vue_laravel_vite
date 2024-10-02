@@ -72,7 +72,7 @@
         v-if="slotProps.data.estado_id===2" 
         label="Agregar modificacion" 
         icon="pi pi-plus" 
-        @click="abrirModal(slotProps.data.id,slotProps.data)" 
+        @click="abrirModalModificacion(slotProps.data.id,slotProps.data)" 
         class="p-button-text" 
          style="color: blue"
       />
@@ -151,7 +151,15 @@
                 <Column field="etapa_fecha_inicio" header="Fecha Inicio Etapa"></Column>
                 <Column field="etapa_fecha_fin" header="Fecha Termino Etapa"></Column>
                 <Column field="usuario_cierre" header="Usuario Cierre"></Column>
-                <Column header="Imprimir" body="imprimirTemplate"></Column>
+                <Column header="Imprimir" body="imprimirTemplate">
+                  <template #body="slotProps">
+                  <Button 
+                      label="Imprimir" 
+                      icon="pi pi-print" 
+                      @click="abrirModalEditttt(slotProps.data.dictamen_id)" 
+                      class="p-button-text" />
+                    </template>   
+                </Column>
                 <Column header="Acciones">
                   <template #body="slotProps">
                     <Button 
@@ -160,18 +168,25 @@
                       icon="pi pi-pencil" 
                       @click="abrirModalEdit(slotProps.data.dictamen_id)" 
                       class="p-button-text" />
+
+                   <!--   <Button 
+                    v-if="slotProps.data.cierre_entidad!==1"
+                      label="Cierre" 
+                      icon="pi pi-pencil" 
+                      @click="abrirModalCierre(slotProps.data)" 
+                      class="p-button-text" />-->
                       <Button 
                             v-if="slotProps.data.bloqueo_proyecto===0" 
                             label="Cierra Form"
                             icon="pi pi-lock-open" 
-                            @click="confirmCierreFormulario(slotProps.data)"
+                            @click="abrirModalCierre(slotProps.data)"
                             class="p-button-text" />
                             
                             <Button 
                             v-if="slotProps.data.cierre_entidad!==1"
                             label="Cierra Form"
                             icon="pi pi-lock-open" 
-                            @click="confirmCierreFormulario(slotProps.data)"
+                            @click="abrirModalCierre(slotProps.data)"
                             class="p-button-text" />      
                       <Button 
                             v-if="slotProps.data.cierre_entidad!==1"
@@ -554,6 +569,90 @@
       </template>
     </Dialog>
 
+      <!-- Modal para editar formulario para modificar -->
+      <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
+      <template v-slot:header>
+              <span>Modificar Formulario yyyy</span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+
+        <Button icon="pi pi-times" @click="cerrarModalEdit" class="p-button-text"></Button>
+      </template>
+     
+      <div style="max-height: 70vh;">
+        <h2>Datos del Formulario</h2>
+        
+        <!-- Select para Etapa -->
+        <div class="field">
+          <label for="etapa">Etapa del Formulario</label>
+          <Dropdown v-model="etapaSeleccionada" :options="etapas" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
+                        class="w-full md:w-14rem" />
+          <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
+        </div>
+
+        <!-- Fechas -->
+        <div class="field">
+          <label>Duración (Inicio y Término de Etapa)</label>
+          <Calendar v-model="fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio" :disabled="true"></Calendar>
+          <Calendar v-model="fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término" :disabled="true"></Calendar>
+        </div>
+
+        <div class="field">
+          <label>Fecha de registro del Formulario</label>
+          <Calendar v-model="form.fecha_dictamen" dateFormat="dd/mm/yy" placeholder="Fecha Registro" :disabled="true"></Calendar>
+        </div>
+
+        <h2>Justificación y Respaldo</h2>
+
+        <!-- Preguntas con radio buttons -->
+        
+             <!-- Datos adicionales -->
+             <div>
+              <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
+              <InputText id="mae" v-model="form.mae" required="true"/>
+            </div>
+            <div>
+              <label for="mae_cargo">Cargo MAE</label>
+              <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
+            </div>
+            <div>
+              <label for="mae_ci">C.I. MAE</label>
+              <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
+            </div>
+            <div>
+              <label for="mae_documento_designacion">Documento de Designación MAE</label>
+              <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
+            </div>
+
+            <div>
+              <label for="responsable">Nombre Responsable del Proyecto</label>
+              <InputText id="responsable" v-model="form.responsable" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_cargo">Cargo Responsable</label>
+              <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_unidad">Unidad Responsable</label>
+              <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_ci">C.I. Responsable</label>
+              <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
+            </div>
+      </div>  
+    
+
+      <template v-slot:footer>
+        <Button label="Grabar" icon="pi pi-check" @click="guardarFormularioModificacion(form.dictamen_id)" class="p-button-primary"></Button>
+        <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalModificacion" class="p-button-secondary"></Button>
+      </template>
+    </Dialog>
+
 
 
   </div>
@@ -565,6 +664,18 @@
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="deleteFormularioDialog = false" />
             <Button label="Si" icon="pi pi-check" @click="deleteFormulario(dictamenes.id )" />
+        </template>
+    </Dialog>
+
+    <Dialog v-model:visible="cierreFormularioDialog" :style="{ width: '450px' }" header="Confirmar" :modal="true">
+        <div class="flex items-center gap-4">
+            <i class="pi pi-exclamation-triangle !text-3xl" />
+            <span v-if="dictamenes">El registro del formulario tiene carácter de declaración jurada, realizado el cierre los datos del Formulario NO podrán modificarse, tampoco se podrá eliminar el formulario cerrado.
+              ¿Está seguro de cerrar el Formulario?<b>{{ dictamenes.transferencia_id }}</b>?</span>
+        </div>
+        <template #footer>
+            <Button label="No" icon="pi pi-times" text @click="cierreFormularioDialog = false" />
+            <Button label="Si" icon="pi pi-check" @click="confirmCierreFormulario(dictamenes.transferencia_id )" />
         </template>
     </Dialog>
 
@@ -598,11 +709,13 @@ const proyectosFiltrados = ref([]);
 //const dictamenes = ref([]);
 //const estadoSeleccionado = ref('en-registro');
 const deleteFormularioDialog = ref(false);
+const cierreFormularioDialog = ref(false);
 const proyectoSeleccionado = ref(null);
 const etapaSeleccionada = ref(null);
 const mostrarModal = ref(false);  // Controla la visibilidad del modal
 const mostrarModalVer = ref(false);  // Controla la visibilidad del modal
 const mostrarModalEdit = ref(false);  // Controla la visibilidad del modal
+const mostrarModalModificacion = ref(false);  // Controla la visibilidad del modal
 // ID for the selected form
 const formId = ref(null);
 const fechaInicio = ref(null);
@@ -773,13 +886,20 @@ const guardar = async () => {
     const response = await dictamenService.guadarForm(formData.id,formData);
     //dictamenes.value = data;
     console.log('Formulario guardado con éxito:', response.data);
-    //await cargarTransferencias(); 
-    await cargarProyectos(); //****
-    refrescarRuta(); 
+    console.log("Guardado correctamente. Iniciando carga de transferencias...");
+    //await cargarProyectos(); //****
+    await cargarProyectos();
+    console.log("Transferencias cargadas correctamente");
+    //refrescarRuta(); 
+    refrescarPagina();
     cerrarModal();
   } catch (error) {
     //console.log(error.response.data);
     console.error('Error al guardar el formulario:', error);
+  } finally {
+    // Esto asegura que `cargarTransferencias` siempre se ejecutará
+    await cargarProyectos();
+    console.log("Transferencias cargadas o intento de cargar realizado");
   }
 };
 
@@ -909,6 +1029,103 @@ const cerrarModalEdit = () => {
 mostrarModalEdit.value = false;
 };
 
+// Función para guardar el nuevo dictamen
+const guardarFormularioModificacion = async (dictamen_id) => {
+  console.log("Formulario Re",form.fechaRegistro)
+  console.log("Formulario IN",form.fechaInicio)
+  console.log("Formulario ID",formId)
+  const formData = reactive({
+    //id: formId, // Ensure the ID is sent
+    id:form.transferencia_id,
+    dictamen_id: form.dictamen_id,
+    etapa: etapaSeleccionada.value.id,
+    fecha_registro: formatDate(form.fecha_dictamen),
+   
+    fecha_inicio: formatDate(form.fechaInicio),
+    fecha_termino: formatDate(form.fechaTermino),
+    pregunta_1: form.pregunta_1,
+    pregunta_2: form.pregunta_2,
+    pregunta_3: form.pregunta_3,
+    respaldo_pregunta_3: form.respaldo_pregunta_3,
+    fecha_pregunta_3: formatDate(form.fecha_pregunta_3),
+    pregunta_4: form.pregunta_4,
+    respaldo_pregunta_4: form.respaldo_pregunta_4,
+    fecha_pregunta_4: formatDate(form.fecha_pregunta_4),
+    pregunta_5: form.pregunta_5,
+    respaldo_pregunta_5: form.respaldo_pregunta_5,
+    fecha_pregunta_5: formatDate(form.fecha_pregunta_5),
+    pregunta_6: form.pregunta_6,
+    respaldo_pregunta_6: form.respaldo_pregunta_6,
+    fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
+    mae: form.mae,
+    mae_cargo: form.mae_cargo,
+    mae_ci: form.mae_ci,
+    mae_documento_designacion: form.mae_documento_designacion,
+    responsable: form.responsable,
+    responsable_cargo: form.responsable_cargo,
+    responsable_unidad: form.responsable_unidad,
+    responsable_ci: form.responsable_ci
+    // Add other form fields here
+  });
+
+try {
+  //await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
+  //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
+  console.log("datos form",formData);
+    const response = await dictamenService.modificarForm(form.dictamen_id,formData);
+    abrirModalVer(form.transferencia_id);
+    //dictamenes.value = data;
+    console.log('Formulario guardado con éxito:', response.data);
+
+
+
+  cerrarModalEdit();  // Cerrar el modal después de guardar
+} catch (error) {
+  console.error('Error al agregar el dictamen:', error);
+}
+};
+
+// Función para abrir el modal
+const abrirModalModificacion = async(id) => {
+  try {
+  
+    const { data } = await dictamenService.mostrarForm(id);
+    form.value = data;
+    console.log("Edit",form.value);
+    console.log("Edit",form.value[0].fecha_registro);
+    console.log("Trans ID",form.value[0].transferencia_id);
+    form.dictamen_id = form.value[0].dictamen_id,
+    form.transferencia_id = form.value[0].transferencia_id,
+    form.etapa = form.value[0].etapa_id,
+    form.fechaRegistro = formatDate(form.value[0].fecha_registro),
+    form.fecha_dictamen = formatDate(form.value[0].fecha_dictamen),
+    form.fechaInicio = formatDate(form.value[0].etapa_fecha_inicio),
+    form.fechaTermino = formatDate(form.value[0].etapa_fecha_fin),
+    form.pregunta_1 =Boolean(form.value[0].pregunta_1),
+    form.pregunta_2 = form.value[0].pregunta_2,
+    form.pregunta_3 = form.value[0].pregunta_3,
+    form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
+    form.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
+    console.log("fecha",form.fechaInicio);
+    Object.assign(form, data[0]);
+            // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
+    etapaSeleccionada.value = etapas.value.find(etapa => etapa.id === form.value[0].etapa_id);
+    console.log("Formulario para edición:", form.value);
+    mostrarModalModificacion.value = true;
+    // Rellenar otros campos...
+  } catch (error) {
+    console.error('Error al cargar los datos del formulario', error);
+  }
+
+
+};
+
+
+// Función para cerrar el modal
+const cerrarModalModificacion = () => {
+mostrarModalModificacion.value = false;
+};
+
 // Función para abrir el modal
 // Function to open the modal and receive the ID
 const abrirModal = (id,datos) => {
@@ -1035,11 +1252,12 @@ const refrescarPagina = () => {
 };
 async function confirmCierreFormulario(prod) {
     // Verificar que el objeto prod tenga el id y transferencia_id necesarios
-    if (prod && prod.id && prod.transferencia_id) {
+    console.log("cierre ID:",prod)
+    if (prod ) {
         dictamenes.value = prod;
-        console.log("ID transferencia", dictamenes.value.transferencia_id);
+        console.log("ID transferencia",prod);
               try {
-              const { data } = await transferenciaService.cierreFormulario(dictamenes.value.transferencia_id);
+              const { data } = await transferenciaService.cierreFormulario(prod);
               //etapas.value = data;
               //refrescarRuta(); 
               refrescarPagina();
@@ -1048,6 +1266,19 @@ async function confirmCierreFormulario(prod) {
             }
     } else {
         console.error("Datos inválidos para cerrar formulario");
+    }
+}
+
+function abrirModalCierre(prod) {
+    // Verificar que el objeto prod tenga el id y transferencia_id necesarios
+    if (prod && prod.id && prod.transferencia_id) {
+        dictamenes.value = prod;
+        console.log("ID transferencia cierre", dictamenes.value.transferencia_id);
+        //toggleDictamen(dictamenes.value.transferencia_id);  // Cambiar si es necesario
+        cierreFormularioDialog.value = true;  // Mostrar diálogo de confirmación
+        //dictamenes.value = prod;
+    } else {
+        console.error("Datos inválidos para eliminar el dictamen");
     }
 }
 
