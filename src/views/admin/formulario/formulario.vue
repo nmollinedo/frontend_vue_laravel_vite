@@ -177,14 +177,14 @@
                       class="p-button-text" />-->
                       <Button 
                             v-if="slotProps.data.bloqueo_proyecto===0" 
-                            label="Cierra Form"
+                            label="Cierre Form"
                             icon="pi pi-lock-open" 
                             @click="abrirModalCierre(slotProps.data)"
                             class="p-button-text" />
                             
                             <Button 
                             v-if="slotProps.data.cierre_entidad!==1"
-                            label="Cierra Form"
+                            label="Cierre Form"
                             icon="pi pi-lock-open" 
                             @click="abrirModalCierre(slotProps.data)"
                             class="p-button-text" />      
@@ -192,6 +192,12 @@
                             v-if="slotProps.data.cierre_entidad!==1"
                             icon="pi pi-trash" outlined rounded severity="danger"
                             @click="confirmDeleteFormulario(slotProps.data)" />
+
+                      <Button 
+                            v-if="slotProps.data.cierre_entidad===1"
+                            label="Eliminar Cierre"
+                            icon="pi pi-trash" outlined rounded severity="danger"
+                            @click="confirmDeleteCierre(slotProps.data)" />
                   </template>
                 </Column>
               </DataTable>
@@ -667,6 +673,17 @@
         </template>
     </Dialog>
 
+    <Dialog v-model:visible="deleteCierreDialog" :style="{ width: '450px' }" header="Confirmar" :modal="true">
+        <div class="flex items-center gap-4">
+            <i class="pi pi-exclamation-triangle !text-3xl" />
+            <span v-if="dictamenes">Esta seguro de eliminar cierre<b>{{ dictamenes.dictamen_id }}</b>?</span>
+        </div>
+        <template #footer>
+            <Button label="No" icon="pi pi-times" text @click="deleteCierreDialog = false" />
+            <Button label="Si" icon="pi pi-check" @click="deleteCierre(dictamenes.dictamen_id,dictamenes.transferencia_id )" />
+        </template>
+    </Dialog>
+
     <Dialog v-model:visible="cierreFormularioDialog" :style="{ width: '450px' }" header="Confirmar" :modal="true">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
@@ -709,6 +726,7 @@ const proyectosFiltrados = ref([]);
 //const dictamenes = ref([]);
 //const estadoSeleccionado = ref('en-registro');
 const deleteFormularioDialog = ref(false);
+const deleteCierreDialog = ref(false);
 const cierreFormularioDialog = ref(false);
 const proyectoSeleccionado = ref(null);
 const etapaSeleccionada = ref(null);
@@ -1282,6 +1300,20 @@ function abrirModalCierre(prod) {
     }
 }
 
+function confirmDeleteCierre(prod) {
+    // Verificar que el objeto prod tenga el id y transferencia_id necesarios
+    if (prod && prod.id && prod.transferencia_id) {
+        dictamenes.value = prod;
+        console.log("ID transferencia", dictamenes.value.transferencia_id);
+        //toggleDictamen(dictamenes.value.transferencia_id);  // Cambiar si es necesario
+        deleteCierreDialog.value = true;  // Mostrar diálogo de confirmación
+        //dictamenes.value = prod;
+    } else {
+        console.error("Datos inválidos para eliminar el dictamen");
+    }
+}
+
+
 function confirmDeleteFormulario(prod) {
     // Verificar que el objeto prod tenga el id y transferencia_id necesarios
     if (prod && prod.id && prod.transferencia_id) {
@@ -1326,6 +1358,44 @@ async function deleteFormulario() {
         }
     } catch (error) {
         console.error("Error al eliminar el dictamen", error);
+        //Toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el dictamen', life: 3000 });
+    }
+}
+
+async function deleteCierre() {
+  const Data = reactive({
+    //id: formId, // Ensure the ID is sent
+    transferencia_id:dictamenes.value.transferencia_id
+    // Add other form fields here
+  });
+
+
+    try {
+        // Verifica si hay un dictamen válido para eliminar
+        if (dictamenes.value.dictamen_id) {
+            console.log("Eliminando formulario con ID:", dictamenes.value.dictamen_id);  // Añade este log para depurar
+            
+            // Almacenar temporalmente transferencia_id antes de limpiar dictamenes
+            const transferenciaId = dictamenes.value.transferencia_id;
+            
+            const { data } = await dictamenService.eliminarCierre(dictamenes.value.dictamen_id,Data);
+            
+            // Acción completada con éxito
+            deleteCierreDialog.value = false;  // Cierra el diálogo de confirmación
+            //cerrarModalVer();
+            //dictamenes.value = {};  // Limpia el dictamen seleccionado
+            console.log("ID transferencia", transferenciaId);
+            window.location.reload();
+            // Recargar la lista usando el transferencia_id guardado
+            //toggleDictamen(transferenciaId);  
+            //deleteCierreDialog.value = false;
+            //refrescarRuta(); 
+            //Toast.add({ severity: 'success', summary: 'Successful', detail: 'Dictamen eliminado', life: 3000 });
+        } else {
+            console.error("No hay formulario válido para eliminar. formulario.value:", dictamenes.value);
+        }
+    } catch (error) {
+        console.error("Error al eliminar el formulario", error);
         //Toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el dictamen', life: 3000 });
     }
 }
