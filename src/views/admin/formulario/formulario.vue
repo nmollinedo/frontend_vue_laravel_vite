@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div class="card" >
   <h2>Lista de Transferencias</h2>
 
   <!-- Filtro por estado de los proyectos usando PrimeVue Dropdown -->
@@ -36,11 +36,11 @@
   </template>
 
   <Column field="codigo_tpp" header="CÓDIGO TPP" sortable></Column>
-  <Column field="nombre_formal" header="Nombre" sortable></Column>
+  <Column field="nombre_formal" header="Nombre" sortable class="fixed-column"></Column>
   <Column field="fecha_inicio" header="Fecha Inicio" sortable></Column>
   <Column field="fecha_termino" header="Fecha Término" sortable></Column>
-  <Column field="clasificacion" header="Clasificación" sortable></Column>
-  <Column field="bloqueo_proyecto" header="Clasificación" sortable></Column>
+ <!-- <Column field="clasificacion" header="Clasificación" sortable></Column>
+  <Column field="bloqueo_proyecto" header="Clasificación" sortable></Column>  -->
   <Column field="entidad" header="Ent." sortable></Column>
   <Column field="estado" header="Estado" sortable></Column>
 
@@ -1428,6 +1428,13 @@ async function cargarTipoDictamen() {
 </script>
 
 <style scoped>
+.fixed-column {
+  width: 15rem; /* o usa 200px por ejemplo */
+  max-width: 15rem;
+  min-width: 15rem;
+  overflow: hidden; /* Para evitar que el contenido desborde */
+}
+
 .dictamen-container {
   width: 100%;
   margin: 0 auto;
@@ -1436,16 +1443,6 @@ async function cargarTipoDictamen() {
 .tabla-proyectos, .dictamenes-etapa table {
   width: 100%;
   border-collapse: collapse;
-}
-
-.tabla-proyectos th, .dictamenes-etapa th, .tabla-proyectos td, .dictamenes-etapa td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: left;
-}
-
-.tabla-proyectos th {
-  background-color: #f4f4f4;
 }
 
 .dictamenes-etapa {

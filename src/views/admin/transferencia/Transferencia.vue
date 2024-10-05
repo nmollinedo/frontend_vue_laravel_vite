@@ -51,7 +51,7 @@
 
                 <Column field="id" header="COD" sortable style="min-width: 1rem"></Column>
                 <Column field="codigo_tpp" header="CODIGO" sortable style="min-width: 7rem"></Column>
-                <Column field="nombre_formal" header="NOMBRES" sortable style="min-width: 12rem"></Column>
+                <Column field="nombre_formal" header="NOMBRES" sortable class="fixed-column"></Column>
                 
                 <Column field="fecha_inicio" header="FECHA INICIO"></Column>
                 <Column field="fecha_termino" header="FECHA TERMINO"></Column>
@@ -96,7 +96,7 @@
 
                 </Fieldset>
 
-
+    
                 <div class="grid grid-cols-10 gap-1">
                     <div class="col-span-2">
                         <label for="price" class="block font-bold mb-2">Codigo TPP</label>
@@ -108,7 +108,7 @@
                     </div>
                     <div class="col-span-2">
                         <label for="codigo_tpp2" class="block font-bold mb-2"></label>
-                        <InputText id="codigo_tpp2" value='0000' integeronly fluid disabled />
+                        <InputText id="codigo_tpp2" v-model="transferencias.codigo_presupuestario" integeronly fluid disabled />
                     </div>
                     <div class="col-span-2">
                         <label for="codigo_tpp" class="block font-bold mb-2"></label>
@@ -127,7 +127,13 @@
                 </div>
                 <div>
                     <label for="nombre_tpp">Nombre TPP</label>
-                    <InputText id="nombre_tpp" :value="nombreTpp" readonly fluid />
+                    <!-- Eliminar readonly y usar v-model para hacer el campo editable -->
+                    <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid />
+
+                    <!-- Mostrar el mensaje de error si excede los 110 caracteres -->
+                    <span v-if="nombreTppError" class="text-red-110">
+                    Máximo 110 caracteres permitidos
+                    </span>
                 </div>
 
                 <div>
@@ -137,9 +143,8 @@
                     v-model="transferencia.denominacion_convenio" 
                     rows="4" 
                     fluid 
-                    @input="validateDenominacion"
                     />
-                    <span v-if="denominacionError" class="text-red-500">Máximo 110 caracteres permitidos</span>
+                    
                 </div>
           
                     <label for="Entidad" class="block font-bold mb-3">Area de Influencia</label>
@@ -148,7 +153,7 @@
 
                     <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione una área"
                         class="w-full md:w-14rem" />
-                    <p>ID de la ciudad seleccionada: {{ selectedArea.id }}</p>
+                    
                 </div>
                 <div>
                     <label for="fecha_inicio" class="block font-bold mb-3">Fecha Inicio</label>
@@ -254,9 +259,19 @@
                             <label for="localizacion" class="block font-bold mb-3">Localización</label>
                             <InputText id="localizacion" v-model="transferencia.localizacion" required="true" fluid />
                         </div>
-                        <div>
+                    <!--    <div>
                             <label for="nombre_tpp">Nombre TPP</label>
                             <InputText id="nombre_tpp" :value="nombreTpp" readonly fluid />
+                        </div> -->
+                        <div>
+                            <label for="nombre_tpp">Nombre TPP</label>
+                           
+                            <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid />
+
+                            <!-- Mostrar el mensaje de error si excede los 110 caracteres -->
+                            <span v-if="nombreTppError" class="text-red-110">
+                            Máximo 110 caracteres permitidos
+                            </span>
                         </div>
                         <div>
                             <label for="denominacion_convenio" class="block font-bold mb-3">Denominación del Convenio</label>
@@ -343,21 +358,21 @@
                     </div>
                 </basic-tab>
 
-                <basic-tab title="Localizacion geografica"><!--{{transferencia}}-->
-                        <div class="flex flex-col gap-6"><!--{{departamentos}}-->
+                <basic-tab title="Localizacion geografica">
+                    <!-- Verifica si el campo descripción (problemática) está vacío antes de habilitar los campos de localización -->
+                    <div v-if="transferencia.descripcion && transferencia.descripcion.length > 0" class="flex flex-col gap-6">
                         <Fieldset legend="Header">
-                            <label for="Departamento" class="block font-bold mb-3">Departamento</label>
-                            <Dropdown 
+                        <label for="Departamento" class="block font-bold mb-3">Departamento</label>
+                        <Dropdown 
                             v-model="selectedDepartamento" 
                             :options="departamentos" 
                             optionLabel="descrip_departamento"
                             placeholder="Seleccione departamento" 
                             class="w-full md:w-14rem" 
                             @change="onDepartamentoChange"
-                            />
-                            <!--{{municipios}} -->
-                            <label for="Municipio" class="block font-bold mb-3">Municipio</label>
-                            <Dropdown 
+                        />
+                        <label for="Municipio" class="block font-bold mb-3">Municipio</label>
+                        <Dropdown 
                             v-model="selectedMunicipio" 
                             :options="municipios" 
                             optionLabel="descrip_municipio"
@@ -365,39 +380,37 @@
                             class="w-full md:w-14rem"
                             :disabled="!selectedDepartamento"
                             @change="onMunicipioChange"
-                            />
-                            <!--{{poblaciones}}-->
-                            <label for="Poblacion" class="block font-bold mb-3">Población</label>
-                            <Dropdown 
+                        />
+                        <label for="Poblacion" class="block font-bold mb-3">Población</label>
+                        <Dropdown 
                             v-model="selectedPoblacion" 
                             :options="poblaciones" 
                             optionLabel="descrip_poblacion"
                             placeholder="Seleccione población" 
                             class="w-full md:w-14rem"
                             :disabled="!selectedMunicipio"
-                            />
+                        />
                         </Fieldset>
-
-                    <!--    <div>
-                            <label for="descripcion" class="block font-bold mb-3">Cobertura</label>
-                            <InputNumber v-model="transferencia.cobertura" inputId="integeronly" fluid />
-                        </div> -->
                         <div>
-                            <label for="descripcion" class="block font-bold mb-3">Poblacion Beneficiada</label>
-                            <InputNumber v-model="transferencia.poblacion" inputId="integeronly" fluid />
+                        <label for="descripcion" class="block font-bold mb-3">Poblacion Beneficiada</label>
+                        <InputNumber v-model="transferencia.poblacion" inputId="integeronly" fluid />
                         </div>
-
                         <div v-if="mensaje_loc" class="text-green-500">
-                            {{ mensaje_loc }}
+                        {{ mensaje_loc }}
                         </div> 
                         <Toast />
                         <Button 
-                            label="Guardar localizacion" 
-                            icon="pi pi-check" 
-                            @click="guardarLocalizacion"
-                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                        label="Guardar localizacion" 
+                        icon="pi pi-check" 
+                        @click="guardarLocalizacion"
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
                         />
-                        </div>
+                    </div>
+
+                    <!-- Mensaje cuando el campo problemática no está lleno -->
+                    <div v-else>
+                        <p class="text-red-500">Por favor, complete la descripción del problema antes de llenar la localización geográfica.</p>
+                    </div>
                     </basic-tab>
 
             <!--        
@@ -844,7 +857,7 @@ function obtenerEntidad() {
 const getTransferencias = async () => {
     // Obtener entidad_id desde el localStorage
     const entidadId = ref(localStorage.getItem('entidad_id'));
-  
+    const codigoPresupuestario = localStorage.getItem('codigo_presupuestario');
     const { data } = await transferenciaService.index(entidadId.value);
 
     for (let i = 0; i < data.length; i++) {
@@ -853,6 +866,7 @@ const getTransferencias = async () => {
     }
 
     transferencias.value = data;
+    transferencias.value.codigo_presupuestario=codigoPresupuestario;
 
     if (transferencia.value.plan) {
         plan.value.plan = transferencia.value.plan;
@@ -989,6 +1003,22 @@ const validateDenominacion = () => {
   }
 };
 
+// Definir las variables reactivas
+
+const nombreTppError = ref(false);
+
+// Función para validar la longitud del Nombre TPP
+const validateNombreTpp = () => {
+  // Verificar si el número de caracteres supera 110
+  console.log("Longitud",nombreTpp.value.length);
+  if (nombreTpp.value.length > 110) {
+    nombreTppError.value = true; // Mostrar error si es mayor a 110
+    nombreTpp.value = nombreTpp.value.slice(0, 110); // Recortar el valor a 110 caracteres
+  } else {
+    nombreTppError.value = false; // No hay error si está dentro del límite
+  }
+};
+
 
 
 async function saveTransferenciaUpdate() {
@@ -1107,6 +1137,12 @@ function actulizarTransferencia() {
 async function saveTransferencia() {
     // Recuperar el codigo_presupuestario desde localStorage
     const codigoPresupuestario = localStorage.getItem('codigo_presupuestario');
+    console.log("longitud",nombreTpp.value.length);
+            if (nombreTpp.value.length > 110) {
+            // Recortar el valor a 110 caracteres justo antes de guardar
+            //nombreTpp.value = nombreTpp.value.slice(0, 110);
+            alert('Se supera los 110 caracteres.');
+            }
     try {
         // Asignación de los valores a la transferencia
         transferencia.value.nombre_tpp = nombreTpp.value;
@@ -1150,7 +1186,7 @@ async function saveTransferencia() {
         }
 
         // Mostrar un mensaje de error al usuario
-        alert('Ocurrió un error al guardar la transferencia. Por favor, intenta nuevamente denominacion tiene mas de 110 caracteres.');
+        alert('Ocurrió un error al guardar la transferencia. Por favor, intenta nuevamente nombre TPP tiene mas de 110 caracteres.');
     }
 }
 
@@ -1169,3 +1205,12 @@ async function deleteTransferencia() {
     //toast.add({ severity: 'success', summary: 'Successful', detail: 'transferencia Deleted', life: 3000 });
 }
 </script>
+
+<style>
+.fixed-column {
+  width: 40rem; /* o usa 200px por ejemplo */
+  max-width: 40rem;
+  min-width: 40rem;
+  overflow: hidden; /* Para evitar que el contenido desborde */
+}
+</style>
