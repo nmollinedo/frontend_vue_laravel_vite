@@ -593,17 +593,18 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario</label>
-          <Dropdown v-model="etapaSeleccionada" :options="etapas" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
+          <label for="etapa2">Etapa del Formulario</label>
+          <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
           <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
         </div>
+        
 
         <!-- Fechas -->
         <div class="field">
           <label>Duración (Inicio y Término de Etapa)</label>
-          <Calendar v-model="fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio" :disabled="true"></Calendar>
-          <Calendar v-model="fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término" :disabled="true"></Calendar>
+          <Calendar v-model="fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio"></Calendar>
+          <Calendar v-model="fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término" ></Calendar>
         </div>
 
         <div class="field">
@@ -775,6 +776,7 @@ responsable_unidad: ''
 
 
 const etapas = ref([]);
+const etapas2 = ref([]);
 
 
 const estados = ref([
@@ -943,6 +945,7 @@ console.log("Formulario cerrado");
 onMounted(async () => {
   await cargarProyectos();
   cargarTipoDictamen();
+  cargarTipoDictamen2();
   transferencias.value.forEach(transferencia => {
     verificarTransferencia(transferencia.id);
   });
@@ -1422,7 +1425,15 @@ async function cargarTipoDictamen() {
   } catch (error) {
     console.error("Error al cargar los departamentos:", error);
   }
-}
+};
+async function cargarTipoDictamen2() {
+  try {
+    const { data } = await tipoDictamenService.listar2();
+    etapas2.value = data;
+  } catch (error) {
+    console.error("Error al cargar los departamentos:", error);
+  }
+};
 
 // Función para agregar un nuevo dictamen
 /*  const agregarDictamen = async () => {

@@ -16,6 +16,8 @@ export default {
     destroy: (id) => {
         return Api().delete(`/dictamen-eliminar/${id}`);
     },
-  
+    listar2: () => {
+        return Api().get("/listar-tipo2");
+    },
   
 }
