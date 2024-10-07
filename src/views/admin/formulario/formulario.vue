@@ -665,11 +665,11 @@
   <Dialog v-model:visible="deleteFormularioDialog" :style="{ width: '450px' }" header="Confirmar" :modal="true">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
-            <span v-if="dictamenes">Esta seguro de eliminar <b>{{ dictamenes.id }}</b>?</span>
+            <span v-if="dictamenes">Esta seguro de eliminar <b>{{ dictamenEliminar.id }}</b>?</span>
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="deleteFormularioDialog = false" />
-            <Button label="Si" icon="pi pi-check" @click="deleteFormulario(dictamenes.id )" />
+            <Button label="Si" icon="pi pi-check" @click="deleteFormulario(dictamenEliminar.id )" />
         </template>
     </Dialog>
 
@@ -1333,8 +1333,8 @@ function confirmDeleteCierre(prod) {
 function confirmDeleteFormulario(prod) {
     // Verificar que el objeto prod tenga el id y transferencia_id necesarios
     if (prod && prod.id && prod.transferencia_id) {
-        dictamenes.value = prod;
-        console.log("ID transferencia", dictamenes.value.transferencia_id);
+        dictamenEliminar.value = prod;
+        console.log("ID transferencia", dictamenEliminar.value.transferencia_id);
         //toggleDictamen(dictamenes.value.transferencia_id);  // Cambiar si es necesario
         deleteFormularioDialog.value = true;  // Mostrar diálogo de confirmación
         //dictamenes.value = prod;
@@ -1352,22 +1352,24 @@ const refrescarRuta = () => {
 async function deleteFormulario() {
     try {
         // Verifica si hay un dictamen válido para eliminar
-        if (dictamenes.value.id) {
-            console.log("Eliminando dictamen con ID:", dictamenes.value.id);  // Añade este log para depurar
+        if (dictamenEliminar.value.id) {
+            console.log("Eliminando dictamen con ID:", dictamenEliminar.value.id);  // Añade este log para depurar
             
             // Almacenar temporalmente transferencia_id antes de limpiar dictamenes
-            const transferenciaId = dictamenes.value.transferencia_id;
+            const transferenciaId = dictamenEliminar.value.transferencia_id;
             
-            const { data } = await dictamenService.destroy(dictamenes.value.id);
+            const { data } = await dictamenService.destroy(dictamenEliminar.value.id);
             
             // Acción completada con éxito
             deleteFormularioDialog.value = false;  // Cierra el diálogo de confirmación
-            dictamenes.value = {};  // Limpia el dictamen seleccionado
+            dictamenEliminar.value = {};  // Limpia el dictamen seleccionado
+            mostrarModalVer.value = false;
             console.log("ID transferencia", transferenciaId);
             
             // Recargar la lista usando el transferencia_id guardado
             toggleDictamen(transferenciaId);  
-            refrescarRuta(); 
+            // refrescarRuta(); 
+            cargarProyectosVerificandoTabla();
             //Toast.add({ severity: 'success', summary: 'Successful', detail: 'Dictamen eliminado', life: 3000 });
         } else {
             console.error("No hay dictamen válido para eliminar. dictamenes.value:", dictamenes.value);
