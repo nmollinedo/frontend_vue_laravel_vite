@@ -120,7 +120,7 @@
         </DataTable>
       </div>
 
-      <Dialog :visible="mostrarModalVer" modal :style="{ width: '80vw' }" :draggable="false" :closable="false">
+      <Dialog v-model:visible="mostrarModalVer" modal :style="{ width: '80vw' }" :draggable="false">
         <template v-slot:header>
               <span>Ver formulario</span>
               <span>   </span>
@@ -134,7 +134,6 @@
               <span></span>
               <span></span>
               <span></span>
-            <Button icon="pi pi-times" @click="cerrarModalVer" class="p-button-text"></Button>
         </template>
         <div class="dictamenes-etapa">
               <h3>Lista de formularios: </h3>
@@ -676,11 +675,11 @@
     <Dialog v-model:visible="deleteCierreDialog" :style="{ width: '450px' }" header="Confirmar" :modal="true">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
-            <span v-if="dictamenes">Esta seguro de eliminar cierre<b>{{ dictamenes.dictamen_id }}</b>?</span>
+            <span v-if="dictamenes">Esta seguro de eliminar cierre<b>{{ dictamenEliminar.dictamen_id }}</b>?</span>
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="deleteCierreDialog = false" />
-            <Button label="Si" icon="pi pi-check" @click="deleteCierre(dictamenes.dictamen_id,dictamenes.transferencia_id )" />
+            <Button label="Si" icon="pi pi-check" @click="deleteCierre(dictamenEliminar.dictamen_id,dictamenEliminar.transferencia_id )" />
         </template>
     </Dialog>
 
@@ -688,11 +687,11 @@
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
             <span v-if="dictamenes">El registro del formulario tiene carácter de declaración jurada, realizado el cierre los datos del Formulario NO podrán modificarse, tampoco se podrá eliminar el formulario cerrado.
-              ¿Está seguro de cerrar el Formulario?<b>{{ dictamenes.transferencia_id }}</b>?</span>
+              ¿Está seguro de cerrar el Formulario?<b>{{ dictamenEditar.transferencia_id }}</b>?</span>
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="cierreFormularioDialog = false" />
-            <Button label="Si" icon="pi pi-check" @click="confirmCierreFormulario(dictamenes.transferencia_id )" />
+            <Button label="Si" icon="pi pi-check" @click="confirmCierreFormulario(dictamenEditar.transferencia_id )" />
         </template>
     </Dialog>
 
@@ -718,6 +717,8 @@ const toast = useToast();
 const proyectos = ref([]);
 const transferencias = ref([]);
 const dictamenes = ref([]);
+const dictamenEliminar = ref(null);
+const dictamenEditar = ref(null);
 const proyectosFiltrados = ref([]);
 //const transferencia = ref([]);
 //const transferenciasFiltrados = ref([]);
@@ -909,7 +910,8 @@ const guardar = async () => {
     await cargarProyectos();
     console.log("Transferencias cargadas correctamente");
     //refrescarRuta(); 
-    refrescarPagina();
+    cargarProyectosVerificandoTabla();
+    // refrescarPagina();
     cerrarModal();
   } catch (error) {
     //console.log(error.response.data);
@@ -961,7 +963,12 @@ const cargarProyectos = async () => {
   }
 };
 
-
+const cargarProyectosVerificandoTabla = async () => {
+  await cargarProyectos();
+  transferencias.value.forEach(transferencia => {
+    verificarTransferencia(transferencia.id);
+  });
+};
 
 // Filtrar proyectos por estado
 const filtrarProyectos = () => {
@@ -1275,10 +1282,15 @@ async function confirmCierreFormulario(prod) {
         dictamenes.value = prod;
         console.log("ID transferencia",prod);
               try {
+              //cierre de dialogs
+              cierreFormularioDialog.value = false;  
+              mostrarModalVer.value = false;
               const { data } = await transferenciaService.cierreFormulario(prod);
               //etapas.value = data;
               //refrescarRuta(); 
-              refrescarPagina();
+              //Cerrar forms y cargar datos
+              
+              cargarProyectosVerificandoTabla();
             } catch (error) {
               console.error("Error al cerrar:", error);
             }
@@ -1290,8 +1302,8 @@ async function confirmCierreFormulario(prod) {
 function abrirModalCierre(prod) {
     // Verificar que el objeto prod tenga el id y transferencia_id necesarios
     if (prod && prod.id && prod.transferencia_id) {
-        dictamenes.value = prod;
-        console.log("ID transferencia cierre", dictamenes.value.transferencia_id);
+        dictamenEditar.value = prod;
+        console.log("ID transferencia cierre", dictamenEditar.value.transferencia_id);
         //toggleDictamen(dictamenes.value.transferencia_id);  // Cambiar si es necesario
         cierreFormularioDialog.value = true;  // Mostrar diálogo de confirmación
         //dictamenes.value = prod;
@@ -1303,10 +1315,11 @@ function abrirModalCierre(prod) {
 function confirmDeleteCierre(prod) {
     // Verificar que el objeto prod tenga el id y transferencia_id necesarios
     if (prod && prod.id && prod.transferencia_id) {
-        dictamenes.value = prod;
-        console.log("ID transferencia", dictamenes.value.transferencia_id);
-        //toggleDictamen(dictamenes.value.transferencia_id);  // Cambiar si es necesario
+        dictamenEliminar.value = prod;
         deleteCierreDialog.value = true;  // Mostrar diálogo de confirmación
+
+        console.log("ID transferencia", dictamenEliminar.value.transferencia_id);
+        //toggleDictamen(dictamenes.value.transferencia_id);  // Cambiar si es necesario
         //dictamenes.value = prod;
     } else {
         console.error("Datos inválidos para eliminar el dictamen");
@@ -1365,34 +1378,36 @@ async function deleteFormulario() {
 async function deleteCierre() {
   const Data = reactive({
     //id: formId, // Ensure the ID is sent
-    transferencia_id:dictamenes.value.transferencia_id
+    transferencia_id:dictamenEliminar.value.transferencia_id
     // Add other form fields here
   });
 
 
     try {
         // Verifica si hay un dictamen válido para eliminar
-        if (dictamenes.value.dictamen_id) {
-            console.log("Eliminando formulario con ID:", dictamenes.value.dictamen_id);  // Añade este log para depurar
+        if (dictamenEliminar.value.dictamen_id) {
+            console.log("Eliminando formulario con ID:", dictamenEliminar.value.dictamen_id);  // Añade este log para depurar
             
             // Almacenar temporalmente transferencia_id antes de limpiar dictamenes
-            const transferenciaId = dictamenes.value.transferencia_id;
+            const transferenciaId = dictamenEliminar.value.transferencia_id;
             
-            const { data } = await dictamenService.eliminarCierre(dictamenes.value.dictamen_id,Data);
+            const { data } = await dictamenService.eliminarCierre(dictamenEliminar.value.dictamen_id,Data);
             
             // Acción completada con éxito
-            deleteCierreDialog.value = false;  // Cierra el diálogo de confirmación
+            cargarProyectosVerificandoTabla();
+            deleteCierreDialog.value = false;
+            mostrarModalVer.value = false;// Cierra el diálogo de confirmación
             //cerrarModalVer();
             //dictamenes.value = {};  // Limpia el dictamen seleccionado
             console.log("ID transferencia", transferenciaId);
-            window.location.reload();
+            await cargarProyectos();
             // Recargar la lista usando el transferencia_id guardado
             //toggleDictamen(transferenciaId);  
             //deleteCierreDialog.value = false;
             //refrescarRuta(); 
             //Toast.add({ severity: 'success', summary: 'Successful', detail: 'Dictamen eliminado', life: 3000 });
         } else {
-            console.error("No hay formulario válido para eliminar. formulario.value:", dictamenes.value);
+            console.error("No hay formulario válido para eliminar. formulario.value:", dictamenEliminar.value);
         }
     } catch (error) {
         console.error("Error al eliminar el formulario", error);
