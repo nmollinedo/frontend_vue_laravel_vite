@@ -25,6 +25,9 @@ export default {
     modificarForm: (id,datos) => {
         return Api().post(`/modificar-dictamen/${id}`, datos);
     },
+    modificarFecha: (id,datos) => {
+        return Api().post(`/modificar-dictamen-fecha/${id}`, datos);
+    },
     eliminarCierre: (id,datos) => {
         return Api().post(`/eliminar-cierre/${id}`, datos);
     }

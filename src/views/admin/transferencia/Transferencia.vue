@@ -21,10 +21,25 @@
 
     <div>
         <div class="card">
-            <Toolbar class="mb-6">
+            <ProgressSpinner
+            style="width: 50px; height: 50px"
+            strokeWidth="8"
+            fill="transparent"
+            animationDuration=".5s"
+            aria-label="Custom ProgressSpinner"
+            v-if="loading"
+            />
+            <Toolbar class="mb-6" style="display: flex; justify-content: space-between;">
+                <!-- Botón de "Nuevo transferencia" alineado a la izquierda -->
                 <template #start>
-                    <Button label="Nuevo transferencia" icon="pi pi-plus" severity="secondary" class="mr-2"
-                        @click="openNew" />
+                <Button label="Nuevo transferencia" icon="pi pi-plus" severity="secondary" class="mr-2"
+                    @click="openNew" />
+                </template>
+                <!-- Botón "Actualizar Tabla" alineado a la derecha -->
+                <template #end>
+                <button @click="actualizarTabla" class="p-button p-button-secondary">
+                    Actualizar Tabla
+                </button>
                 </template>
                 <!--
                 <template #end>
@@ -551,7 +566,7 @@ const toast = useToast();
 const fecha_inicio = ref(null);
 const fecha_termino = ref(null);
 
-
+const loading = ref(true);
 const objeto = ref('');
 const localizacion = ref('');
 //const submitted = ref(false);
@@ -582,6 +597,11 @@ const entidadId = ref([]);
 
 const planes = ref([]);
 const programas = ref([]);
+
+// Función que se llama al hacer clic en el botón de actualizar
+function actualizarTabla() {
+    getTransferencias();
+}
 
 function formatDateVista(date) {
     if (!date) return '';
@@ -855,7 +875,10 @@ function obtenerEntidad() {
 
 //listar transferencias
 const getTransferencias = async () => {
-    // Obtener entidad_id desde el localStorage
+    
+    try {
+        loading.value = true;
+        // Obtener entidad_id desde el localStorage
     const entidadId = ref(localStorage.getItem('entidad_id'));
     const codigoPresupuestario = localStorage.getItem('codigo_presupuestario');
     const { data } = await transferenciaService.index(entidadId.value);
@@ -875,7 +898,11 @@ const getTransferencias = async () => {
     if (transferencia.value.programa) {
         programa.value.programa = transferencia.value.programa;
     }
-    //alert(transferencias);
+        loading.value = false;
+        
+    } catch (error) {
+        alert("error al recuperar la lista de usuarios")
+    }
 };
 
 function mostrarDatosPersonales(transferencia) {
@@ -1154,7 +1181,7 @@ async function saveTransferencia() {
         transferencia.value.fecha_inicio = fecha_inicio;
         transferencia.value.fecha_termino = fecha_termino;
         transferencia.value.codigo_presupuestario = codigoPresupuestario
-        //alert("ggggg"+transferencia.value);
+        console.log("codigo presupuestario",transferencia.value.codigo_presupuestario);
         console.log("Guardar transferencia",transferencia.value);
         // Envío de la solicitud al servicio
         const { data } = await transferenciaService.store(transferencia.value);

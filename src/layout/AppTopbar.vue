@@ -34,7 +34,7 @@
                 <i class="pi pi-ellipsis-v"></i>
             </button> 
             <!-- Sección para seleccionar la entidad y el código presupuestario -->
-        <!--    <div>
+              <div v-if="userRole === 'ADM'">
                     <h1>Entidad seleccionada: {{ entidadId }}</h1>
                     <Dropdown 
                         v-model="entidadId" 
@@ -47,7 +47,7 @@
                     
                     <p>Código presupuestario: {{ codigoPresupuestario }}</p>
                 </div>
-            -->
+            
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
                     <button type="button" class="layout-topbar-action" @click="toggleProfileMenu">
@@ -84,12 +84,14 @@ import authService from "../services/auth.service";
 import entidadService from '../services/entidad.service';
 import { useRoute } from 'vue-router';
 import { store } from '../store/store';  // Importa el store
+import transferenciaService from '../services/transferencia.service';
 
 // Estado del perfil
 const perfil = ref({});
 const entidades = ref([]);
 const selectedEntidad = ref(null);
 const selectedCodigoPresupuestario = ref(null);
+const transferencias = ref([]);
 
 // Importar funciones del layout
 const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
@@ -105,12 +107,29 @@ const entidadId = computed({
 });
 
 const codigoPresupuestario = ref(null);  // Código presupuestario reactivo
-/*
-const codigoPresupuestarioId = computed({
-  get: () => store.codigo_presupuestario,
-  set: (value) => store.setCodigoPresupuestario(value)
-});*/
 
+const userRole = ref(localStorage.getItem('rol')); // Cambia esto a 'USER' para probar si es diferente
+/*console.log("rol",userRole.value);
+const esAdmin = computed(() => userRole.value === 'ADM');
+console.log("es admin",esAdmin);*/
+
+// Cargar perfil y entidades al montar el componente
+onMounted(() => {
+  obtenerPerfil();
+  getEntidades();
+  loadTransferencias(); // Cargar las transferencias al inicio si es necesario
+  const storedEntidadId = localStorage.getItem('entidad_id');
+    if (storedEntidadId) {
+        entidadId.value = parseInt(storedEntidadId);  // Asegúrate de convertir a número si es necesario
+        //updateCodigoPresupuestario(entidadId.value);  // Actualizar código presupuestario
+    }
+
+});
+
+const onEntidadChange = async () => {
+    await updateEntidadId();
+    //await loadTransferencias();
+};
 // Función para actualizar el ID de la entidad y almacenarlo en localStorage
 function updateEntidadId() {
   console.log("Id entidad", entidadId.value);
@@ -124,20 +143,48 @@ function updateEntidadId() {
 
   // Almacenar el entidad_id en localStorage
   localStorage.setItem('entidad_id', entidadId.value);
+  router.go(0);
+  //window.location.reload();
 }
+
+const loadTransferencias = async () => {
+      console.log("entro aqui")
+     
+      //exit();
+    try {
+        //const response = await getTransferenciasByEntidad(entidadId.value);
+        const { data } = await transferenciaService.index(entidadId.value);
+/*
+    for (let i = 0; i < data.length; i++) {
+        data[i].fecha_inicio = formatDateVista(data[i].fecha_inicio);
+        data[i].fecha_termino = formatDateVista(data[i].fecha_termino);
+    }
+*/
+    transferencias.value = data;
+        //transferencias.value = response.data; // Asegúrate de que el API te devuelva los proyectos correctos
+    } catch (error) {
+        console.error('Error al cargar las transferencias', error);
+    }
+};
 
 // Función para cargar entidades
 const getEntidades = async () => {
   const { data } = await entidadService.index();
   entidades.value = data;
   console.log("Lista entidad", entidades);
+  
 };
+
+
 
 // Función para obtener el perfil del usuario
 async function obtenerPerfil() {
   try {
     const { data } = await authService.perfil();
     perfil.value = data;
+    console.log("perfil",perfil.value.entidad_id);
+    localStorage.setItem('rol', perfil.value.rol.rol);
+    localStorage.setItem('entidad_id', perfil.value.entidad_id);
   } catch (error) {
     alert("Error al recuperar los datos de perfil");
   }
@@ -148,6 +195,7 @@ async function salir() {
   try {
     const { data } = await authService.salir();
     localStorage.removeItem("access_token");
+    localStorage.clear();
     router.push({ name: 'Login' });
   } catch {
     alert("Error al cerrar sesión");
@@ -159,11 +207,7 @@ function toggleProfileMenu() {
   showProfileMenu.value = !showProfileMenu.value;
 }
 
-// Cargar perfil y entidades al montar el componente
-onMounted(() => {
-  obtenerPerfil();
-  getEntidades();
-});
+
 
 // Actualizar el valor de localStorage cuando cambie selectedEntidad o selectedCodigoPresupuestario
 watch(entidadId, (newEntidad) => {

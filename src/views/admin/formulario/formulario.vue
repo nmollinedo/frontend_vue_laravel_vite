@@ -1,19 +1,35 @@
 <template>
   <div class="card" >
+    <ProgressSpinner
+            style="width: 50px; height: 50px"
+            strokeWidth="8"
+            fill="transparent"
+            animationDuration=".5s"
+            aria-label="Custom ProgressSpinner"
+            v-if="loading"
+            />
   <h2>Lista de Transferencias</h2>
 
   <!-- Filtro por estado de los proyectos usando PrimeVue Dropdown -->
-  <div>
+  <div style="display: flex; align-items: center; gap: 10px;">
     <label for="estado">Estado:</label>
+    
+    <!-- Dropdown -->
     <Dropdown 
       id="estado" 
       :options="estados" 
       v-model="estadoSeleccionado" 
       optionLabel="descripcion" 
-      @change="filtrarProyectos" 
+      @change="filtrarTransferencia" 
       placeholder="Seleccionar Estado" />
+    
+    <!-- Botón al lado derecho del Dropdown -->
+    <button @click="actualizarTabla" style="margin-left: auto; border: 2px solid gold; color: black; background-color: white; padding: 10px 20px; border-radius: 5px;">
+      Actualizar Tabla
+    </button>
   </div>
-
+ 
+  
         <!-- Botón para agregar un formulario 
   <Button label="Agregar Formulario" icon="pi pi-plus" @click="abrirModal" class="p-mt-2" />-->
 
@@ -593,7 +609,7 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa2">Etapa del Formulario</label>
+          <label for="etapa">Etapa del Formulario</label>
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
           <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
@@ -732,6 +748,7 @@ const deleteCierreDialog = ref(false);
 const cierreFormularioDialog = ref(false);
 const proyectoSeleccionado = ref(null);
 const etapaSeleccionada = ref(null);
+const etapaSeleccionada2 = ref(null);
 const mostrarModal = ref(false);  // Controla la visibilidad del modal
 const mostrarModalVer = ref(false);  // Controla la visibilidad del modal
 const mostrarModalEdit = ref(false);  // Controla la visibilidad del modal
@@ -741,38 +758,8 @@ const formId = ref(null);
 const fechaInicio = ref(null);
 const fechaTermino = ref(null);
 const id = null;
+const loading = ref(true);
 
-/*
-const form = ref({
-etapa: '',
-fechaInicio: '',
-fechaTermino: '',
-fechaRegistro: '',
-pregunta_1: '',
-pregunta_2: '',
-pregunta_3: '',
-respaldo_pregunta_3: '', // Asegúrate de que tenga valor por defecto
-fecha_pregunta_3:'',
-pregunta_4: '',
-respaldo_pregunta_4: '', 
-fecha_pregunta_4:'',
-pregunta_5: '',
-respaldo_pregunta_5: '', 
-fecha_pregunta_5:'',
-pregunta_6: '',
-respaldo_pregunta_6: '', 
-fecha_pregunta_6:'',
-mae: '',
-mae_cargo: '',
-mae_ci: '',
-mae_documento_designacion: '',
-responsable: '',
-responsable_ci: '',
-responsable_cargo: '',
-responsable_unidad: ''
-// otros campos
-});
-*/
 
 
 const etapas = ref([]);
@@ -781,7 +768,7 @@ const etapas2 = ref([]);
 
 const estados = ref([
 { id: 1, descripcion: 'En registro' },
-{ id: 2, descripcion: 'Completado' }
+{ id: 2, descripcion: 'Validado Entidad' }
 ]);
 
 const estadoSeleccionado = ref(null);
@@ -850,7 +837,10 @@ function limpiarFormulario() {
   form = reactive({ ...defaultForm  });
 }
 
-
+// Función que se llama al hacer clic en el botón de actualizar
+function actualizarTabla() {
+    cargarProyectos();
+}
 
 const guardar = async () => {
   console.log('ID entro:', formId.value);
@@ -955,12 +945,14 @@ onMounted(async () => {
 // Función para cargar proyectos desde la API //listar transferencias
 const cargarProyectos = async () => {
   try {
+    loading.value = true;
      // Obtener entidad_id desde el localStorage
      const entidadId = ref(localStorage.getItem('entidad_id'));
     const { data } = await transferenciaService.index(entidadId.value);
     transferencias.value = data;
     //proyectos.value = response.data;
-    filtrarProyectos();
+    filtrarTransferencia();
+    loading.value = false;
   } catch (error) {
     console.error('Error al cargar los proyectos:', error);
   }
@@ -974,10 +966,21 @@ const cargarProyectosVerificandoTabla = async () => {
 };
 
 // Filtrar proyectos por estado
-const filtrarProyectos = () => {
-  proyectosFiltrados.value = proyectos.value.filter(
-    (proyecto) => proyecto.estado === estadoSeleccionado.value
-  );
+const filtrarTransferencia = async() => {
+  //const entidad_id.value= ref(localStorage.getItem('entidad_id'));
+  const entidadId = ref(localStorage.getItem('entidad_id'));
+
+ /*
+  const payload = {
+                  estado_id: estadoSeleccionado.value.id
+                  };
+*/
+  const estado_id = estadoSeleccionado.value.id
+  console.log("Estado proyecto",estado_id);
+  console.log("Estado proyecto ID",entidadId.value);
+  const { data } = await transferenciaService.filtrarTransferencia(entidadId.value,estado_id);
+  transferencias.value = data;
+
 };
 
 // Función para mostrar los dictámenes de un proyecto
@@ -1000,6 +1003,7 @@ const toggleDictamen = async (id) => {
 
 // Función para abrir el modal
 const abrirModalVer = async (id, datos) => {
+    console.log("abrir modal",id); 
   try {
     fechaInicio.value = datos.fecha_inicio;  // fechas guardadas en transferencias
   fechaTermino.value = datos.fecha_termino;    // fechas guardadas en transferencias
@@ -1100,10 +1104,11 @@ try {
   //await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
   //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
   console.log("datos form",formData);
-    const response = await dictamenService.modificarForm(form.dictamen_id,formData);
-    abrirModalVer(form.transferencia_id);
+    const response = await dictamenService.modificarFecha(form.dictamen_id,formData);
+    console.log("transferencia ID",form.transferencia_id)
+    //abrirModalVer(form.transferencia_id);
     //dictamenes.value = data;
-    console.log('Formulario guardado con éxito:', response.data);
+    console.log('Formulario fecha modificada con éxito:', response.data);
 
 
 
@@ -1352,13 +1357,13 @@ const refrescarRuta = () => {
 async function deleteFormulario() {
     try {
         // Verifica si hay un dictamen válido para eliminar
-        if (dictamenEliminar.value.id) {
-            console.log("Eliminando dictamen con ID:", dictamenEliminar.value.id);  // Añade este log para depurar
+        if (dictamenEliminar.value.dictamen_id) {
+            console.log("Eliminando dictamen con ID:", dictamenEliminar.value.dictamen_id);  // Añade este log para depurar
             
             // Almacenar temporalmente transferencia_id antes de limpiar dictamenes
             const transferenciaId = dictamenEliminar.value.transferencia_id;
             
-            const { data } = await dictamenService.destroy(dictamenEliminar.value.id);
+            const { data } = await dictamenService.destroy(dictamenEliminar.value.dictamen_id);
             
             // Acción completada con éxito
             deleteFormularioDialog.value = false;  // Cierra el diálogo de confirmación

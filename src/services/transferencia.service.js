@@ -29,6 +29,9 @@ export default {
         return Api().get(`/activar-cierre/${id}`);
     },
     cierreFormulario: (id) => {
-        return Api().get(`/cierre-formulario/${id}`);
+        return Api().get(`/cierre-formulario/${id}`); 
+    },
+    filtrarTransferencia: (entidadId,estado_id) => {
+        return Api().get(`/filtrar-transferencia/${entidadId}/${estado_id}`); //filtrar-transferencia
     }
 }
