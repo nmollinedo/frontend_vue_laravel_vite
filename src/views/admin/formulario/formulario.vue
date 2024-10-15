@@ -139,10 +139,10 @@
       <Dialog v-model:visible="mostrarModalVer" modal :style="{ width: '80vw' }" :draggable="false">
         <template v-slot:header>
               <span>Ver formulario</span>
-              <span>   </span>
-              <span>   </span>
-              <span>   </span>
-              <span>  </span>
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
               <span></span>
               <span></span>
               <span></span>
@@ -731,6 +731,7 @@ import tipoDictamenService from '../../../services/tipoDictamen.service';
 import { useRouter } from 'vue-router';
 
 import { eventBus } from "../../../utils/eventBus";
+import componenteService from '../../../services/componente.service';
 
 
 // Cambiar la entidad cuando el usuario selecciona una nueva
@@ -966,7 +967,7 @@ onMounted(async () => {
   transferencias.value.forEach(transferencia => {
     verificarTransferencia(transferencia.id);
   });
-  //await getTransferencias();
+   //await getTransferencias();
 });
 
 // Función para cargar proyectos desde la API //listar transferencias
@@ -1469,6 +1470,8 @@ async function cargarTipoDictamen2() {
     console.error("Error al cargar los departamentos:", error);
   }
 };
+
+
 
 // Función para agregar un nuevo dictamen
 /*  const agregarDictamen = async () => {

@@ -326,6 +326,10 @@
                         <div v-if="error" class="text-red-500">
                             {{ error }}
                         </div> 
+                        <div v-if="mensaje_loc" class="text-green-500">
+                        {{ mensaje_loc }}
+                        </div> 
+                        <Toast />
                     </div>
                     <Toast />
                     
@@ -376,7 +380,7 @@
                 <basic-tab title="Localizacion geografica">
                     <!-- Verifica si el campo descripción (problemática) está vacío antes de habilitar los campos de localización -->
                     <div v-if="transferencia.descripcion && transferencia.descripcion.length > 0" class="flex flex-col gap-6">
-                        <Fieldset legend="Header">
+                        <Fieldset legend="">
                         <label for="Departamento" class="block font-bold mb-3">Departamento</label>
                         <Dropdown 
                             v-model="selectedDepartamento" 
@@ -428,17 +432,92 @@
                     </div>
                     </basic-tab>
 
-            <!--        
-                <basic-tab title="Etapa - Componenete">
-                    <div class="flex flex-col gap-4">
-                        <InputText v-model="value1" type="text" size="small" placeholder="Componente" />
-                        
-                        
-
-
-                        <Button label="Guardar4" severity="info" raised />
+                    
+                <basic-tab title="Componenete">
+                    <div v-if="transferencia.descripcion && transferencia.descripcion.length > 0" class="flex flex-col gap-6">
+                        <Fieldset legend="">
+                        <label for="Componenete" class="block font-bold mb-3">Componente</label>
+                        <Dropdown 
+                            v-model="selectedDepartamento" 
+                            :options="componentes" 
+                            optionLabel="componente"
+                            placeholder="Seleccione componente" 
+                            class="w-full md:w-14rem" 
+                            
+                        />
+                       
+                        </Fieldset>
+                        <div>
+                        <label for="monto_aporte_local" class="block font-bold mb-3">Aporte Propio (Bs.) </label>
+                        <InputNumber v-model="transferencia.monto_aporte_local" inputId="integeronly" fluid />
+                        </div>
+                        <div>
+                        <label for="monto_cofinanciamiento" class="block font-bold mb-3">Co-Finan./Transf.(Bs.)</label>
+                        <InputNumber v-model="transferencia.monto_cofinanciamiento" inputId="integeronly" fluid />
+                        </div>
+                        <div>
+                        <label for="monto_finan_externo" class="block font-bold mb-3">Finan. Externo (Bs.)</label>
+                        <InputNumber v-model="transferencia.monto_finan_externo" inputId="integeronly" fluid />
+                        </div>
+                        <div>
+                        <label for="monto_otros" class="block font-bold mb-3">Otros (Bs.)</label>
+                        <InputNumber v-model="transferencia.monto_otros" inputId="integeronly" fluid />
+                        </div>
+                        <div v-if="mensaje_loc" class="text-green-500">
+                        {{ mensaje_loc }}
+                        </div> 
+                        <Toast />
+                        <Button 
+                        label="Guardar componente" 
+                        icon="pi pi-check" 
+                        @click="guardarLocalizacion"
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                        />
                     </div>
-                </basic-tab> -->
+
+                    <!-- Mensaje cuando el campo problemática no está lleno -->
+                    <div v-else>
+                        <p class="text-red-500">Por favor, complete la descripción del problema antes de llenar la localización geográfica.</p>
+                    </div>
+                    <div>
+                        <DataTable :value="componentes" responsiveLayout="scroll">
+                        <!-- Define Columns -->
+                        <Column field="componente" header="Componentes Etapa" />
+                        <Column field="aporte_propio" header="Aporte Propio (Bs.)" />
+                        <Column field="cofinanciamiento" header="Co-Finan./Transf. (Bs.)" />
+                        <Column field="finan_externo" header="Finan. Externo (Bs.)" />
+                        <Column field="otros" header="Otros (Bs.)" />
+                        
+                        
+                        <!-- Total for Each Row -->
+                        <Column header="Total Etapa (Bs.)">
+                            <template #body="slotProps">
+                            {{ getRowTotal(slotProps.data) }}
+                            </template>
+                        </Column>
+
+                        <!-- Action Buttons -->
+                        <Column header="Actions" :style="{ width: '100px' }">
+                            <template #body="slotProps">
+                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editComponent(slotProps.data)" />
+                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
+                            </template>
+                        </Column>
+
+                        <!-- Footer Row (Total for Columns) -->
+                        <template #footer>
+                        <td class="total-cell">Total:</td>
+                        <td class="total-cell">{{ getColumnTotal('aporte_propio') }}</td>
+                        <td class="total-cell">{{ getColumnTotal('cofinanciamiento') }}</td>
+                        <td class="total-cell">{{ getColumnTotal('finan_externo') }}</td>
+                        <td class="total-cell">{{ getColumnTotal('otros') }}</td>
+                       
+                        <td class="total-cell">{{ getGrandTotal() }}</td>
+                        <td class="total-cell"></td> <!-- Empty cell for Actions column -->
+                        </template>
+                        </DataTable>
+                    </div>
+                </basic-tab> 
 
 
             </basic-tabs>
@@ -484,6 +563,7 @@ import departamentoService from "../../../services/departamento.service";
 import municipioService from "../../../services/municipio.service";
 import poblacionService from "../../../services/poblacion.service";
 import { eventBus } from "../../../utils/eventBus";
+import componenteService from "../../../services/componente.service";
 
 
 // Cambiar la entidad cuando el usuario selecciona una nueva
@@ -516,6 +596,7 @@ const error = ref('');
 const mensaje = ref('');
 const mensaje_prob = ref('');
 const mensaje_loc = ref('');
+const mensaje_fech = ref('');
 const transferencia = ref({
     id: null,
     entidad_operadora: '',
@@ -567,6 +648,8 @@ const loading = ref(true);
 const objeto = ref('');
 const localizacion = ref('');
 //const submitted = ref(false);
+//const componentes = ref([]);
+const selectedComponente = ref({ id: null });
 
 
 // Computed property para concatenar el nombre TPP
@@ -587,6 +670,7 @@ onMounted(() => {
     cargarPoblaciones();
     obtenerEntidadEjecutora();
     actualizarEntidadId();
+    cargarComponente();
  /*   const entidadId = localStorage.getItem('entidad_id');
   if (entidadId) {
     console.log("monment0",entidadId)
@@ -651,6 +735,15 @@ function onMunicipioChange() {
 //   poblaciones.value = [];
 //   transferencia.value.poblacion = [];
 }
+
+async function cargarComponente() {
+  try {
+    const { data } = await componenteService.index();
+   // componentes.value = data;
+  } catch (error) {
+    console.error("Error al cargar los departamentos:", error);
+  }
+};
 
 async function cargarDepartamentos() {
   try {
@@ -1118,6 +1211,7 @@ function validarFechas() {
     //const fechaTermino = fecha_termino.value;
 
     if (fechaTermino <= fechaInicio) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'La fecha de término debe ser al menos un día después de la fecha de inicio.', life: 3000 });
         error.value = 'La fecha de término debe ser al menos un día después de la fecha de inicio.';
     } else {
         error.value = '';
@@ -1249,9 +1343,51 @@ async function deleteTransferencia() {
     getTransferencias();
     //toast.add({ severity: 'success', summary: 'Successful', detail: 'transferencia Deleted', life: 3000 });
 }
+
+const componentes = ref([
+  { componente: 'Administración', aporte_propio: 0, cofinanciamiento: 0, finan_externo: 0, otros: 1 },
+  { componente: 'Auditoría', aporte_propio: 0, cofinanciamiento: 0, finan_externo: 10, otros: 0 },
+  { componente: 'Gestión de Riesgo de Desastres', aporte_propio: 11, cofinanciamiento: 0, finan_externo: 0, otros: 0}
+]);
+
+// Function to calculate row total
+const getRowTotal = (rowData) => {
+  return rowData.aporte_propio + rowData.cofinanciamiento + rowData.finan_externo + rowData.otros ;
+};
+
+// Function to calculate total for a specific column
+const getColumnTotal = (field) => {
+  return componentes.value.reduce((total, item) => total + item[field], 0);
+};
+
+// Function to calculate grand total (sum of totals for each row)
+const getGrandTotal = () => {
+  return componentes.value.reduce((total, item) => total + getRowTotal(item), 0);
+};
+
+const editComponent = (rowData) => {
+  console.log('Edit:', rowData);
+  // Add logic for editing the row data
+};
+
+const deleteComponent = (rowData) => {
+  console.log('Delete:', rowData);
+  // Add logic for deleting the row data
+};
+
 </script>
 
 <style>
+.total-cell {
+  padding: 0.5rem 3.0rem;  /* Ajustar los valores para más o menos espacio */
+  text-align: right;     /* Alineación derecha para los totales */
+  font-weight: bold;     /* Para resaltar los totales */
+}
+
+.total-cell:first-child {
+  text-align: left;      /* El texto "Total:" alineado a la izquierda */
+}
+
 .fixed-column {
   width: 40rem; /* o usa 200px por ejemplo */
   max-width: 40rem;
