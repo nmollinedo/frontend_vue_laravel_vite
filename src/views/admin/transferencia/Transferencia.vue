@@ -483,11 +483,8 @@ import programaService from "../../../services/programa.service";
 import departamentoService from "../../../services/departamento.service";
 import municipioService from "../../../services/municipio.service";
 import poblacionService from "../../../services/poblacion.service";
+import { eventBus } from "../../../utils/eventBus";
 
-//import { useStore } from 'vuex';
-
-//const store = useStore();
-//const entidadId = computed(() => store.state.entidadId);
 
 // Cambiar la entidad cuando el usuario selecciona una nueva
 function cambiarEntidad(nuevaEntidad) {
@@ -590,7 +587,28 @@ onMounted(() => {
     cargarPoblaciones();
     obtenerEntidadEjecutora();
     actualizarEntidadId();
+ /*   const entidadId = localStorage.getItem('entidad_id');
+  if (entidadId) {
+    console.log("monment0",entidadId)
+    loadTransferencias(entidadId);
+  }  */
     //fetchProgramas();
+});
+
+
+const loadTransferencias = async (entidadId) => {
+  try {
+    console.log("load trans adentro",entidadId.value)
+   // const var.value = entidadId.value;
+    const { data } = await transferenciaService.index(entidadId.value);
+    transferencias.value = data;
+  } catch (error) {
+    console.error('Error al cargar las transferencias', error);
+  }
+};
+// Escucha el evento 'entidadSeleccionada'
+eventBus.on('entidadSeleccionada', (entidadId) => {
+  loadTransferencias(entidadId);
 });
 // Computed para obtener el valor reactivo desde el store
 const entidadId = ref([]);

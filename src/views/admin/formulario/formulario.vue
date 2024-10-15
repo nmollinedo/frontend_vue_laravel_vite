@@ -729,6 +729,16 @@ import transferenciaService from '../../../services/transferencia.service';
 import dictamenService from '../../../services/dictamen.service';
 import tipoDictamenService from '../../../services/tipoDictamen.service';
 import { useRouter } from 'vue-router';
+
+import { eventBus } from "../../../utils/eventBus";
+
+
+// Cambiar la entidad cuando el usuario selecciona una nueva
+function cambiarEntidad(nuevaEntidad) {
+  store.commit('setEntidadId', nuevaEntidad.id);
+}
+
+
 const toast = useToast();
 // Variables reactivas
 const proyectos = ref([]);
@@ -806,6 +816,23 @@ const defaultForm = {
   responsable_unidad: '',
   responsable_ci: ''
 };
+
+
+const loadTransferencias = async (entidadId) => {
+  try {
+    console.log("load trans adentro",entidadId.value)
+   // const var.value = entidadId.value;
+    const { data } = await transferenciaService.index(entidadId.value);
+    transferencias.value = data;
+  } catch (error) {
+    console.error('Error al cargar las transferencias', error);
+  }
+};
+
+// Escucha el evento 'entidadSeleccionada'
+eventBus.on('entidadSeleccionada', (entidadId) => {
+  loadTransferencias(entidadId);
+});
 
 function validarFormulario() {
   // Array de errores
@@ -1121,8 +1148,9 @@ try {
 // Función para abrir el modal
 const abrirModalModificacion = async(id) => {
   try {
-  
+     console.log("modifica",id);
     const { data } = await dictamenService.mostrarForm(id);
+    console.log("modifica data",data);
     form.value = data;
     console.log("Edit",form.value);
     console.log("Edit",form.value[0].fecha_registro);

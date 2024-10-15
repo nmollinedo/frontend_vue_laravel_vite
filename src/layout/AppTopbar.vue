@@ -83,7 +83,7 @@ import authService from "../services/auth.service";
 import entidadService from '../services/entidad.service';
 import { useRoute } from 'vue-router';
 import { store } from '../store/store';  // Importa el store
-
+import { eventBus } from '../utils/eventBus'; // O '../eventBus' si está en la raíz
 // Estado del perfil
 const perfil = ref({});
 const entidades = ref([]);
@@ -96,6 +96,11 @@ const { onMenuToggle, toggleDarkMode, isDarkTheme } = useLayout();
 // Estado del menú de perfil
 const showProfileMenu = ref(false);
 const router = useRoute();
+
+const updateNuevoEntidadId = (newEntidadId) => {
+  eventBus.emit('entidadSeleccionada', newEntidadId);  // Emitir evento con el nuevo ID de entidad
+  localStorage.setItem('entidad_id', newEntidadId);
+};
 
 // Computed para el entidad_id y codigo_presupuestario desde el store
 const entidadId = computed({
@@ -111,8 +116,11 @@ const codigoPresupuestarioId = computed({
 });*/
 const userRole = ref(localStorage.getItem('rol')); // Cambia esto a 'USER' para probar si es diferente
 // Función para actualizar el ID de la entidad y almacenarlo en localStorage
-function updateEntidadId() {
-  console.log("Id entidad", entidadId.value);
+function updateEntidadId(newEntidadId) {
+    eventBus.emit('entidadSeleccionada', newEntidadId);  // Emitir evento con el nuevo ID de entidad
+    localStorage.setItem('entidad_id', newEntidadId);
+    console.log("Id entidad selec", newEntidadId);
+  console.log("Id entidad Up", entidadId.value);
   store.setEntidadId(entidadId.value);
   // Buscar la entidad seleccionada para obtener el código presupuestario
   const selectedEntidad = entidades.value.find(entidad => entidad.id === entidadId.value);
