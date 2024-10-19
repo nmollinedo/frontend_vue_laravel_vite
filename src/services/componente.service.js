@@ -13,7 +13,11 @@ export default {
     update: (id, datos) => {
         return Api().put(`/componente/${id}`, datos);
     },
-    destroy: (id) => {
-        return Api().delete(`/componente/${id}`);
+    destroy: (transferencia_id,componenete_id) => {
+        return Api().delete(`/eliminar-componente/${transferencia_id}/${componenete_id}`);
+    }
+    ,
+    modificarComponente: (id, datos) => {
+        return Api().post(`/modificar-componente/${id}`, datos);
     }
 }

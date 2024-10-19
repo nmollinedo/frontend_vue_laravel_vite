@@ -47,7 +47,7 @@
   <!-- Encabezado personalizado -->
   <template #header>
     <div>
-      <h2>Transferencias</h2> 
+      <h2>Transferencias</h2> {{transferencias}}
     </div>
   </template>
 
@@ -609,7 +609,7 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario</label>
+          <label for="etapa">Etapa del Formulario</label>{{etapas2}}
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
           <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
@@ -1051,11 +1051,12 @@ mostrarModalVer.value = false;
 
 // Función para abrir el modal
 const abrirModalEdit = async(id) => {
+  console.log("formulario ID dictamen",id);
   try {
   
     const { data } = await dictamenService.mostrarForm(id);
     form.value = data;
-    console.log("Edit",form.value);
+    console.log("Editar form data",data);
     console.log("Edit",form.value[0].fecha_registro);
     console.log("Trans ID",form.value[0].transferencia_id);
     form.dictamen_id = form.value[0].dictamen_id,
@@ -1093,6 +1094,7 @@ mostrarModalEdit.value = false;
 const guardarFormularioModificacion = async (dictamen_id) => {
   console.log("Formulario Re",form.fechaRegistro)
   console.log("Formulario IN",form.fechaInicio)
+  console.log("Formulario Termino",form.fechaTermino)
   console.log("Formulario ID",formId)
   const formData = reactive({
     //id: formId, // Ensure the ID is sent

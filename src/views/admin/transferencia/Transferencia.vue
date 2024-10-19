@@ -433,12 +433,98 @@
                     </basic-tab>
 
                     
-                <basic-tab title="Componenete">
-                    <div v-if="transferencia.descripcion && transferencia.descripcion.length > 0" class="flex flex-col gap-6">
+                <basic-tab title="Componente">
+                    <!--
+                        <div>
+                            <h2>Costo de la Etapa (Expresado en Bolivianos)</h2>
+                            <p>Ejecución reportada a la fecha: {{ reportedExecution.toFixed(2) }}</p>
+                            <div class="button-row">
+                            <Button label="Adicionar Componente" icon="pi pi-plus" @click="addComponent" class="p-button-secondary" />
+                            </div>
+                            <DataTable :value="costItems" >
+                            <Column field="component" header="Componentes Etapa">
+                                <template #body="slotProps">
+                                <div v-if="slotProps.data.isEditing">
+                                    <Dropdown v-model="slotProps.data.component" :options="predefinedComponents" optionLabel="name" placeholder="Seleccione un componente" @change="(e) => onComponentChange(e, slotProps.data)">
+                                    <template #option="slotProps">
+                                        <div>{{ slotProps.option.name }}</div>
+                                    </template>
+                                    </Dropdown>
+                                    <InputText v-if="slotProps.data.component === ''" v-model="slotProps.data.component" placeholder="Ingrese componente personalizado" />
+                                </div>
+                                <span v-else>{{ slotProps.data.component }}</span>
+                                </template>
+                            </Column>
+                            <Column field="ownContribution" header="Aporte Propio (Bs.)">
+                                <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.ownContribution" @input="calculateTotal(slotProps.data)" />
+                                <span v-else>{{ slotProps.data.ownContribution }}</span>
+                                </template>
+                            </Column>
+                            <Column field="coFinancing" header="Co-Finan./Transf.(Bs.)">
+                                <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.coFinancing" @input="calculateTotal(slotProps.data)" />
+                                <span v-else>{{ slotProps.data.coFinancing }}</span>
+                                </template>
+                            </Column>
+                            <Column field="externalFinancing" header="Finan. Externo (Bs.)">
+                                <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.externalFinancing" @input="calculateTotal(slotProps.data)" />
+                                <span v-else>{{ slotProps.data.externalFinancing }}</span>
+                                </template>
+                            </Column>
+                            <Column field="others" header="Otros (Bs.)">
+                                <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.others" @input="calculateTotal(slotProps.data)" />
+                                <span v-else>{{ slotProps.data.others }}</span>
+                                </template>
+                            </Column>
+                            <Column field="noFinancing" header="Sin Finan.(Bs.)">
+                                <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.noFinancing" @input="calculateTotal(slotProps.data)" />
+                                <span v-else>{{ slotProps.data.noFinancing }}</span>
+                                </template>
+                            </Column>
+                            <Column field="total" header="Total Etapa(Bs.)">
+                                <template #body="slotProps">
+                                {{ slotProps.data.total.toFixed(2) }}
+                                </template>
+                            </Column>
+                            <Column>
+                                <template #body="slotProps">
+                                <div class="action-buttons">
+                                    <Button v-if="slotProps.data.isEditing" icon="pi pi-check" class="p-button-rounded p-button-success p-button-text" @click="saveChanges(slotProps.data)" />
+                                    <Button v-if="slotProps.data.isEditing" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelEditing(slotProps.data, slotProps.index)" />
+                                    <Button v-if="!slotProps.data.isEditing" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="startEditing(slotProps.data)" />
+                                    <Button v-if="!slotProps.data.isEditing" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="removeComponent(slotProps.data.id)" />
+                                </div>
+                                </template>
+                            </Column>
+                            
+                                <template #footer>
+                                <td class="total-cell">Total:</td>
+                                <td class="total-cell">{{ getColumnTotal('aporte_propio') }}</td>
+                                <td class="total-cell">{{ getColumnTotal('cofinanciamiento') }}</td>
+                                <td class="total-cell">{{ getColumnTotal('finan_externo') }}</td>
+                                <td class="total-cell">{{ getColumnTotal('otros') }}</td>
+                            
+                                <td class="total-cell">{{ getGrandTotal() }}</td>
+                                <td class="total-cell"></td> 
+                                </template>
+                            </DataTable>
+                            
+                            <div class="total-row">
+                            <strong>TOTAL</strong>
+                            <span>{{ totalCost.toFixed(2) }}</span>
+                            </div>
+                        </div> -->
+                       
+                <!--    <div v-if="transferencia.descripcion && transferencia.descripcion.length > 0" class="flex flex-col gap-6">-->
+                        <div  class="flex flex-col gap-6">    
                         <Fieldset legend="">
-                        <label for="Componenete" class="block font-bold mb-3">Componente</label>
+                        <label for="Componente" class="block font-bold mb-3">Componente</label>
                         <Dropdown 
-                            v-model="selectedDepartamento" 
+                            v-model="selectedComponente" 
                             :options="componentes" 
                             optionLabel="componente"
                             placeholder="Seleccione componente" 
@@ -449,19 +535,19 @@
                         </Fieldset>
                         <div>
                         <label for="monto_aporte_local" class="block font-bold mb-3">Aporte Propio (Bs.) </label>
-                        <InputNumber v-model="transferencia.monto_aporte_local" inputId="integeronly" fluid />
+                        <InputNumber v-model="componentes.monto_aporte_local" inputId="integeronly" fluid />
                         </div>
                         <div>
                         <label for="monto_cofinanciamiento" class="block font-bold mb-3">Co-Finan./Transf.(Bs.)</label>
-                        <InputNumber v-model="transferencia.monto_cofinanciamiento" inputId="integeronly" fluid />
+                        <InputNumber v-model="componentes.monto_cofinanciamiento" inputId="integeronly" fluid />
                         </div>
                         <div>
                         <label for="monto_finan_externo" class="block font-bold mb-3">Finan. Externo (Bs.)</label>
-                        <InputNumber v-model="transferencia.monto_finan_externo" inputId="integeronly" fluid />
+                        <InputNumber v-model="componentes.monto_finan_externo" inputId="integeronly" fluid />
                         </div>
                         <div>
                         <label for="monto_otros" class="block font-bold mb-3">Otros (Bs.)</label>
-                        <InputNumber v-model="transferencia.monto_otros" inputId="integeronly" fluid />
+                        <InputNumber v-model="componentes.monto_otros" inputId="integeronly" fluid />
                         </div>
                         <div v-if="mensaje_loc" class="text-green-500">
                         {{ mensaje_loc }}
@@ -470,52 +556,110 @@
                         <Button 
                         label="Guardar componente" 
                         icon="pi pi-check" 
-                        @click="guardarLocalizacion"
+                        @click="guardarComponente"
                         style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
                         />
                     </div>
 
                     <!-- Mensaje cuando el campo problemática no está lleno -->
-                    <div v-else>
+                <!--    <div v-else>
                         <p class="text-red-500">Por favor, complete la descripción del problema antes de llenar la localización geográfica.</p>
-                    </div>
+                    </div> -->
                     <div>
-                        <DataTable :value="componentes" responsiveLayout="scroll">
-                        <!-- Define Columns -->
+                        <DataTable :value="listaComponentes" responsiveLayout="scroll" editMode="row" @rowEditInit="onRowEditInit" @rowEditSave="onRowEditSave" @rowEditCancel="onRowEditCancel">
+                        <!-- Mostrar la lista de componentes (opcional para debugging) -->
+                       
+
+                        <!-- Columna Componentes Etapa -->
                         <Column field="componente" header="Componentes Etapa" />
-                        <Column field="aporte_propio" header="Aporte Propio (Bs.)" />
-                        <Column field="cofinanciamiento" header="Co-Finan./Transf. (Bs.)" />
-                        <Column field="finan_externo" header="Finan. Externo (Bs.)" />
-                        <Column field="otros" header="Otros (Bs.)" />
-                        
-                        
-                        <!-- Total for Each Row -->
+
+                        <!-- Columnas editables con InputNumber -->
+                        <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" editor="true">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_aporte_local" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" editor="true">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_cofinanciamiento" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" editor="true">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_finan_externo" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_otros" header="Otros (Bs.)" editor="true">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_otros" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <!-- Columna para mostrar el total de cada fila -->
                         <Column header="Total Etapa (Bs.)">
                             <template #body="slotProps">
                             {{ getRowTotal(slotProps.data) }}
                             </template>
                         </Column>
 
-                        <!-- Action Buttons -->
+                        <!-- Columna para el RowEditor (botón de edición/guardar) 
+                        <Column rowEditor headerStyle="width: 7rem" bodyStyle="text-align:center"></Column>-->
+                        
+
+                        <!-- Columna de acciones para eliminar -->
                         <Column header="Actions" :style="{ width: '100px' }">
                             <template #body="slotProps">
-                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editComponent(slotProps.data)" />
-                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
+                                <Button
+                                icon="pi pi-pencil"
+                                class="p-button-rounded p-button-text"
+                                @click="openEditDialog(slotProps.data)"
+                            />    
+                                <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
                             </template>
                         </Column>
 
-                        <!-- Footer Row (Total for Columns) -->
+                        <!-- Footer para mostrar los totales de las columnas -->
                         <template #footer>
-                        <td class="total-cell">Total:</td>
-                        <td class="total-cell">{{ getColumnTotal('aporte_propio') }}</td>
-                        <td class="total-cell">{{ getColumnTotal('cofinanciamiento') }}</td>
-                        <td class="total-cell">{{ getColumnTotal('finan_externo') }}</td>
-                        <td class="total-cell">{{ getColumnTotal('otros') }}</td>
-                       
-                        <td class="total-cell">{{ getGrandTotal() }}</td>
-                        <td class="total-cell"></td> <!-- Empty cell for Actions column -->
+                            <td class="total-cell">Total:</td>
+                            <td class="total-cell">{{ getColumnTotal('monto_aporte_local') }}</td>
+                            <td class="total-cell">{{ getColumnTotal('monto_cofinanciamiento') }}</td>
+                            <td class="total-cell">{{ getColumnTotal('monto_finan_externo') }}</td>
+                            <td class="total-cell">{{ getColumnTotal('monto_otros') }}</td>
+                            <td class="total-cell">{{ getGrandTotal() }}</td>
+                            <td class="total-cell"></td>
                         </template>
                         </DataTable>
+
+                        <!-- Dialog para la edición -->
+                        <Dialog header="Editar Componente" v-model:visible="editDialogVisible" :modal="true" :closable="false" :style="{ width: '400px' }">
+                        <div class="p-field">
+                            <label for="monto_aporte_local">Aporte Propio (Bs.)</label>
+                            <InputNumber v-model="selectedComponent.monto_aporte_local" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                        </div>
+
+                        <div class="p-field">
+                            <label for="monto_cofinanciamiento">Co-Finan./Transf. (Bs.)</label>
+                            <InputNumber v-model="selectedComponent.monto_cofinanciamiento" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                        </div>
+
+                        <div class="p-field">
+                            <label for="monto_finan_externo">Finan. Externo (Bs.)</label>
+                            <InputNumber v-model="selectedComponent.monto_finan_externo" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                        </div>
+
+                        <div class="p-field">
+                            <label for="monto_otros">Otros (Bs.)</label>
+                            <InputNumber v-model="selectedComponent.monto_otros" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                        </div>
+
+                        <div class="p-dialog-footer">
+                            <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="cancelEdit" />
+                            <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveEdit" />
+                        </div>
+                        </Dialog>
                     </div>
                 </basic-tab> 
 
@@ -564,6 +708,8 @@ import municipioService from "../../../services/municipio.service";
 import poblacionService from "../../../services/poblacion.service";
 import { eventBus } from "../../../utils/eventBus";
 import componenteService from "../../../services/componente.service";
+import InputNumber from 'primevue/inputnumber';
+import Button from 'primevue/button';
 
 
 // Cambiar la entidad cuando el usuario selecciona una nueva
@@ -648,7 +794,8 @@ const loading = ref(true);
 const objeto = ref('');
 const localizacion = ref('');
 //const submitted = ref(false);
-//const componentes = ref([]);
+const componentes = ref([]);
+const listaComponentes = ref([]);
 const selectedComponente = ref({ id: null });
 
 
@@ -671,6 +818,7 @@ onMounted(() => {
     obtenerEntidadEjecutora();
     actualizarEntidadId();
     cargarComponente();
+    listarComponentes();
  /*   const entidadId = localStorage.getItem('entidad_id');
   if (entidadId) {
     console.log("monment0",entidadId)
@@ -739,7 +887,7 @@ function onMunicipioChange() {
 async function cargarComponente() {
   try {
     const { data } = await componenteService.index();
-   // componentes.value = data;
+    componentes.value = data;
   } catch (error) {
     console.error("Error al cargar los departamentos:", error);
   }
@@ -810,6 +958,50 @@ const guardarLocalizacion = async () => {
     } catch (err) {
         error.value = 'Error saving data';
     }
+};
+
+// Funccion guarda componente
+const guardarComponente = async () => {
+    const selectedComponenteId = selectedComponente.value.id;
+    console.log("Componente ID",selectedComponenteId)
+    console.log("Transferencia ID",transferencia.value.id)
+    console.log(" monto_aporte_local",componentes.value.monto_aporte_local)
+    console.log(" monto_aporte_local",componentes.value.monto_cofinanciamiento)
+    try {
+        // Crear el payload con los datos de la transferencia
+        const payload = {
+            transferencia_id: transferencia.value.id,
+            componente_id: selectedComponente.value.id,
+            monto_aporte_local: componentes.value.monto_aporte_local,
+            monto_cofinanciamiento: componentes.value.monto_cofinanciamiento,
+            monto_finan_externo:componentes.value.monto_finan_externo,
+            monto_otros:componentes.value.monto_otros,
+
+        };
+        console.log(payload);
+        // Llamar al servicio para guardar la problemática
+        const { data } = await componenteService.store(payload);
+        listarComponentes();
+        // Mostrar mensaje de éxito o manejar la respuesta según sea necesario
+        console.log(data);
+        toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
+         // Limpiar el formulario después de guardar
+         cargarComponente();
+         limpiarFormularioComponente();
+    } catch (err) {
+        error.value = 'Error saving data';
+    }
+};
+
+// Función para limpiar el formulario de componente
+const limpiarFormularioComponente = () => {
+    componentes.value = {
+        monto_aporte_local: null,
+        monto_cofinanciamiento: null,
+        monto_finan_externo: null,
+        monto_otros: null,
+    };
+    selectedComponente.value = null;
 };
 
 
@@ -1064,6 +1256,8 @@ async function editTransferencia(transferenciaData) {
         // selectedEntidadNombre.value = data[0]["responsable_ejecucion"];
         Object.assign(transferencia.value, data[0]);
         visibleDialogTransferencia.value = true;
+        listarComponentes();
+        cargarComponente();
     } catch (err) {
         error.value = 'Error al cargar los datos de la transferencia.';
     }
@@ -1343,26 +1537,86 @@ async function deleteTransferencia() {
     getTransferencias();
     //toast.add({ severity: 'success', summary: 'Successful', detail: 'transferencia Deleted', life: 3000 });
 }
-
+/*
 const componentes = ref([
   { componente: 'Administración', aporte_propio: 0, cofinanciamiento: 0, finan_externo: 0, otros: 1 },
   { componente: 'Auditoría', aporte_propio: 0, cofinanciamiento: 0, finan_externo: 10, otros: 0 },
   { componente: 'Gestión de Riesgo de Desastres', aporte_propio: 11, cofinanciamiento: 0, finan_externo: 0, otros: 0}
-]);
+]);*/
 
+//Listar componentes
+const listarComponentes = async () => {
+       console.log("compnenete",transferencia.value[0].id)
+//       transferencia_id=componentes.value.transferencia_id;
+//       componente_id=componentes.value.componente_id;
+    try {
+    
+    const { data } = await componenteService.show(transferencia.value[0].id);
+      console.log("data",data);
+    
+    listaComponentes.value = data;
+    //transferencias.value.codigo_presupuestario=codigoPresupuestario;
+
+           
+    } catch (error) {
+        alert("error al recuperar la lista de componentes")
+    }
+};
+
+const onRowEditInit = (event) => {
+  console.log('Iniciando edición', event.data);
+  event.originalData = { ...event.data }; // Guardar una copia del original por si se cancela la edición
+};
+const onRowEditSave = async (event) => {
+  console.log('Guardando cambios', event.data);
+  try {
+    // Llama al servicio para actualizar el componente en el backend
+    await componenteService.update(event.data.id, event.data);
+    console.log('Componente actualizado');
+  } catch (error) {
+    console.error('Error al guardar el componente:', error);
+  }
+};
+
+const onRowEditCancel = (event) => {
+  console.log('Cancelando edición', event.data);
+  listaComponentes.value[event.index] = event.originalData; // Revertir los cambios
+};
+
+const deleteComponent1 = (rowData) => {
+  const index = listaComponentes.value.indexOf(rowData);
+  if (index !== -1) {
+    listaComponentes.value.splice(index, 1);
+  }
+};
 // Function to calculate row total
 const getRowTotal = (rowData) => {
-  return rowData.aporte_propio + rowData.cofinanciamiento + rowData.finan_externo + rowData.otros ;
+    const montoAporteLocal = parseFloat(rowData.monto_aporte_local) || 0;
+  const montoCofinanciamiento = parseFloat(rowData.monto_cofinanciamiento) || 0;
+  const montoFinanExterno = parseFloat(rowData.monto_finan_externo) || 0;
+  const montoOtros = parseFloat(rowData.monto_otros) || 0;
+
+  const total = montoAporteLocal + montoCofinanciamiento + montoFinanExterno + montoOtros;
+
+  return total.toFixed(2); // Devuelve el total con 2 decima
 };
 
 // Function to calculate total for a specific column
 const getColumnTotal = (field) => {
-  return componentes.value.reduce((total, item) => total + item[field], 0);
+    const total = listaComponentes.value.reduce((total, item) => {
+    return total + (parseFloat(item[field]) || 0);
+  }, 0);
+
+  return parseFloat(total.toFixed(2)); // Devuelve el total con 2 decimales como número
 };
 
 // Function to calculate grand total (sum of totals for each row)
 const getGrandTotal = () => {
-  return componentes.value.reduce((total, item) => total + getRowTotal(item), 0);
+    const total = listaComponentes.value.reduce((total, item) => {
+    return total + parseFloat(getRowTotal(item)) || 0;
+  }, 0);
+
+  return parseFloat(total.toFixed(2)); // Devuelve el total con 2 decimales como número
 };
 
 const editComponent = (rowData) => {
@@ -1370,14 +1624,158 @@ const editComponent = (rowData) => {
   // Add logic for editing the row data
 };
 
-const deleteComponent = (rowData) => {
-  console.log('Delete:', rowData);
+const deleteComponent = async(rowData) => {
+  console.log('Delete:', rowData.transferencia_id);
+  console.log('Delete:', rowData.componente_id);
+  const transferencia_id = rowData.transferencia_id;
+  const componente_id = rowData.componente_id;
+  try {
+    
+    const { data } = await componenteService.destroy(transferencia_id,componente_id);
+    listarComponentes();
+    cargarComponente();
+    } catch (error) {
+        alert("error al eliminar componentes")
+    }
   // Add logic for deleting the row data
 };
 
+
+// Estado para manejar el componente seleccionado y la visibilidad del diálogo
+const editDialogVisible = ref(false);
+const selectedComponent = ref({});
+
+// Función para abrir el diálogo con los datos seleccionados
+const openEditDialog = (rowData) => {
+  selectedComponent.value = { ...rowData }; // Copia los datos del componente
+  editDialogVisible.value = true; // Mostrar el diálogo
+};
+
+// Función para guardar los cambios
+const saveEdit = async() => {
+    try {
+    // Crear el payload con los datos del componente seleccionado
+    const payload = {
+      transferencia_id: selectedComponent.value.transferencia_id,  // o el campo que corresponda
+      componente_id: selectedComponent.value.componente_id,       // ID del componente
+      monto_aporte_local: selectedComponent.value.monto_aporte_local,
+      monto_cofinanciamiento: selectedComponent.value.monto_cofinanciamiento,
+      monto_finan_externo: selectedComponent.value.monto_finan_externo,
+      monto_otros: selectedComponent.value.monto_otros,
+    };
+
+    // Llamada a la API para guardar los cambios (puedes usar POST o PUT según tu API)
+    const response = await componenteService.modificarComponente(payload.transferencia_id, payload);
+    
+    // Si la respuesta es exitosa, actualizamos la lista localmente
+    const index = listaComponentes.value.findIndex((item) => item.componente_id === selectedComponent.value.componente_id);
+    if (index !== -1) {
+      listaComponentes.value[index] = { ...selectedComponent.value }; // Actualizar los valores en la lista
+    }
+
+    // Mostrar mensaje de éxito
+    toast.add({ severity: 'success', summary: 'Componente actualizado', detail: 'Se guardó correctamente', life: 3000 });
+
+    // Cerrar el diálogo
+    editDialogVisible.value = false;
+
+  } catch (error) {
+    // Manejar el error, si ocurre
+    console.error('Error al guardar los cambios:', error);
+    toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el componente', life: 3000 });
+  }
+};
+
+// Función para cancelar la edición
+const cancelEdit = () => {
+  selectedComponent.value = {}; // Limpiar el componente seleccionado
+  editDialogVisible.value = false; // Cerrar el diálogo
+};
+
+/*
+
+const costItems = ref([
+  { id: 1, component: 'Administración', ownContribution: 0, coFinancing: 0, externalFinancing: 1, others: 1, noFinancing: 1, total: 3, isEditing: false },
+  { id: 2, component: 'Auditoría', ownContribution: 0, coFinancing: 0, externalFinancing: 10, others: 0, noFinancing: 0, total: 10, isEditing: false },
+  { id: 3, component: 'Gestión de Riesgo de Desastres', ownContribution: 11, coFinancing: 0, externalFinancing: 0, others: 0, noFinancing: 0, total: 11, isEditing: false },
+])
+
+const totalCost = ref(24)
+const reportedExecution = ref(0)
+let nextId = 4
+
+const predefinedComponents = [
+  { name: 'Administración', code: 'ADM' },
+  { name: 'Auditoría', code: 'AUD' },
+  { name: 'Gestión de Riesgo de Desastres', code: 'GRD' },
+  { name: 'Infraestructura', code: 'INF' },
+  { name: 'Equipamiento', code: 'EQP' },
+  { name: 'Capacitación', code: 'CAP' },
+  { name: 'Otro', code: 'OTR' }
+]
+
+const calculateTotal = (item) => {
+  item.total = item.ownContribution + item.coFinancing + item.externalFinancing + item.others + item.noFinancing
+  totalCost.value = costItems.value.reduce((sum, item) => sum + item.total, 0)
+}
+
+const addComponent = () => {
+  costItems.value.push({
+    id: nextId++,
+    component: '',
+    ownContribution: 0,
+    coFinancing: 0,
+    externalFinancing: 0,
+    others: 0,
+    noFinancing: 0,
+    total: 0,
+    isEditing: true
+  })
+}
+
+const removeComponent = (id) => {
+  const index = costItems.value.findIndex(item => item.id === id)
+  if (index !== -1) {
+    costItems.value.splice(index, 1)
+    totalCost.value = costItems.value.reduce((sum, item) => sum + item.total, 0)
+  }
+}
+
+const startEditing = (item) => {
+  item.isEditing = true
+}
+
+const saveChanges = (item) => {
+  item.isEditing = false
+  calculateTotal(item)
+  console.log('Saving changes for component:', item.component)
+}
+
+const cancelEditing = (item, index) => {
+  if (item.component === '') {
+    removeComponent(item.id)
+  } else {
+    item.isEditing = false
+  }
+}
+
+const onComponentChange = (event, item) => {
+  if (event.value === 'OTR') {
+    item.component = ''
+  } else {
+    item.component = event.value.name
+  }
+}
+
+*/
 </script>
 
 <style>
+.p-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+}
 .total-cell {
   padding: 0.5rem 3.0rem;  /* Ajustar los valores para más o menos espacio */
   text-align: right;     /* Alineación derecha para los totales */
@@ -1393,5 +1791,29 @@ const deleteComponent = (rowData) => {
   max-width: 40rem;
   min-width: 40rem;
   overflow: hidden; /* Para evitar que el contenido desborde */
+}
+
+.cost-form {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 </style>
