@@ -1041,6 +1041,7 @@ const guardarComponente = async () => {
          // Limpiar el formulario después de guardar
          cargarComponente();
          limpiarFormularioComponente();
+         noMostrarComponente();
     } catch (err) {
         error.value = 'Error saving data';
     }
@@ -1785,7 +1786,7 @@ const saveEdit = async() => {
     // Cerrar el diálogo
     editDialogVisible.value = false;
     limpiarFormularioComponente();
-
+    noMostrarComponente();
   } catch (error) {
     // Manejar el error, si ocurre
     console.error('Error al guardar los cambios:', error);
