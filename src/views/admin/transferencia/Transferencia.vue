@@ -142,6 +142,15 @@
                         :invalid="submitted && !transferencia.localizacion" fluid />
                 </div>
                 <div>
+                    <h3>Select Location on Map</h3>
+                    <div id="map" style="height: 400px;"></div>
+                    <p>Selected Latitude: {{ latitude }}</p>
+                    <p>Selected Longitude: {{ longitude }}</p>
+                    
+                    <Button label="Save Location" @click="saveLocation" />
+
+                </div>
+                <div>
                     <label for="nombre_tpp">Nombre TPP</label>
                     <!-- Eliminar readonly y usar v-model para hacer el campo editable -->
                     <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid />
@@ -214,7 +223,7 @@
 
 
 
-    <Dialog v-model:visible="visibleDialogTransferencia" modal header="Actualizar Datos" :style="{ width: '56rem' }">
+    <Dialog v-model:visible="visibleDialogTransferencia" modal header="Actualizar Datos" :style="{ width: '78rem' }">
         <!--    <div class="p-6">
         <p>Codigo TPP: <span class="text-lg font-medium text-gray-900">{{  }}</span></p>
         <p>Nombre: <span class="text-lg font-medium text-gray-900">{{  }}</span></p>
@@ -222,9 +231,9 @@
   {{ transferencia }}   -->
         
 
-        <div class="mt-6 mb-6 space-y-6" style="max-width: 750px; margin-top: 20px; margin-bottom: 20px;">
+        <div class="mt-6 mb-6 space-y-6" style="max-width: 1050px; margin-top: 20px; margin-bottom: 20px;">
 
-            <basic-tabs class="mt-6 mb-6 space-y-6 " style="max-width: 750px; margin-top: 20px; margin-bottom: 20px;">
+            <basic-tabs class="mt-6 mb-6 space-y-6 " style="max-width: 1050px; margin-top: 20px; margin-bottom: 20px;">
                 <basic-tab title="Aspectos Generales">
                     <div class="flex flex-col gap-6">
                        <!-- <Fieldset legend="Header">
@@ -587,37 +596,46 @@
                        
 
                         <!-- Columna Componentes Etapa -->
-                        <Column field="componente" header="Componentes Etapa" />
+                        <Column field="componente" header="Componentes Etapa" :style="{ width: '150px' }"/>
 
                         <!-- Columnas editables con InputNumber -->
-                        <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" editor="true">
+                        <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
                             <template #editor="slotProps">
-                            <InputNumber v-model="slotProps.data.monto_aporte_local" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                                <InputNumber 
+            v-model="slotProps.data.monto_aporte_local" 
+            mode="decimal" 
+            :min="0" 
+            :step="0.01" 
+            :maxFractionDigits="2" 
+            :useGrouping="true"  
+            :locale="'es-ES'"
+            :currency="false"
+        />
                             </template>
                         </Column>
 
-                        <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" editor="true">
+                        <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
                             <template #editor="slotProps">
                             <InputNumber v-model="slotProps.data.monto_cofinanciamiento" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
                             </template>
                         </Column>
 
-                        <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" editor="true">
+                        <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
                             <template #editor="slotProps">
                             <InputNumber v-model="slotProps.data.monto_finan_externo" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
                             </template>
                         </Column>
 
-                        <Column field="monto_otros" header="Otros (Bs.)" editor="true">
+                        <Column field="monto_otros" header="Otros (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
                             <template #editor="slotProps">
                             <InputNumber v-model="slotProps.data.monto_otros" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
                             </template>
                         </Column>
 
                         <!-- Columna para mostrar el total de cada fila -->
-                        <Column header="Total Etapa (Bs.)">
+                        <Column header="Total Etapa (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: right">
                             <template #body="slotProps">
-                            {{ getRowTotal(slotProps.data) }}
+                                {{ getRowTotal(slotProps.data) }}
                             </template>
                         </Column>
 
@@ -672,13 +690,13 @@
                                 </tr>
                                 </template>
                                 <tr>
-                                    <td class="total-cell">Total:</td>
-                                    <td class="total-cell">{{ getColumnTotal('monto_aporte_local') }}</td>
-                                    <td class="total-cell">{{ getColumnTotal('monto_cofinanciamiento') }}</td>
-                                    <td class="total-cell">{{ getColumnTotal('monto_finan_externo') }}</td>
-                                    <td class="total-cell">{{ getColumnTotal('monto_otros') }}</td>
-                                    <td class="total-cell">{{ getGrandTotal() }}</td>
-                                    <td class="total-cell"></td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">Total:</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_aporte_local')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_cofinanciamiento')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_finan_externo')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_otros')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getGrandTotal()) }}</td>
+                                <td class="total-cell"></td>
                                 </tr>
                             </template>
                         </DataTable>
@@ -760,6 +778,8 @@ import { eventBus } from "../../../utils/eventBus";
 import componenteService from "../../../services/componente.service";
 import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
+
+
 
 
 // Cambiar la entidad cuando el usuario selecciona una nueva
@@ -879,6 +899,17 @@ onMounted(() => {
     //fetchProgramas();
 });
 
+// Función para formatear los números con separador de miles y dos decimales
+const formatCurrency = (value) => {
+  if (value === null || value === undefined) return '0.00';
+  return value.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
+// Obtener total por fila con formato
+const getRowTotalFormatted = (data) => {
+  const total = data.monto_aporte_local + data.monto_cofinanciamiento + data.monto_finan_externo + data.monto_otros;
+  return formatCurrency(total);
+};
 
 const loadTransferencias = async (entidadId) => {
   try {
@@ -1041,6 +1072,7 @@ const guardarComponente = async () => {
          // Limpiar el formulario después de guardar
          cargarComponente();
          limpiarFormularioComponente();
+         noMostrarComponente();
     } catch (err) {
         error.value = 'Error saving data';
     }
