@@ -520,7 +520,7 @@
                         </div> -->
                        
                 <!--    <div v-if="transferencia.descripcion && transferencia.descripcion.length > 0" class="flex flex-col gap-6">-->
-                        <div  class="flex flex-col gap-6">    
+                        <!-- <div  class="flex flex-col gap-6">    
                         <Fieldset legend="">
                         <label for="Componente" class="block font-bold mb-3">Componente</label>
                         <Dropdown 
@@ -539,7 +539,7 @@
                         </div>
                         <div>
                         <label for="monto_cofinanciamiento" class="block font-bold mb-3">Co-Finan./Transf.(Bs.)</label>
-                        <InputNumber v-model="componentes.monto_cofinanciamiento" inputId="integeronly" fluid />
+                            <InputNumber v-model="componentes.monto_cofinanciamiento" inputId="integeronly" fluid />
                         </div>
                         <div>
                         <label for="monto_finan_externo" class="block font-bold mb-3">Finan. Externo (Bs.)</label>
@@ -559,7 +559,7 @@
                         @click="guardarComponente"
                         style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
                         />
-                    </div>
+                    </div> -->
 
                     <!-- Mensaje cuando el campo problemática no está lleno -->
                 <!--    <div v-else>
@@ -608,7 +608,6 @@
                         <!-- Columna para el RowEditor (botón de edición/guardar) 
                         <Column rowEditor headerStyle="width: 7rem" bodyStyle="text-align:center"></Column>-->
                         
-
                         <!-- Columna de acciones para eliminar -->
                         <Column header="Actions" :style="{ width: '100px' }">
                             <template #body="slotProps">
@@ -622,19 +621,51 @@
                         </Column>
 
                         <!-- Footer para mostrar los totales de las columnas -->
-                        <template #footer>
-                            <td class="total-cell">Total:</td>
-                            <td class="total-cell">{{ getColumnTotal('monto_aporte_local') }}</td>
-                            <td class="total-cell">{{ getColumnTotal('monto_cofinanciamiento') }}</td>
-                            <td class="total-cell">{{ getColumnTotal('monto_finan_externo') }}</td>
-                            <td class="total-cell">{{ getColumnTotal('monto_otros') }}</td>
-                            <td class="total-cell">{{ getGrandTotal() }}</td>
-                            <td class="total-cell"></td>
-                        </template>
+                        <!-- Fila para agregar un nuevo componente -->
+                            <template #footer>
+                                <tr>
+                                    <td >
+                                        <Dropdown 
+                                        v-model="componenteSelecionado" 
+                                        :options="componentes" 
+                                        optionLabel="componente"
+                                        placeholder="Seleccione componente" 
+                                        class="custom-dropdown" 
+                                        :disabled="editDialogVisible"
+                                    />
+                                    </td>               
+                                    <td><InputNumber v-model="selectedComponent.monto_aporte_local" inputId="integeronly" fluid @input="updateTotal"/></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_cofinanciamiento" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_finan_externo" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_otros" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td class="total-cell">{{ totalSuma }}</td>
+                                    <td>
+                                        <template v-if="editDialogVisible">
+                                            <Button icon="pi pi-check"  class="p-button-rounded p-button-text" @click="saveEdit" />
+                                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelarForm()" 
+                                            />
+                                        </template>
+                                        <template v-else>
+                                            <Button icon="pi pi-plus" class="p-button-rounded p-button-text" @click="guardarComponente" />
+                                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelarForm()" />
+                                        </template>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td class="total-cell">Total:</td>
+                                    <td class="total-cell">{{ getColumnTotal('monto_aporte_local') }}</td>
+                                    <td class="total-cell">{{ getColumnTotal('monto_cofinanciamiento') }}</td>
+                                    <td class="total-cell">{{ getColumnTotal('monto_finan_externo') }}</td>
+                                    <td class="total-cell">{{ getColumnTotal('monto_otros') }}</td>
+                                    <td class="total-cell">{{ getGrandTotal() }}</td>
+                                    <td class="total-cell"></td>
+                                </tr>
+                            </template>
                         </DataTable>
 
                         <!-- Dialog para la edición -->
-                        <Dialog header="Editar Componente" v-model:visible="editDialogVisible" :modal="true" :closable="false" :style="{ width: '400px' }">
+                        <!-- <Dialog header="Editar Componente" v-model:visible="editDialogVisible" :modal="true" :closable="false" :style="{ width: '400px' }">
                         <div class="p-field">
                             <label for="monto_aporte_local">Aporte Propio (Bs.)</label>
                             <InputNumber v-model="selectedComponent.monto_aporte_local" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
@@ -659,8 +690,8 @@
                             <Button label="Cancelar" icon="pi pi-times" class="p-button-text" @click="cancelEdit" />
                             <Button label="Guardar" icon="pi pi-check" class="p-button-text" @click="saveEdit" />
                         </div>
-                        </Dialog>
-                    </div>
+                        </Dialog>  -->
+                    </div> 
                 </basic-tab> 
 
 
@@ -796,8 +827,10 @@ const localizacion = ref('');
 //const submitted = ref(false);
 const componentes = ref([]);
 const listaComponentes = ref([]);
-const selectedComponente = ref({ id: null });
+const selectedComponente = ref([]);
+const componenteSelecionado = ref({ id: null });
 
+const totalSuma = ref(0);
 
 // Computed property para concatenar el nombre TPP
 const nombreTpp = computed(() => {
@@ -962,7 +995,7 @@ const guardarLocalizacion = async () => {
 
 // Funccion guarda componente
 const guardarComponente = async () => {
-    const selectedComponenteId = selectedComponente.value.id;
+    const selectedComponenteId = componenteSelecionado.value.id;
     console.log("Componente ID",selectedComponenteId)
     console.log("Transferencia ID",transferencia.value.id)
     console.log(" monto_aporte_local",componentes.value.monto_aporte_local)
@@ -971,11 +1004,11 @@ const guardarComponente = async () => {
         // Crear el payload con los datos de la transferencia
         const payload = {
             transferencia_id: transferencia.value.id,
-            componente_id: selectedComponente.value.id,
-            monto_aporte_local: componentes.value.monto_aporte_local,
-            monto_cofinanciamiento: componentes.value.monto_cofinanciamiento,
-            monto_finan_externo:componentes.value.monto_finan_externo,
-            monto_otros:componentes.value.monto_otros,
+            componente_id: componenteSelecionado.value.id,
+            monto_aporte_local: selectedComponent.value.monto_aporte_local,
+            monto_cofinanciamiento: selectedComponent.value.monto_cofinanciamiento,
+            monto_finan_externo:selectedComponent.value.monto_finan_externo,
+            monto_otros:selectedComponent.value.monto_otros,
 
         };
         console.log(payload);
@@ -995,13 +1028,15 @@ const guardarComponente = async () => {
 
 // Función para limpiar el formulario de componente
 const limpiarFormularioComponente = () => {
-    componentes.value = {
-        monto_aporte_local: null,
-        monto_cofinanciamiento: null,
-        monto_finan_externo: null,
-        monto_otros: null,
-    };
-    selectedComponente.value = null;
+    // componentes.value = {
+    //     monto_aporte_local: null,
+    //     monto_cofinanciamiento: null,
+    //     monto_finan_externo: null,
+    //     monto_otros: null,
+    // };
+    // selectedComponente.value = null;
+    selectedComponent.value = {};
+    totalSuma.value = 0;
 };
 
 
@@ -1619,6 +1654,35 @@ const getGrandTotal = () => {
   return parseFloat(total.toFixed(2)); // Devuelve el total con 2 decimales como número
 };
 
+
+const updateTotal = (nuevoValor) => {
+    // Inicializar la suma total con 0
+    let valorSumar = 0;
+
+    // Verifica si nuevoValor está definido y es un número
+    if (nuevoValor !== undefined && nuevoValor !== null) {
+        // Asigna nuevoValor solo si es un número
+        valorSumar = parseFloat(nuevoValor.value) || 0; // Convierte a número y maneja NaN
+        console.log("Valor a sumar:", nuevoValor); // Muestra el valor a sumar en la consola
+    }
+
+    // Calcula el total de los montos
+    const total = 
+        parseFloat(selectedComponent.value.monto_aporte_local || 0) +
+        parseFloat(selectedComponent.value.monto_cofinanciamiento || 0) +
+        parseFloat(selectedComponent.value.monto_finan_externo || 0) +
+        parseFloat(selectedComponent.value.monto_otros || 0);
+
+    console.log("Total de la suma:", total); // Muestra el total en la consola
+
+    // Actualiza totalSuma sumando el total y el valor a sumar
+    totalSuma.value = total + valorSumar;
+
+    // Para verificar que totalSuma se actualiza correctamente
+    console.log("Total actualizado:", totalSuma.value.toFixed(2)); // Muestra el total actualizado
+};
+
+
 const editComponent = (rowData) => {
   console.log('Edit:', rowData);
   // Add logic for editing the row data
@@ -1648,7 +1712,18 @@ const selectedComponent = ref({});
 // Función para abrir el diálogo con los datos seleccionados
 const openEditDialog = (rowData) => {
   selectedComponent.value = { ...rowData }; // Copia los datos del componente
+  console.log("componentes",componentes)
+  componenteSelecionado.value = componentes.value.find(ent => ent.id === selectedComponent.value.componente_id);
+//   componentes.value = { ...rowData }; // Copia los datos del componente
+  updateTotal();
   editDialogVisible.value = true; // Mostrar el diálogo
+};
+
+const cancelarForm = () => {
+    editDialogVisible.value = false; // Mostrar el diálogo
+    componenteSelecionado.value = {};
+    selectedComponent.value = {}; // Copia los datos del componente
+    totalSuma.value = 0;
 };
 
 // Función para guardar los cambios
@@ -1678,6 +1753,7 @@ const saveEdit = async() => {
 
     // Cerrar el diálogo
     editDialogVisible.value = false;
+    limpiarFormularioComponente();
 
   } catch (error) {
     // Manejar el error, si ocurre
@@ -1771,6 +1847,26 @@ const onComponentChange = (event, item) => {
 </script>
 
 <style>
+.custom-dropdown {
+    width: 150px; /* Limitar el ancho al 10% */
+}
+
+/* Limitar el ancho del texto y aplicar el desbordamiento */
+.custom-dropdown .p-dropdown-label {
+    white-space: nowrap; /* Evitar que el texto se divida en varias líneas */
+    overflow: hidden; /* Ocultar el contenido que desborda */
+    text-overflow: ellipsis; /* Mostrar "..." para indicar que hay más texto */
+    max-width: 100%; /* Asegúrate de que no exceda el ancho del contenedor */
+}
+
+.custom-dropdown .p-dropdown {
+    width: 100%; /* Asegurarte de que el dropdown ocupe todo el contenedor */
+    white-space: nowrap; /* Evitar que el texto se divida en varias líneas */
+    overflow: hidden; /* Ocultar el contenido que desborda */
+    text-overflow: ellipsis; /* Mostrar "..." para indicar que hay más texto */
+    max-width: 100%; /* Asegúrate de que no exceda el ancho del contenedor */
+}
+
 .p-dialog-footer {
   display: flex;
   justify-content: flex-end;
