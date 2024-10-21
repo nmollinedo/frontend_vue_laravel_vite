@@ -47,7 +47,7 @@
   <!-- Encabezado personalizado -->
   <template #header>
     <div>
-      <h2>Transferencias</h2> {{transferencias}}
+      <h2>Transferencias</h2> 
     </div>
   </template>
 
@@ -88,7 +88,7 @@
         v-if="slotProps.data.estado_id===2" 
         label="Agregar modificacion" 
         icon="pi pi-plus" 
-        @click="abrirModalModificacion(slotProps.data.id,slotProps.data)" 
+        @click="abrirModalModificacion(slotProps.data.dictamen_id)" 
         class="p-button-text" 
          style="color: blue"
       />
@@ -163,8 +163,8 @@
                 <Column field="tipo_dictamen" header="Tipo de formulario"></Column>
               <!--  <Column field="etapa" header="Etapa"></Column> -->
                 <Column field="fecha_dictamen" header="Fecha formulario"></Column>
-                <Column field="etapa_fecha_inicio" header="Fecha Inicio Etapa"></Column>
-                <Column field="etapa_fecha_fin" header="Fecha Termino Etapa"></Column>
+                <Column field="proyecto_fecha_inicio" header="Fecha Inicio"></Column>
+                <Column field="proyecto_fecha_fin" header="Fecha Termino"></Column>
                 <Column field="usuario_cierre" header="Usuario Cierre"></Column>
                 <Column header="Imprimir" body="imprimirTemplate">
                   <template #body="slotProps">
@@ -420,6 +420,8 @@
       <div>
         <label for="dictamen_id">ID formulario:</label>
         <input type="text" v-model="form.dictamen_id" readonly class="border rounded-md p-2">
+        <label for="dictamen_id">ID trans:</label>
+        <input type="text" v-model="form.transferencia_id" readonly class="border rounded-md p-2">
       </div>
       <div style="max-height: 70vh;">
         <h2>Datos del Formulario</h2>
@@ -619,8 +621,8 @@
         <!-- Fechas -->
         <div class="field">
           <label>Duración (Inicio y Término de Etapa)</label>
-          <Calendar v-model="fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio"></Calendar>
-          <Calendar v-model="fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término" ></Calendar>
+          <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
+          <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
         </div>
 
         <div class="field">
@@ -823,7 +825,7 @@ const loadTransferencias = async (entidadId) => {
   try {
     console.log("load trans adentro",entidadId.value)
    // const var.value = entidadId.value;
-    const { data } = await transferenciaService.index(entidadId.value);
+    const { data } = await transferenciaService.listarTrafrenciaFormulario(entidadId.value);
     transferencias.value = data;
   } catch (error) {
     console.error('Error al cargar las transferencias', error);
@@ -889,7 +891,9 @@ const guardar = async () => {
   }
 
   // Prepare the form data
+  console.log("form id transfer cia",formId.value);
   const formData = reactive({
+    
     id: formId.value, // Ensure the ID is sent
     etapa: form.etapa,
     fecha_registro: formatDate(form.fechaRegistro),
@@ -976,7 +980,8 @@ const cargarProyectos = async () => {
     loading.value = true;
      // Obtener entidad_id desde el localStorage
      const entidadId = ref(localStorage.getItem('entidad_id'));
-    const { data } = await transferenciaService.index(entidadId.value);
+    const { data } = await transferenciaService.listarTrafrenciaFormulario(entidadId.value);
+
     transferencias.value = data;
     //proyectos.value = response.data;
     filtrarTransferencia();
@@ -1032,6 +1037,7 @@ const toggleDictamen = async (id) => {
 // Función para abrir el modal
 const abrirModalVer = async (id, datos) => {
     console.log("abrir modal",id); 
+    console.log("abrir modal datos",datos);
   try {
     fechaInicio.value = datos.fecha_inicio;  // fechas guardadas en transferencias
   fechaTermino.value = datos.fecha_termino;    // fechas guardadas en transferencias
@@ -1098,7 +1104,7 @@ const guardarFormularioModificacion = async (dictamen_id) => {
   console.log("Formulario ID",formId)
   const formData = reactive({
     //id: formId, // Ensure the ID is sent
-    id:form.transferencia_id,
+    transferencia_id:form.transferencia_id,
     dictamen_id: form.dictamen_id,
     etapa: etapaSeleccionada.value.id,
     fecha_registro: formatDate(form.fecha_dictamen),
@@ -1140,37 +1146,43 @@ try {
     //dictamenes.value = data;
     console.log('Formulario fecha modificada con éxito:', response.data);
 
-
-
-  cerrarModalEdit();  // Cerrar el modal después de guardar
+    //mostrarModalModificacion=false;
+    toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
+    //toast.add({ severity: 'error', summary: 'Formulario fecha modificada con éxito', detail: error });
+  cerrarModalModificacion();  // Cerrar el modal después de guardar
+  loadTransferencias();
 } catch (error) {
   console.error('Error al agregar el dictamen:', error);
 }
 };
 
 // Función para abrir el modal
-const abrirModalModificacion = async(id) => {
+const abrirModalModificacion = async(dictamen_id) => {
   try {
-     console.log("modifica",id);
-    const { data } = await dictamenService.mostrarForm(id);
-    console.log("modifica data",data);
+     console.log("modifica Fecha",dictamen_id);
+    const { data } = await dictamenService.mostrarForm(dictamen_id);
+    console.log("modifica fecha data",data);
     form.value = data;
-    console.log("Edit",form.value);
-    console.log("Edit",form.value[0].fecha_registro);
+    console.log("Edit form",form.value);
+    console.log("Edit fecha registro",form.value[0].fecha_registro);
+    console.log("Edit fecha inicio",form.value[0].proyecto_fecha_inicio);
+    console.log("Edit fecha fin",form.value[0].proyecto_fecha_fin);
     console.log("Trans ID",form.value[0].transferencia_id);
     form.dictamen_id = form.value[0].dictamen_id,
     form.transferencia_id = form.value[0].transferencia_id,
     form.etapa = form.value[0].etapa_id,
     form.fechaRegistro = formatDate(form.value[0].fecha_registro),
     form.fecha_dictamen = formatDate(form.value[0].fecha_dictamen),
-    form.fechaInicio = formatDate(form.value[0].etapa_fecha_inicio),
-    form.fechaTermino = formatDate(form.value[0].etapa_fecha_fin),
+    form.fechaInicio = formatDate(form.value[0].proyecto_fecha_inicio),
+    form.fechaTermino = formatDate(form.value[0].proyecto_fecha_fin),
     form.pregunta_1 =Boolean(form.value[0].pregunta_1),
     form.pregunta_2 = form.value[0].pregunta_2,
     form.pregunta_3 = form.value[0].pregunta_3,
     form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
     form.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
-    console.log("fecha",form.fechaInicio);
+    console.log("fecha iii",form.fechaInicio);
+    console.log("fecha ttt",form.fechaTermino);
+ 
     Object.assign(form, data[0]);
             // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
     etapaSeleccionada.value = etapas.value.find(etapa => etapa.id === form.value[0].etapa_id);
@@ -1258,11 +1270,12 @@ mostrarModal.value = false;
 // Función para guardar el nuevo dictamen
 const guardarFormulario = async (dictamen_id) => {
   console.log("Formulario Re",form.fechaRegistro)
-  console.log("Formulario IN",form.fechaInicio)
+  console.log("Formulario Inicio",form.fechaInicio)
+  console.log("Formulario Termino",form.fechaTermino)
   console.log("Formulario ID",formId)
   const formData = reactive({
     //id: formId, // Ensure the ID is sent
-    id:form.transferencia_id,
+    transferencia_id:form.transferencia_id,
     dictamen_id: form.dictamen_id,
     etapa: etapaSeleccionada.value.id,
     fecha_registro: formatDate(form.fecha_dictamen),

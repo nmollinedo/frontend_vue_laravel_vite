@@ -33,7 +33,7 @@
                 <!-- Botón de "Nuevo transferencia" alineado a la izquierda -->
                 <template #start>
                 <Button label="Nuevo transferencia" icon="pi pi-plus" severity="secondary" class="mr-2"
-                    @click="openNew" />
+                    @click="nuevaTransferencia" />
                 </template>
                 <!-- Botón "Actualizar Tabla" alineado a la derecha -->
                 <template #end>
@@ -90,7 +90,7 @@
         </div>
 
         <Dialog v-model:visible="transferenciaDialog" :style="{ width: '650px' }" header="Nueva transferencias" :modal="true">
-          <!-- {{ transferencia }}  -->
+           {{ transferencia }}  {{entidad}}
             <div class="flex flex-col gap-6">
                 <Fieldset legend="">
                     <td>
@@ -123,7 +123,8 @@
                     </div>
                     <div class="col-span-2">
                         <label for="codigo_tpp2" class="block font-bold mb-2"></label>
-                        <InputText id="codigo_tpp2" v-model="transferencias.codigo_presupuestario" integeronly fluid disabled />
+                    <!--    <InputText id="codigo_tpp2" v-model="transferencias.codigo_presupuestario" integeronly fluid disabled />  -->
+                        <InputText id="codigo_tpp2" value='0000' integeronly fluid disabled />
                     </div>
                     <div class="col-span-2">
                         <label for="codigo_tpp" class="block font-bold mb-2"></label>
@@ -339,7 +340,7 @@
 
                 <basic-tab title="Problematica  "> <!--{{ transferencia }}-->
                     <div class="flex flex-col gap-6"> <!--{{ planes }} -->
-                        <Fieldset legend="Header">
+                        <Fieldset legend="">
                                 <!-- Plan Dropdown -->
                                 <label for="Plan" class="block font-bold mb-3">Plan</label>
                                 <Dropdown
@@ -867,6 +868,7 @@ const loadTransferencias = async (entidadId) => {
    // const var.value = entidadId.value;
     const { data } = await transferenciaService.index(entidadId.value);
     transferencias.value = data;
+    //obtenerEntidadEjecutora();
   } catch (error) {
     console.error('Error al cargar las transferencias', error);
   }
@@ -1179,6 +1181,7 @@ const obtenerEntidadEjecutora = async () => {
         try {
             const { data } = await entidadService.show(entidadId.value);
             entidades.value = data;
+            console.log("entidad cod",data);
         } catch (error) {
             console.error('Error al obtener los datos de la entidad:', error);
         }
@@ -1298,9 +1301,10 @@ async function editTransferencia(transferenciaData) {
     }
 }
 
-function openNew() {
+function nuevaTransferencia() {
     //obtiene entidad segun el id de entidad
     obtenerEntidadEjecutora();
+    //const codigoPresupuestarioId=
     transferencia.value = {};
     selectedEntidad.value = {};
     selectedArea.value = {};
@@ -1515,6 +1519,7 @@ async function saveTransferencia() {
         // Asignación de los valores a la transferencia
         transferencia.value.nombre_tpp = nombreTpp.value;
         transferencia.value.entidad_operadora_id = selectedEntidad.value.id;
+        console.log("Entidad ejecutora:",selectedEntidad.value.id);
         console.log("Entidad Ejecutora:",selectedEntidad.value.nombre);
         transferencia.value.entidad_ejecutora = selectedEntidad.value.nombre;
         transferencia.value.id_area = selectedArea.value.id;

@@ -33,5 +33,8 @@ export default {
     },
     filtrarTransferencia: (entidadId,estado_id) => {
         return Api().get(`/filtrar-transferencia/${entidadId}/${estado_id}`); //filtrar-transferencia
+    },
+    listarTrafrenciaFormulario: (id) => {
+        return Api().get(`/listar-transferencia-formulario/${id}`);
     }
 }
