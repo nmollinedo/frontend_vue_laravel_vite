@@ -561,7 +561,22 @@
                         style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
                         />
                     </div> -->
-
+                    <template v-if="!mostrarFormulario">
+                        <Button 
+                            label="Agregar componente" 
+                            icon="pi pi-check" 
+                            @click="mostrarComponente"
+                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                            />
+                    </template>
+                    <template v-else>
+                        <Button 
+                            label="Ocultar agregar" 
+                            icon="pi pi-times" 
+                            @click="noMostrarComponente"
+                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                            />
+                    </template>
                     <!-- Mensaje cuando el campo problemática no está lleno -->
                 <!--    <div v-else>
                         <p class="text-red-500">Por favor, complete la descripción del problema antes de llenar la localización geográfica.</p>
@@ -624,7 +639,9 @@
                         <!-- Footer para mostrar los totales de las columnas -->
                         <!-- Fila para agregar un nuevo componente -->
                             <template #footer>
+                                <template v-if="mostrarFormulario">
                                 <tr>
+                                    
                                     <td >
                                         <Dropdown 
                                         v-model="componenteSelecionado" 
@@ -653,6 +670,7 @@
                                     </td>
 
                                 </tr>
+                                </template>
                                 <tr>
                                     <td class="total-cell">Total:</td>
                                     <td class="total-cell">{{ getColumnTotal('monto_aporte_local') }}</td>
@@ -830,7 +848,7 @@ const componentes = ref([]);
 const listaComponentes = ref([]);
 const selectedComponente = ref([]);
 const componenteSelecionado = ref({ id: null });
-
+const mostrarFormulario = ref(false);
 const totalSuma = ref(0);
 
 // Computed property para concatenar el nombre TPP
@@ -1027,6 +1045,14 @@ const guardarComponente = async () => {
         error.value = 'Error saving data';
     }
 };
+
+const mostrarComponente = () => {
+    mostrarFormulario.value = true;
+}
+
+const noMostrarComponente = () => {
+    mostrarFormulario.value = false;
+}
 
 // Función para limpiar el formulario de componente
 const limpiarFormularioComponente = () => {
@@ -1684,7 +1710,6 @@ const updateTotal = (nuevoValor) => {
     totalSuma.value = total + valorSumar;
 
     // Para verificar que totalSuma se actualiza correctamente
-    console.log("Total actualizado:", totalSuma.value.toFixed(2)); // Muestra el total actualizado
 };
 
 
@@ -1718,6 +1743,7 @@ const selectedComponent = ref({});
 const openEditDialog = (rowData) => {
   selectedComponent.value = { ...rowData }; // Copia los datos del componente
   console.log("componentes",componentes)
+  mostrarFormulario.value = true;
   componenteSelecionado.value = componentes.value.find(ent => ent.id === selectedComponent.value.componente_id);
 //   componentes.value = { ...rowData }; // Copia los datos del componente
   updateTotal();
