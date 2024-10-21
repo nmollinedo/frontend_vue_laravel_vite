@@ -1817,7 +1817,7 @@ const saveEdit = async() => {
     // Cerrar el diálogo
     editDialogVisible.value = false;
     limpiarFormularioComponente();
-
+    noMostrarComponente();
   } catch (error) {
     // Manejar el error, si ocurre
     console.error('Error al guardar los cambios:', error);
