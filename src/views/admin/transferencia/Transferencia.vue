@@ -602,15 +602,15 @@
                         <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
                             <template #editor="slotProps">
                                 <InputNumber 
-            v-model="slotProps.data.monto_aporte_local" 
-            mode="decimal" 
-            :min="0" 
-            :step="0.01" 
-            :maxFractionDigits="2" 
-            :useGrouping="true"  
-            :locale="'es-ES'"
-            :currency="false"
-        />
+                                    v-model="slotProps.data.monto_aporte_local" 
+                                    mode="decimal" 
+                                    :min="0" 
+                                    :step="0.01" 
+                                    :maxFractionDigits="2" 
+                                    :useGrouping="true"  
+                                    :locale="'es-ES'"
+                                    :currency="false"
+                                />
                             </template>
                         </Column>
 
@@ -778,7 +778,7 @@ import { eventBus } from "../../../utils/eventBus";
 import componenteService from "../../../services/componente.service";
 import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
-
+import moment from 'moment'
 
 
 

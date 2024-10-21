@@ -239,7 +239,7 @@
         
       </div>
     <div style="max-height: 70vh;">
-        <h2>Datos del Formulario</h2> 
+        <h2>Datos del Formulario</h2> {{form.dictamen_id}}
         
         <!-- Select para Etapa -->
         <div class="field">
@@ -592,10 +592,10 @@
       </template>
     </Dialog>
 
-      <!-- Modal para editar formulario para modificar -->
+      <!-- Modal para editar formulario para modificar fecha -->
       <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
       <template v-slot:header>
-              <span>Modificar Formulario yyyy</span>
+              <span>Modificar Formulario Fechas yyyy</span>
               <span>   </span>
               <span>   </span>
               <span>   </span>
@@ -611,7 +611,7 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario</label>{{etapas2}}
+          <label for="etapa">Etapa del Formulario</label>
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
           <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
@@ -676,7 +676,351 @@
         <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalModificacion" class="p-button-secondary"></Button>
       </template>
     </Dialog>
+    <!-- Modal para editar formulario para modificar fecha -->
+      <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
+      <template v-slot:header>
+              <span>Modificar Formulario yyyy</span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
 
+        <Button icon="pi pi-times" @click="cerrarModalEdit" class="p-button-text"></Button>
+      </template>
+     
+      <div style="max-height: 70vh;">
+        <h2>Datos del Formulario</h2>
+        
+        <!-- Select para Etapa -->
+        <div class="field">
+          <label for="etapa">Etapa del Formulario</label>
+          <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
+                        class="w-full md:w-14rem" />
+          <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
+        </div>
+        
+        <div v-if="etapaSeleccionada && etapaSeleccionada.id === 4">
+        <!-- Fechas -->
+        <div class="field">
+          <label>Duración (Inicio y Término de Etapa)</label>
+          <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
+          <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
+        </div>
+
+        <div class="field">
+          <label>Fecha de registro del Formulario</label>
+          <Calendar v-model="form.fecha_dictamen" dateFormat="dd-mm-yy" placeholder="Fecha Registro" :disabled="true"></Calendar>
+        </div>
+
+        <h2>Justificación y Respaldo</h2>
+
+        <!-- Preguntas con radio buttons -->
+        
+             <!-- Datos adicionales -->
+             <div>
+              <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
+              <InputText id="mae" v-model="form.mae" required="true"/>
+            </div>
+            <div>
+              <label for="mae_cargo">Cargo MAE</label>
+              <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
+            </div>
+            <div>
+              <label for="mae_ci">C.I. MAE</label>
+              <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
+            </div>
+            <div>
+              <label for="mae_documento_designacion">Documento de Designación MAE</label>
+              <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
+            </div>
+
+            <div>
+              <label for="responsable">Nombre Responsable del Proyecto</label>
+              <InputText id="responsable" v-model="form.responsable" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_cargo">Cargo Responsable</label>
+              <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_unidad">Unidad Responsable</label>
+              <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_ci">C.I. Responsable</label>
+              <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
+            </div>
+        </div>  
+
+        <div v-if="etapaSeleccionada && etapaSeleccionada.id === 3">
+              <!-- Fechas -->
+              <div class="field">
+                <label>Duración (Inicio y Término de Etapa)</label>
+                <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio" :disabled="true"></Calendar>
+                <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" :disabled="true"></Calendar>
+              </div>
+
+              <div class="field">
+                <label>Fecha de registro del Formulario</label>
+                <Calendar v-model="form.fecha_dictamen" dateFormat="dd/mm/yy" placeholder="Fecha Registro" :disabled="true"></Calendar>
+              </div>
+
+              <div class="field">
+                <label>Modificar Costo</label>
+                <!-- Botón para abrir el diálogo -->
+                <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="abrirDialogo" />
+                
+              </div>
+              <div>
+                <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="mostrarDialog = true" />
+    <DataTable :value="listaComponentes" responsiveLayout="scroll" editMode="row" @rowEditInit="onRowEditInit" @rowEditSave="onRowEditSave" @rowEditCancel="onRowEditCancel">
+                        <!-- Mostrar la lista de componentes (opcional para debugging) -->
+                       
+
+                        <!-- Columna Componentes Etapa -->
+                        <Column field="componente" header="Componentes Etapa" :style="{ width: '150px' }"/>
+
+                        <!-- Columnas editables con InputNumber -->
+                        <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #editor="slotProps">
+                                <InputNumber 
+                                    v-model="slotProps.data.monto_aporte_local" 
+                                    mode="decimal" 
+                                    :min="0" 
+                                    :step="0.01" 
+                                    :maxFractionDigits="2" 
+                                    :useGrouping="true"  
+                                    :locale="'es-ES'"
+                                    :currency="false"
+                                />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_cofinanciamiento" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_finan_externo" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_otros" header="Otros (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_otros" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <!-- Columna para mostrar el total de cada fila -->
+                        <Column header="Total Etapa (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #body="slotProps">
+                                {{ getRowTotal(slotProps.data) }}
+                            </template>
+                        </Column>
+
+                        <!-- Columna para el RowEditor (botón de edición/guardar) 
+                        <Column rowEditor headerStyle="width: 7rem" bodyStyle="text-align:center"></Column>-->
+                        
+                        <!-- Columna de acciones para eliminar -->
+                        <Column header="Actions" :style="{ width: '100px' }">
+                            <template #body="slotProps">
+                                <Button
+                                icon="pi pi-pencil"
+                                class="p-button-rounded p-button-text"
+                                @click="openEditDialog(slotProps.data)"
+                            />    
+                                <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
+                            </template>
+                        </Column>
+
+                        <!-- Footer para mostrar los totales de las columnas -->
+                        <!-- Fila para agregar un nuevo componente -->
+                            <template #footer>
+                                <template v-if="mostrarFormulario">
+                                <tr>
+                                    
+                                    <td >
+                                        <Dropdown 
+                                        v-model="componenteSelecionado" 
+                                        :options="componentes" 
+                                        optionLabel="componente"
+                                        placeholder="Seleccione componente" 
+                                        class="custom-dropdown" 
+                                        :disabled="editDialogVisible"
+                                    />
+                                    </td>               
+                                    <td><InputNumber v-model="selectedComponent.monto_aporte_local" inputId="integeronly" fluid @input="updateTotal"/></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_cofinanciamiento" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_finan_externo" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_otros" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td class="total-cell">{{ totalSuma }}</td>
+                                    <td>
+                                        <template v-if="editDialogVisible">
+                                            <Button icon="pi pi-check"  class="p-button-rounded p-button-text" @click="saveEdit" />
+                                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelarForm()" 
+                                            />
+                                        </template>
+                                        <template v-else>
+                                            <Button icon="pi pi-plus" class="p-button-rounded p-button-text" @click="guardarComponente" />
+                                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelarForm()" />
+                                        </template>
+                                    </td>
+
+                                </tr>
+                                </template>
+                                <tr>
+                                <td :style="{ width: '250px', textAlign: 'right' }">Total:</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_aporte_local')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_cofinanciamiento')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_finan_externo')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_otros')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getGrandTotal()) }}</td>
+                                <td class="total-cell"></td>
+                                </tr>
+                            </template>
+                        </DataTable>
+      
+              </div>
+
+        
+        </div>  
+
+      </div>
+
+      <template v-slot:footer>
+        <Button label="Grabar" icon="pi pi-check" @click="guardarFormularioModificacion(form.dictamen_id)" class="p-button-primary"></Button>
+        <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalModificacion" class="p-button-secondary"></Button>
+      </template>
+    </Dialog>
+
+    <div>
+    
+
+    <!-- Dialog para mostrar los componentes de costos -->
+    <Dialog header="Componentes de Costos" v-model:visible="mostrarComponenteDialog" :style="{ width: '50vw' }" modal>
+      <!-- Botón para abrir el diálogo -->
+    <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="mostrarDialog = true" />
+    <DataTable :value="listaComponentes" responsiveLayout="scroll" editMode="row" @rowEditInit="onRowEditInit" @rowEditSave="onRowEditSave" @rowEditCancel="onRowEditCancel">
+                        <!-- Mostrar la lista de componentes (opcional para debugging) -->
+                       
+
+                        <!-- Columna Componentes Etapa -->
+                        <Column field="componente" header="Componentes Etapa" :style="{ width: '150px' }"/>
+
+                        <!-- Columnas editables con InputNumber -->
+                        <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #editor="slotProps">
+                                <InputNumber 
+                                    v-model="slotProps.data.monto_aporte_local" 
+                                    mode="decimal" 
+                                    :min="0" 
+                                    :step="0.01" 
+                                    :maxFractionDigits="2" 
+                                    :useGrouping="true"  
+                                    :locale="'es-ES'"
+                                    :currency="false"
+                                />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_cofinanciamiento" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_finan_externo" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <Column field="monto_otros" header="Otros (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #editor="slotProps">
+                            <InputNumber v-model="slotProps.data.monto_otros" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
+                            </template>
+                        </Column>
+
+                        <!-- Columna para mostrar el total de cada fila -->
+                        <Column header="Total Etapa (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                            <template #body="slotProps">
+                                {{ getRowTotal(slotProps.data) }}
+                            </template>
+                        </Column>
+
+                        <!-- Columna para el RowEditor (botón de edición/guardar) 
+                        <Column rowEditor headerStyle="width: 7rem" bodyStyle="text-align:center"></Column>-->
+                        
+                        <!-- Columna de acciones para eliminar -->
+                        <Column header="Actions" :style="{ width: '100px' }">
+                            <template #body="slotProps">
+                                <Button
+                                icon="pi pi-pencil"
+                                class="p-button-rounded p-button-text"
+                                @click="openEditDialog(slotProps.data)"
+                            />    
+                                <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
+                            </template>
+                        </Column>
+
+                        <!-- Footer para mostrar los totales de las columnas -->
+                        <!-- Fila para agregar un nuevo componente -->
+                            <template #footer>
+                                <template v-if="mostrarFormulario">
+                                <tr>
+                                    
+                                    <td >
+                                        <Dropdown 
+                                        v-model="componenteSelecionado" 
+                                        :options="componentes" 
+                                        optionLabel="componente"
+                                        placeholder="Seleccione componente" 
+                                        class="custom-dropdown" 
+                                        :disabled="editDialogVisible"
+                                    />
+                                    </td>               
+                                    <td><InputNumber v-model="selectedComponent.monto_aporte_local" inputId="integeronly" fluid @input="updateTotal"/></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_cofinanciamiento" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_finan_externo" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td><InputNumber v-model="selectedComponent.monto_otros" inputId="integeronly" fluid @input="updateTotal" /></td>
+                                    <td class="total-cell">{{ totalSuma }}</td>
+                                    <td>
+                                        <template v-if="editDialogVisible">
+                                            <Button icon="pi pi-check"  class="p-button-rounded p-button-text" @click="saveEdit" />
+                                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelarForm()" 
+                                            />
+                                        </template>
+                                        <template v-else>
+                                            <Button icon="pi pi-plus" class="p-button-rounded p-button-text" @click="guardarComponente" />
+                                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelarForm()" />
+                                        </template>
+                                    </td>
+
+                                </tr>
+                                </template>
+                                <tr>
+                                <td :style="{ width: '250px', textAlign: 'right' }">Total:</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_aporte_local')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_cofinanciamiento')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_finan_externo')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_otros')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getGrandTotal()) }}</td>
+                                <td class="total-cell"></td>
+                                </tr>
+                            </template>
+                        </DataTable>
+      
+      <!-- Botón para cerrar el diálogo -->
+      <template #footer>
+        <Button label="Cerrar" icon="pi pi-times" @click="mostrarDialog = false" />
+      </template>
+    </Dialog>
+  </div>
 
 
   </div>
@@ -773,7 +1117,8 @@ const fechaTermino = ref(null);
 const id = null;
 const loading = ref(true);
 
-
+const componentes = ref([]);
+const listaComponentes = ref([]);
 
 const etapas = ref([]);
 const etapas2 = ref([]);
@@ -820,7 +1165,160 @@ const defaultForm = {
   responsable_ci: ''
 };
 
+// Estado del diálogo
+const mostrarComponenteDialog = ref(false);
+// Función para abrir el diálogo
+const abrirDialogo = () => {
+  mostrarComponenteDialog.value = true;
+};
 
+// Función para cerrar el diálogo
+const cerrarDialogo = () => {
+  mostrarComponenteDialog.value = false;
+};
+
+// Lista de componentes de costos (puedes obtenerla de una API o definirla localmente)
+const componentesCostos = ref([
+  { componente: 'Componente 1', descripcion: 'Descripción del componente 1', monto: 15000.25 },
+  { componente: 'Componente 2', descripcion: 'Descripción del componente 2', monto: 3200.75 },
+  { componente: 'Componente 3', descripcion: 'Descripción del componente 3', monto: 5000.50 },
+]);
+
+// Función para formatear los montos
+const formatCurrency = (value) => {
+  return new Intl.NumberFormat('es-ES', {
+    style: 'currency',
+    currency: 'BOB',
+    minimumFractionDigits: 2,
+  }).format(value);
+};
+
+//Componentes metodos
+//Listar componentes
+const listarComponentes = async () => {
+       console.log("compnenete",transferencia.value[0].id)
+//       transferencia_id=componentes.value.transferencia_id;
+//       componente_id=componentes.value.componente_id;
+    try {
+    
+    const { data } = await componenteService.show(transferencia.value[0].id);
+      console.log("data",data);
+    
+    listaComponentes.value = data;
+    //transferencias.value.codigo_presupuestario=codigoPresupuestario;
+
+           
+    } catch (error) {
+        alert("error al recuperar la lista de componentes")
+    }
+};
+
+const onRowEditInit = (event) => {
+  console.log('Iniciando edición', event.data);
+  event.originalData = { ...event.data }; // Guardar una copia del original por si se cancela la edición
+};
+const onRowEditSave = async (event) => {
+  console.log('Guardando cambios', event.data);
+  try {
+    // Llama al servicio para actualizar el componente en el backend
+    await componenteService.update(event.data.id, event.data);
+    console.log('Componente actualizado');
+  } catch (error) {
+    console.error('Error al guardar el componente:', error);
+  }
+};
+
+const onRowEditCancel = (event) => {
+  console.log('Cancelando edición', event.data);
+  listaComponentes.value[event.index] = event.originalData; // Revertir los cambios
+};
+
+const deleteComponent1 = (rowData) => {
+  const index = listaComponentes.value.indexOf(rowData);
+  if (index !== -1) {
+    listaComponentes.value.splice(index, 1);
+  }
+};
+// Function to calculate row total
+const getRowTotal = (rowData) => {
+    const montoAporteLocal = parseFloat(rowData.monto_aporte_local) || 0;
+  const montoCofinanciamiento = parseFloat(rowData.monto_cofinanciamiento) || 0;
+  const montoFinanExterno = parseFloat(rowData.monto_finan_externo) || 0;
+  const montoOtros = parseFloat(rowData.monto_otros) || 0;
+
+  const total = montoAporteLocal + montoCofinanciamiento + montoFinanExterno + montoOtros;
+
+  return total.toFixed(2); // Devuelve el total con 2 decima
+};
+
+// Function to calculate total for a specific column
+const getColumnTotal = (field) => {
+    const total = listaComponentes.value.reduce((total, item) => {
+    return total + (parseFloat(item[field]) || 0);
+  }, 0);
+
+  return parseFloat(total.toFixed(2)); // Devuelve el total con 2 decimales como número
+};
+
+// Function to calculate grand total (sum of totals for each row)
+const getGrandTotal = () => {
+    const total = listaComponentes.value.reduce((total, item) => {
+    return total + parseFloat(getRowTotal(item)) || 0;
+  }, 0);
+
+  return parseFloat(total.toFixed(2)); // Devuelve el total con 2 decimales como número
+};
+
+
+const updateTotal = (nuevoValor) => {
+    // Inicializar la suma total con 0
+    let valorSumar = 0;
+
+    // Verifica si nuevoValor está definido y es un número
+    if (nuevoValor !== undefined && nuevoValor !== null) {
+        // Asigna nuevoValor solo si es un número
+        valorSumar = parseFloat(nuevoValor.value) || 0; // Convierte a número y maneja NaN
+        console.log("Valor a sumar:", nuevoValor); // Muestra el valor a sumar en la consola
+    }
+
+    // Calcula el total de los montos
+    const total = 
+        parseFloat(selectedComponent.value.monto_aporte_local || 0) +
+        parseFloat(selectedComponent.value.monto_cofinanciamiento || 0) +
+        parseFloat(selectedComponent.value.monto_finan_externo || 0) +
+        parseFloat(selectedComponent.value.monto_otros || 0);
+
+    console.log("Total de la suma:", total); // Muestra el total en la consola
+
+    // Actualiza totalSuma sumando el total y el valor a sumar
+    totalSuma.value = total + valorSumar;
+
+    // Para verificar que totalSuma se actualiza correctamente
+};
+
+
+const editComponent = (rowData) => {
+  console.log('Edit:', rowData);
+  // Add logic for editing the row data
+};
+
+const deleteComponent = async(rowData) => {
+  console.log('Delete:', rowData.transferencia_id);
+  console.log('Delete:', rowData.componente_id);
+  const transferencia_id = rowData.transferencia_id;
+  const componente_id = rowData.componente_id;
+  try {
+    
+    const { data } = await componenteService.destroy(transferencia_id,componente_id);
+    listarComponentes();
+    cargarComponente();
+    } catch (error) {
+        alert("error al eliminar componentes")
+    }
+  // Add logic for deleting the row data
+};
+
+//----------------------------
 const loadTransferencias = async (entidadId) => {
   try {
     console.log("load trans adentro",entidadId.value)
@@ -971,6 +1469,7 @@ onMounted(async () => {
   transferencias.value.forEach(transferencia => {
     verificarTransferencia(transferencia.id);
   });
+  listarComponentes();
    //await getTransferencias();
 });
 
@@ -979,9 +1478,14 @@ const cargarProyectos = async () => {
   try {
     loading.value = true;
      // Obtener entidad_id desde el localStorage
+     
      const entidadId = ref(localStorage.getItem('entidad_id'));
     const { data } = await transferenciaService.listarTrafrenciaFormulario(entidadId.value);
-
+    console.log("lista formulario",data);
+     for (let i = 0; i < data.length; i++) {
+        data[i].fecha_inicio = formatDateVista(data[i].fecha_inicio);
+        data[i].fecha_termino = formatDateVista(data[i].fecha_termino);
+    }
     transferencias.value = data;
     //proyectos.value = response.data;
     filtrarTransferencia();
@@ -990,6 +1494,12 @@ const cargarProyectos = async () => {
     console.error('Error al cargar los proyectos:', error);
   }
 };
+
+function formatDateVista(date) {
+    if (!date) return '';
+    const [year, month, day] = date.split('-');
+    return `${day}-${month}-${year}`;
+}
 
 const cargarProyectosVerificandoTabla = async () => {
   await cargarProyectos();
@@ -1164,24 +1674,24 @@ const abrirModalModificacion = async(dictamen_id) => {
     console.log("modifica fecha data",data);
     form.value = data;
     console.log("Edit form",form.value);
-    console.log("Edit fecha registro",form.value[0].fecha_registro);
+    console.log("Edit fecha registro",formatDateVista(form.value[0].fecha_registro));
     console.log("Edit fecha inicio",form.value[0].proyecto_fecha_inicio);
     console.log("Edit fecha fin",form.value[0].proyecto_fecha_fin);
     console.log("Trans ID",form.value[0].transferencia_id);
     form.dictamen_id = form.value[0].dictamen_id,
     form.transferencia_id = form.value[0].transferencia_id,
     form.etapa = form.value[0].etapa_id,
-    form.fechaRegistro = formatDate(form.value[0].fecha_registro),
-    form.fecha_dictamen = formatDate(form.value[0].fecha_dictamen),
-    form.fechaInicio = form.value[0].proyecto_fecha_inicio,
-    form.fechaTermino = form.value[0].proyecto_fecha_fin,
+    form.fechaRegistro = formatDateVista(form.value[0].fecha_registro),
+    form.fecha_dictamen = formatDateVista(form.value[0].fecha_dictamen),
+    form.fechaInicio = formatDateVista(form.value[0].proyecto_fecha_inicio),
+    form.fechaTermino = formatDateVista(form.value[0].proyecto_fecha_fin),
     form.pregunta_1 =Boolean(form.value[0].pregunta_1),
     form.pregunta_2 = form.value[0].pregunta_2,
     form.pregunta_3 = form.value[0].pregunta_3,
     form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
     form.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
-    console.log("fecha iii",form.fechaInicio);
-    console.log("fecha ttt",form.fechaTermino);
+    console.log("fecha iii",formatDateVista(form.fechaInicio));
+    console.log("fecha ttt",formatDateVista(form.fechaTermino));
  
     Object.assign(form, data[0]);
             // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
