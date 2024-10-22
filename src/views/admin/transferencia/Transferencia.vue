@@ -88,126 +88,85 @@
                 </Column>
             </DataTable>
         </div>
-
         <Dialog v-model:visible="transferenciaDialog" :style="{ width: '650px' }" header="Nueva transferencias" :modal="true">
-           {{ transferencia }}  {{entidad}}
-            <div class="flex flex-col gap-6">
-                <Fieldset legend="">
-                    <td>
-                        <label for="Entidad" class="block font-bold mb-3">Responsable de la operacion</label>
-                    </td>
-                    <div>
-
-                        <Dropdown v-model="selectedEntidad" :options="entidades" optionLabel="nombre"
-                            placeholder="Seleccionar una entidad" class="w-full md:w-14rem" />
-                    <!--    <p>ID de la ciudad seleccionada: {{ selectedEntidad.id }}</p>  -->
-                    </div>
-                    <div>
-                        <label for="responsableEjecucion" class="block font-bold mb-3">Responsable de la
-                            ejecucion</label>
-                        <!-- Aquí el campo InputText se llena automáticamente con el nombre de la entidad seleccionada -->
-                        <InputText v-model="selectedEntidadNombre" id="responsableEjecucion" fluid />
-                    </div>
-
-                </Fieldset>
-
-    
-                <div class="grid grid-cols-10 gap-1">
-                    <div class="col-span-2">
-                        <label for="price" class="block font-bold mb-2">Codigo TPP</label>
-
-                    </div>
-                    <div class="col-span-2">
-                        <label for="codigo_tpp1" class="block font-bold mb-2"></label>
-                        <InputText id="codigo_tpp1" value='TPP' integeronly fluid disabled />
-                    </div>
-                    <div class="col-span-2">
-                        <label for="codigo_tpp2" class="block font-bold mb-2"></label>
-                    <!--    <InputText id="codigo_tpp2" v-model="transferencias.codigo_presupuestario" integeronly fluid disabled />  -->
-                        <InputText id="codigo_tpp2" value='0000' integeronly fluid disabled />
-                    </div>
-                    <div class="col-span-2">
-                        <label for="codigo_tpp" class="block font-bold mb-2"></label>
-                        <InputText id="codigo_tpp" value='0000000' integeronly fluid disabled />
-                    </div>
-                </div>
-                <div>
-                    <label for="objeto" class="block font-bold mb-3">Objeto</label>
-                    <InputText id="objeto" v-model.trim="transferencia.objeto" required="true" autofocus
-                        :invalid="submitted && !transferencia.objeto" fluid />
-                </div>
-                <div>
-                    <label for="localizacion" class="block font-bold mb-3">Localización</label>
-                    <InputText id="localizacion" v-model.trim="transferencia.localizacion" required="true" autofocus
-                        :invalid="submitted && !transferencia.localizacion" fluid />
-                </div>
-                <div>
-                    <h3>Select Location on Map</h3>
-                    <div id="map" style="height: 400px;"></div>
-                    <p>Selected Latitude: {{ latitude }}</p>
-                    <p>Selected Longitude: {{ longitude }}</p>
-                    
-                    <Button label="Save Location" @click="saveLocation" />
-
-                </div>
-                <div>
-                    <label for="nombre_tpp">Nombre TPP</label>
-                    <!-- Eliminar readonly y usar v-model para hacer el campo editable -->
-                    <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid />
-
-                    <!-- Mostrar el mensaje de error si excede los 110 caracteres -->
-                    <span v-if="nombreTppError" class="text-red-110">
-                    Máximo 110 caracteres permitidos
-                    </span>
-                </div>
-
-                <div>
-                    <label for="denominacion_convenio" class="block font-bold mb-3">Denominación del Convenio</label>
-                    <Textarea 
-                    id="denominacion_convenio" 
-                    v-model="transferencia.denominacion_convenio" 
-                    rows="4" 
-                    fluid 
-                    />
-                    
-                </div>
-          
-                    <label for="Entidad" class="block font-bold mb-3">Area de Influencia</label>
-              
-                <div><!--{{areas}}-->
-
-                    <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione una área"
-                        class="w-full md:w-14rem" />
-                    
-                </div>
-                <div>
-                    <label for="fecha_inicio" class="block font-bold mb-3">Fecha Inicio</label>
-                    <Calendar v-model="fecha_inicio" dateFormat="dd/mm/yy" showIcon />
-                </div>
-                <div>
-                    <label for="fecha_termino" class="block font-bold mb-3">Fecha Termino</label>
-                    <Calendar v-model="fecha_termino" dateFormat="dd/mm/yy" showIcon />
-                </div>
-<!--
-                <div class="mt-3">
-                    <p><strong>Fecha Inicio Seleccionada:</strong> {{ fecha_inicio }}</p>
-                    <p><strong>Fecha Término Seleccionada:</strong> {{ fecha_termino }}</p>
-                </div>
-            -->
-            
-            </div>
-            <div v-if="error" class="text-red-500">
-                {{ error }}
-            </div>
-
-
-            <template #footer>
-                <Button label="Cancelar" icon="pi pi-times" text @click="hideDialog"
-                    style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
-                <Button label="Guardar" icon="pi pi-check" @click="validarFechas"
-                    style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
-            </template>
-        </Dialog>
+         
+         <!-- Se reduce el espaciado entre los elementos a gap-2 -->
+         <div class="flex flex-col gap-2">
+             <Fieldset legend="">
+                 <td>
+                     <label for="Entidad" class="block font-bold mb-2">Responsable de la operacion</label>
+                 </td>
+                 <div>
+                     <Dropdown v-model="selectedEntidad" :options="entidades" optionLabel="nombre"
+                         placeholder="Seleccionar una entidad" class="w-full md:w-14rem" />
+                 </div>
+                 <div>
+                     <label for="responsableEjecucion" class="block font-bold mb-2">Responsable de la ejecucion</label>
+                     <InputText v-model="selectedEntidadNombre" id="responsableEjecucion" fluid />
+                 </div>
+             </Fieldset>
+ 
+             <div class="grid grid-cols-10 gap-1">
+                 <div class="col-span-2">
+                     <label for="price" class="block font-bold mb-2">Codigo TPP</label>
+                 </div>
+                 <div class="col-span-2">
+                     <InputText id="codigo_tpp1" value='TPP' integeronly fluid disabled />
+                 </div>
+                 <div class="col-span-2">
+                     <InputText id="codigo_tpp2" value='0000' integeronly fluid disabled />
+                 </div>
+                 <div class="col-span-2">
+                     <InputText id="codigo_tpp" value='0000000' integeronly fluid disabled />
+                 </div>
+             </div>
+             
+             <div>
+                 <label for="objeto" class="block font-bold mb-2">Objeto</label>
+                 <InputText id="objeto" v-model.trim="transferencia.objeto" required="true" fluid />
+             </div>
+             
+             <div>
+                 <label for="localizacion" class="block font-bold mb-2">Localización</label>
+                 <InputText id="localizacion" v-model.trim="transferencia.localizacion" required="true" fluid />
+             </div>
+ 
+             <div>
+                 <label for="nombre_tpp" class="block font-bold mb-2">Nombre TPP</label>
+                 <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid disabled />
+                 <span v-if="nombreTppError" class="text-red-110">Máximo 110 caracteres permitidos</span>
+             </div>
+ 
+             <div>
+                 <label for="denominacion_convenio" class="block font-bold mb-2">Denominación del Convenio</label>
+                 <Textarea id="denominacion_convenio" v-model="transferencia.denominacion_convenio" rows="4" fluid />
+             </div>
+ 
+             <div>
+                 <label for="Entidad" class="block font-bold mb-2">Área de Influencia</label>
+                 <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione una área" class="w-full md:w-14rem" />
+             </div>
+ 
+             <div>
+                 <label for="fecha_inicio" class="block font-bold mb-2">Fecha Inicio</label>
+                 <Calendar v-model="fecha_inicio" dateFormat="dd/mm/yy" showIcon />
+             </div>
+ 
+             <div>
+                 <label for="fecha_termino" class="block font-bold mb-2">Fecha Termino</label>
+                 <Calendar v-model="fecha_termino" dateFormat="dd/mm/yy" showIcon />
+             </div>
+         </div>
+ 
+         <div v-if="error" class="text-red-500">{{ error }}</div>
+ 
+         <template #footer>
+             <Button label="Cancelar" icon="pi pi-times" text @click="hideDialog"
+                 style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+             <Button label="Guardar" icon="pi pi-check" @click="validarFechas"
+                 style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+         </template>
+     </Dialog>
 
         <Dialog v-model:visible="deletetransferenciaDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
             <div class="flex items-center gap-4">
@@ -1571,54 +1530,58 @@ async function saveTransferencia() {
             if (nombreTpp.value.length > 110) {
             // Recortar el valor a 110 caracteres justo antes de guardar
             //nombreTpp.value = nombreTpp.value.slice(0, 110);
+            // Mostrar un mensaje de error al usuario
+            alert('Ocurrió un error al guardar la transferencia. Por favor, intenta nuevamente nombre TPP tiene mas de 110 caracteres.');
             alert('Se supera los 110 caracteres.');
+            }else{
+                try {
+                    // Asignación de los valores a la transferencia
+                    transferencia.value.nombre_tpp = nombreTpp.value;
+                    transferencia.value.entidad_operadora_id = selectedEntidad.value.id;
+                    console.log("Entidad ejecutora:",selectedEntidad.value.id);
+                    console.log("Entidad Ejecutora:",selectedEntidad.value.nombre);
+                    transferencia.value.entidad_ejecutora = selectedEntidad.value.nombre;
+                    transferencia.value.id_area = selectedArea.value.id;
+                    //transferencia.value.localizacion = localizacion;
+                    transferencia.value.fecha_inicio = fecha_inicio;
+                    transferencia.value.fecha_termino = fecha_termino;
+                    transferencia.value.codigo_presupuestario = codigoPresupuestario
+                    console.log("codigo presupuestario",transferencia.value.codigo_presupuestario);
+                    console.log("Guardar transferencia",transferencia.value);
+                    // Envío de la solicitud al servicio
+                    const { data } = await transferenciaService.store(transferencia.value);
+
+                    // Actualizar la lista de transferencias
+                    getTransferencias();
+
+                    // Marcar el formulario como enviado y cerrar el diálogo
+                    submitted.value = true;
+                    transferenciaDialog.value = false;
+
+                    // Limpiar los valores de la transferencia
+                    transferencia.value = {};
+
+                } catch (error) {
+                    console.error("Error guardando la transferencia:", error);
+
+                    // Comprobar si el error tiene una respuesta del servidor (caso común en Axios)
+                    if (error.response) {
+                        console.error("Respuesta del servidor:", error.response);
+                        console.error("Datos del error:", error.response.data);
+                        console.error("Estado del error:", error.response.status);
+                    } else if (error.request) {
+                        // El cliente hizo la solicitud pero no recibió respuesta
+                        console.error("No hubo respuesta del servidor:", error.request);
+                    } else {
+                        // Algo ocurrió al configurar la solicitud
+                        console.error("Error al configurar la solicitud:", error.message);
+                    }
+
+                    
+                }
+
             }
-    try {
-        // Asignación de los valores a la transferencia
-        transferencia.value.nombre_tpp = nombreTpp.value;
-        transferencia.value.entidad_operadora_id = selectedEntidad.value.id;
-        console.log("Entidad ejecutora:",selectedEntidad.value.id);
-        console.log("Entidad Ejecutora:",selectedEntidad.value.nombre);
-        transferencia.value.entidad_ejecutora = selectedEntidad.value.nombre;
-        transferencia.value.id_area = selectedArea.value.id;
-        //transferencia.value.localizacion = localizacion;
-        transferencia.value.fecha_inicio = fecha_inicio;
-        transferencia.value.fecha_termino = fecha_termino;
-        transferencia.value.codigo_presupuestario = codigoPresupuestario
-        console.log("codigo presupuestario",transferencia.value.codigo_presupuestario);
-        console.log("Guardar transferencia",transferencia.value);
-        // Envío de la solicitud al servicio
-        const { data } = await transferenciaService.store(transferencia.value);
-
-        // Actualizar la lista de transferencias
-        getTransferencias();
-
-        // Marcar el formulario como enviado y cerrar el diálogo
-        submitted.value = true;
-        transferenciaDialog.value = false;
-
-        // Limpiar los valores de la transferencia
-        transferencia.value = {};
-
-    } catch (error) {
-        console.error("Error guardando la transferencia:", error);
-
-        // Comprobar si el error tiene una respuesta del servidor (caso común en Axios)
-        if (error.response) {
-            console.error("Respuesta del servidor:", error.response);
-            console.error("Datos del error:", error.response.data);
-            console.error("Estado del error:", error.response.status);
-        } else if (error.request) {
-            // El cliente hizo la solicitud pero no recibió respuesta
-            console.error("No hubo respuesta del servidor:", error.request);
-        } else {
-            // Algo ocurrió al configurar la solicitud
-            console.error("Error al configurar la solicitud:", error.message);
-        }
-
-        // Mostrar un mensaje de error al usuario
-        alert('Ocurrió un error al guardar la transferencia. Por favor, intenta nuevamente nombre TPP tiene mas de 110 caracteres.');
-    }
+                
 }
 
 
@@ -1787,6 +1750,7 @@ const cancelarForm = () => {
     componenteSelecionado.value = {};
     selectedComponent.value = {}; // Copia los datos del componente
     totalSuma.value = 0;
+    noMostrarComponente();
 };
 
 // Función para guardar los cambios

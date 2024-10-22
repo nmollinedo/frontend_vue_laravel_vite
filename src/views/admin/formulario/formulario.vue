@@ -614,7 +614,7 @@
           <label for="etapa">Etapa del Formulario</label>
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
-          <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
+          <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>{{form}}
         </div>
         
 
@@ -695,7 +695,8 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario****</label>
+          <label for="etapa">Etapa del Formulario****</label><Message severity="error" v-if="etapas2" :content="errorMessage" placeholder="Seleccionar..." />
+          
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
           <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
@@ -704,7 +705,7 @@
         <div v-if="etapaSeleccionada && etapaSeleccionada.id === 4">
         <!-- Fechas -->
         <div class="field">
-          <label>Duración (Inicio y Término de Etapa)</label>
+          <label>Duración (Inicio y Término de Etapa)</label>{{form.transferencia_id}}
           <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
           <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
         </div>
@@ -769,8 +770,8 @@
 
               <div class="field">
                 <label>Modificar Costo</label>{{form.transferencia_id}}
-                <!-- Botón para abrir el diálogo -->
-                <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="abrirDialogo(form.dictamen_id)" />
+                <!-- Botón para abrir el diálogo 
+                <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="abrirDialogo(form.dictamen_id)" />-->
                 
               </div>
               <div>
@@ -922,8 +923,8 @@
 
     <!-- Dialog para mostrar los componentes de costos -->
     <Dialog header="Componentes de Costos" v-model:visible="mostrarComponenteDialog" :style="{ width: '50vw' }" modal>
-      <!-- Botón para abrir el diálogo -->
-    <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="mostrarDialog = true" />
+      <!-- Botón para abrir el diálogo
+    <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="mostrarDialog = true" /> -->
     <DataTable :value="listaComponentes" responsiveLayout="scroll" editMode="row" @rowEditInit="onRowEditInit" @rowEditSave="onRowEditSave" @rowEditCancel="onRowEditCancel">
                         <!-- Mostrar la lista de componentes (opcional para debugging) -->
                        
@@ -1024,11 +1025,11 @@
                                 </template>
                                 <tr>
                                 <td :style="{ width: '250px', textAlign: 'right' }">Total:</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_aporte_local')) }}</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_cofinanciamiento')) }}</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_finan_externo')) }}</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_otros')) }}</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getGrandTotal()) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatNumber(getColumnTotal('monto_aporte_local')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatNumber(getColumnTotal('monto_cofinanciamiento')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatNumber(getColumnTotal('monto_finan_externo')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatNumber(getColumnTotal('monto_otros')) }}</td>
+                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatNumber(getGrandTotal()) }}</td>
                                 <td class="total-cell"></td>
                                 </tr>
                             </template>
@@ -1139,7 +1140,11 @@ const loading = ref(true);
 const componentes = ref([]);
 const listaComponentes = ref([]);
 const selectedComponente = ref([]);
+
+const editDialogVisible = ref(false);
+const selectedComponent = ref({});
 const componenteSelecionado = ref({ id: null });
+const totalSuma = ref(0);
 
 const etapas = ref([]);
 const etapas2 = ref([]);
@@ -1151,11 +1156,38 @@ const estados = ref([
 ]);
 
 const estadoSeleccionado = ref(null);
+
+const errorMessage = ref('');
 /*
 const filtrarProyectos = () => {
 // Lógica para filtrar los proyectos según el estado seleccionado
 console.log('Filtrar proyectos por estado:', estadoSeleccionado.value);
 };*/
+
+const transferencia = ref({
+    id: null,
+    entidad_operadora: '',
+    responsable_ejecucion: '',
+    codigo_tpp: '',
+    objeto: '',
+    localizacion: '',
+    nombre_tpp: '',
+    denominacion_convenio: '',
+    area_id: '',
+    fecha_inicio: '',
+    fecha_termino: '',
+    entidad_ejecutora: '',
+    unidad_ejecutora: '',
+    area_influencia: '',
+    plan: '',
+    programa: '',
+    descripcion:'',
+    departamento: null,
+    municipio: null,
+    poblacion_id: null,
+    cobertura: '',
+    poblacion: ''
+    });
 
 const defaultForm = {
   etapa: null,
@@ -1186,6 +1218,24 @@ const defaultForm = {
   responsable_ci: ''
 };
 
+// Funciones para formatear los números con miles y dos decimales
+const formatNumber = (num) => {
+  return num.toLocaleString( { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// Cargar proyectos al montar el componente
+onMounted(async () => {
+  await cargarProyectos();
+  cargarTipoDictamen();
+  cargarTipoDictamen2();
+  transferencias.value.forEach(transferencia => {
+    verificarTransferencia(transferencia.id);
+  });
+  listarComponentes();
+  cargarComponente();
+
+   //await getTransferencias();
+});
 // Estado del diálogo
 const mostrarComponenteDialog = ref(false);
 // Función para abrir el diálogo
@@ -1243,6 +1293,53 @@ const mostrarComponente = () => {
 const noMostrarComponente = () => {
     mostrarFormulario.value = false;
 }
+
+// Función para limpiar el formulario de componente
+const limpiarFormularioComponente = () => {
+    // componentes.value = {
+    //     monto_aporte_local: null,
+    //     monto_cofinanciamiento: null,
+    //     monto_finan_externo: null,
+    //     monto_otros: null,
+    // };
+    // selectedComponente.value = null;
+    selectedComponent.value = {};
+    totalSuma.value = 0;
+};
+
+// Funccion guarda componente
+const guardarComponente = async () => {
+    const selectedComponenteId = componenteSelecionado.value.id;
+    console.log("Componente ID",selectedComponenteId)
+    console.log("Transferencia ID",form.transferencia_id)
+    console.log(" monto_aporte_local",componentes.value.monto_aporte_local)
+    console.log(" monto_aporte_local",componentes.value.monto_cofinanciamiento)
+    try {
+        // Crear el payload con los datos de la transferencia
+        const payload = {
+            transferencia_id: form.transferencia_id,
+            componente_id: componenteSelecionado.value.id,
+            monto_aporte_local: selectedComponent.value.monto_aporte_local,
+            monto_cofinanciamiento: selectedComponent.value.monto_cofinanciamiento,
+            monto_finan_externo:selectedComponent.value.monto_finan_externo,
+            monto_otros:selectedComponent.value.monto_otros,
+
+        };
+        console.log(payload);
+        // Llamar al servicio para guardar la problemática
+        const { data } = await componenteService.store(payload);
+        listarComponentes();
+        // Mostrar mensaje de éxito o manejar la respuesta según sea necesario
+        console.log(data);
+        toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
+         // Limpiar el formulario después de guardar
+         cargarComponente();
+         limpiarFormularioComponente();
+         noMostrarComponente();
+    } catch (err) {
+        error.value = 'Error saving data';
+    }
+};
 
 // Función para abrir el diálogo con los datos seleccionados
 const openEditDialog = (rowData) => {
@@ -1381,6 +1478,14 @@ const updateTotal = (nuevoValor) => {
     // Para verificar que totalSuma se actualiza correctamente
 };
 
+async function cargarComponente() {
+  try {
+    const { data } = await componenteService.index();
+    componentes.value = data;
+  } catch (error) {
+    console.error("Error al cargar los departamentos:", error);
+  }
+};
 
 const editComponent = (rowData) => {
   console.log('Edit:', rowData);
@@ -1546,19 +1651,30 @@ form.value = {};  // Limpia el formulario, reinicia el objeto form
 console.log("Formulario cerrado");
 }
 
-// Cargar proyectos al montar el componente
-onMounted(async () => {
-  await cargarProyectos();
-  cargarTipoDictamen();
-  cargarTipoDictamen2();
-  transferencias.value.forEach(transferencia => {
-    verificarTransferencia(transferencia.id);
-  });
-  listarComponentes();
-   //await getTransferencias();
-});
+//verificar estado formulario
+const verificarFormularioActivo = async (id) => {
+    try {
+        // Supongo que 'data' es un array
+        console.log("lista formulario activo", transferencias);
+        const { data } = await dictamenService.verificarFormulario(id);
+        
+        // Asegúrate de que 'data' tiene al menos un elemento
+        if (data && data.length > 0 && data[0].value) {
+            
+            const bandera = data
+            console.log("lista formulario activo", 0);
+            return bandera;
+        } else {
+            console.error("No se encontró información válida en la respuesta");
+            return null; // O algún valor por defecto si no hay datos válidos
+        }
+    } catch (error) {
+        console.error("Error al verificar el formulario activo", error);
+        return null; // Manejo de errores
+    }
+}
 
-// Función para cargar proyectos desde la API //listar transferencias
+// Función para cargar transferencias desde la API //listar transferencias
 const cargarProyectos = async () => {
   try {
     loading.value = true;
@@ -1573,7 +1689,11 @@ const cargarProyectos = async () => {
     }
     transferencias.value = data;
     //proyectos.value = response.data;
+    
     filtrarTransferencia();
+    
+    ///const bandera = verificarFormularioActivo();
+    //console.log("Bandera", bandera);
     loading.value = false;
   } catch (error) {
     console.error('Error al cargar los proyectos:', error);
@@ -1697,64 +1817,76 @@ const guardarFormularioModificacion = async (dictamen_id) => {
   console.log("Formulario IN",form.fechaInicio)
   console.log("Formulario Termino",form.fechaTermino)
   console.log("Formulario ID",formId)
-  const formData = reactive({
-    //id: formId, // Ensure the ID is sent
-    transferencia_id:form.transferencia_id,
-    dictamen_id: form.dictamen_id,
-    etapa: etapaSeleccionada.value.id,
-    fecha_registro: formatDate(form.fecha_dictamen),
-   
-    fecha_inicio: formatDate(form.fechaInicio),
-    fecha_termino: formatDate(form.fechaTermino),
-    pregunta_1: form.pregunta_1,
-    pregunta_2: form.pregunta_2,
-    pregunta_3: form.pregunta_3,
-    respaldo_pregunta_3: form.respaldo_pregunta_3,
-    fecha_pregunta_3: formatDate(form.fecha_pregunta_3),
-    pregunta_4: form.pregunta_4,
-    respaldo_pregunta_4: form.respaldo_pregunta_4,
-    fecha_pregunta_4: formatDate(form.fecha_pregunta_4),
-    pregunta_5: form.pregunta_5,
-    respaldo_pregunta_5: form.respaldo_pregunta_5,
-    fecha_pregunta_5: formatDate(form.fecha_pregunta_5),
-    pregunta_6: form.pregunta_6,
-    respaldo_pregunta_6: form.respaldo_pregunta_6,
-    fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
-    mae: form.mae,
-    mae_cargo: form.mae_cargo,
-    mae_ci: form.mae_ci,
-    mae_documento_designacion: form.mae_documento_designacion,
-    responsable: form.responsable,
-    responsable_cargo: form.responsable_cargo,
-    responsable_unidad: form.responsable_unidad,
-    responsable_ci: form.responsable_ci
-    // Add other form fields here
-  });
+  console.log("Select ID",etapaSeleccionada.id)
 
-try {
-  //await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
-  //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
-  console.log("datos form",formData);
-    const response = await dictamenService.modificarFecha(form.dictamen_id,formData);
-    console.log("transferencia ID",form.transferencia_id)
-    //abrirModalVer(form.transferencia_id);
-    //dictamenes.value = data;
-    console.log('Formulario fecha modificada con éxito:', response.data);
+  const bandera = verificarFormularioActivo(form.transferencia_id); 
 
-    //mostrarModalModificacion=false;
-    toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
-    //toast.add({ severity: 'error', summary: 'Formulario fecha modificada con éxito', detail: error });
-  cerrarModalModificacion();  // Cerrar el modal después de guardar
-  loadTransferencias();
-} catch (error) {
-  console.error('Error al agregar el dictamen:', error);
-}
+      if (bandera!=0){
+        toast.add({ severity: 'info', summary: 'Información', detail: 'Debe cerrar el formulario que aun tiene registrado', life: 3000 });
+        
+      }else{
+
+  
+            const formData = reactive({
+              //id: formId, // Ensure the ID is sent
+              transferencia_id:form.transferencia_id,
+              dictamen_id: form.dictamen_id,
+              etapa: etapaSeleccionada.value.id,
+              fecha_registro: form.fecha_dictamen,
+            
+              fecha_inicio:form.fechaInicio,
+              fecha_termino: form.fechaTermino,
+              pregunta_1: form.pregunta_1,
+              pregunta_2: form.pregunta_2,
+              pregunta_3: form.pregunta_3,
+              respaldo_pregunta_3: form.respaldo_pregunta_3,
+              fecha_pregunta_3: formatDate(form.fecha_pregunta_3),
+              pregunta_4: form.pregunta_4,
+              respaldo_pregunta_4: form.respaldo_pregunta_4,
+              fecha_pregunta_4: formatDate(form.fecha_pregunta_4),
+              pregunta_5: form.pregunta_5,
+              respaldo_pregunta_5: form.respaldo_pregunta_5,
+              fecha_pregunta_5: formatDate(form.fecha_pregunta_5),
+              pregunta_6: form.pregunta_6,
+              respaldo_pregunta_6: form.respaldo_pregunta_6,
+              fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
+              mae: form.mae,
+              mae_cargo: form.mae_cargo,
+              mae_ci: form.mae_ci,
+              mae_documento_designacion: form.mae_documento_designacion,
+              responsable: form.responsable,
+              responsable_cargo: form.responsable_cargo,
+              responsable_unidad: form.responsable_unidad,
+              responsable_ci: form.responsable_ci
+              // Add other form fields here
+            });
+
+            try {
+              //await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
+              //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
+              console.log("datos form",formData);
+                //const response = await dictamenService.modificarFecha(form.dictamen_id,formData);
+                console.log("transferencia ID",form.transferencia_id)
+                //abrirModalVer(form.transferencia_id);
+                //dictamenes.value = data;
+                console.log('Formulario fecha modificada con éxito:', response.data);
+
+                //mostrarModalModificacion=false;
+                toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
+                //toast.add({ severity: 'error', summary: 'Formulario fecha modificada con éxito', detail: error });
+              cerrarModalModificacion();  // Cerrar el modal después de guardar
+              loadTransferencias();
+              actualizarTabla();
+            } catch (error) {
+              console.error('Error al agregar el dictamen:', error);
+            }
+    }
 };
 
 // Función para abrir el modal
 const abrirModalModificacion = async(dictamen_id) => {
   try {
-     console.log("modifica Fecha",dictamen_id);
+     console.log("modifica Fecha",form.dictamen_id);
     const { data } = await dictamenService.mostrarForm(dictamen_id);
     console.log("modifica fecha data",data);
     form.value = data;
@@ -2074,12 +2206,23 @@ async function cargarTipoDictamen() {
   }
 };
 async function cargarTipoDictamen2() {
-  try {
-    const { data } = await tipoDictamenService.listar2();
-    etapas2.value = data;
-  } catch (error) {
-    console.error("Error al cargar los departamentos:", error);
-  }
+  
+  const bandera = verificarFormularioActivo(form.transferencia_id); 
+console.log("bandera yyyy",form);
+      if (bandera!=0){
+        
+        errorMessage.value = "Todos los campos son obligatorios.";
+        
+        //toast.add({ severity: 'info', summary: 'Información', detail: 'Debe cerrar el formulario que aun tiene registrado', life: 3000 });
+        
+      }else{
+              try {
+                const { data } = await tipoDictamenService.listar2();
+                etapas2.value = data;
+              } catch (error) {
+                console.error("Error al cargar los departamentos:", error);
+              }
+      }  
 };
 
 

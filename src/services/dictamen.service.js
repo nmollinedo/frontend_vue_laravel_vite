@@ -30,6 +30,9 @@ export default {
     },
     eliminarCierre: (id,datos) => {
         return Api().post(`/eliminar-cierre/${id}`, datos);
+    },
+    verificarFormulario: (id,datos) => {
+        return Api().get(`/verificar-formulario/${id}`);
     }
   
 }
