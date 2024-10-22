@@ -208,11 +208,11 @@
                             icon="pi pi-trash" outlined rounded severity="danger"
                             @click="confirmDeleteFormulario(slotProps.data)" />
 
-                      <Button 
+                  <!--    <Button 
                             v-if="slotProps.data.cierre_entidad===1"
                             label="Eliminar Cierre"
                             icon="pi pi-trash" outlined rounded severity="danger"
-                            @click="confirmDeleteCierre(slotProps.data)" />
+                            @click="confirmDeleteCierre(slotProps.data)" /> -->
                   </template>
                 </Column>
               </DataTable>
@@ -677,7 +677,7 @@
       </template>
     </Dialog>
     <!-- Modal para editar formulario para modificar fecha -->
-      <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
+      <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '70vw' }" :draggable="false" :closable="false">
       <template v-slot:header>
               <span>Modificar Formulario yyyy</span>
               <span>   </span>
@@ -695,7 +695,7 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario</label>
+          <label for="etapa">Etapa del Formulario****</label>
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
           <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
@@ -768,14 +768,34 @@
               </div>
 
               <div class="field">
-                <label>Modificar Costo</label>
+                <label>Modificar Costo</label>{{form.transferencia_id}}
                 <!-- Botón para abrir el diálogo -->
-                <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="abrirDialogo" />
+                <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="abrirDialogo(form.dictamen_id)" />
                 
               </div>
               <div>
-                <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="mostrarDialog = true" />
-    <DataTable :value="listaComponentes" responsiveLayout="scroll" editMode="row" @rowEditInit="onRowEditInit" @rowEditSave="onRowEditSave" @rowEditCancel="onRowEditCancel">
+                <template v-if="!mostrarFormulario">
+                        <Button 
+                            label="Agregar componente" 
+                            icon="pi pi-check" 
+                            @click="mostrarComponente"
+                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                            />
+                    </template>
+                    <template v-else>
+                        <Button 
+                            label="Ocultar agregar" 
+                            icon="pi pi-times" 
+                            @click="noMostrarComponente"
+                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                            />
+                    </template>
+                    <!-- Mensaje cuando el campo problemática no está lleno -->
+                <!--    <div v-else>
+                        <p class="text-red-500">Por favor, complete la descripción del problema antes de llenar la localización geográfica.</p>
+                    </div> -->
+                    
+                        <DataTable :value="listaComponentes" responsiveLayout="scroll" editMode="row" @rowEditInit="onRowEditInit" @rowEditSave="onRowEditSave" @rowEditCancel="onRowEditCancel">
                         <!-- Mostrar la lista de componentes (opcional para debugging) -->
                        
 
@@ -884,7 +904,6 @@
                                 </tr>
                             </template>
                         </DataTable>
-      
               </div>
 
         
@@ -1119,11 +1138,13 @@ const loading = ref(true);
 
 const componentes = ref([]);
 const listaComponentes = ref([]);
+const selectedComponente = ref([]);
+const componenteSelecionado = ref({ id: null });
 
 const etapas = ref([]);
 const etapas2 = ref([]);
 
-
+const mostrarFormulario = ref(false);
 const estados = ref([
 { id: 1, descripcion: 'En registro' },
 { id: 2, descripcion: 'Validado Entidad' }
@@ -1168,7 +1189,7 @@ const defaultForm = {
 // Estado del diálogo
 const mostrarComponenteDialog = ref(false);
 // Función para abrir el diálogo
-const abrirDialogo = () => {
+const abrirDialogo = (dictamen_id) => {
   mostrarComponenteDialog.value = true;
 };
 
@@ -1196,12 +1217,14 @@ const formatCurrency = (value) => {
 //Componentes metodos
 //Listar componentes
 const listarComponentes = async () => {
-       console.log("compnenete",transferencia.value[0].id)
+       //console.log("componente",transferencia.value[0].id)
+       console.log("componente", form.transferencia_id)
 //       transferencia_id=componentes.value.transferencia_id;
 //       componente_id=componentes.value.componente_id;
     try {
     
-    const { data } = await componenteService.show(transferencia.value[0].id);
+    //const { data } = await componenteService.show(transferencia.value[0].id);
+    const { data } = await componenteService.show(form.transferencia_id);
       console.log("data",data);
     
     listaComponentes.value = data;
@@ -1209,8 +1232,70 @@ const listarComponentes = async () => {
 
            
     } catch (error) {
-        alert("error al recuperar la lista de componentes")
+        //alert("error al recuperar la lista de componentes")
     }
+};
+
+const mostrarComponente = () => {
+    mostrarFormulario.value = true;
+}
+
+const noMostrarComponente = () => {
+    mostrarFormulario.value = false;
+}
+
+// Función para abrir el diálogo con los datos seleccionados
+const openEditDialog = (rowData) => {
+  selectedComponent.value = { ...rowData }; // Copia los datos del componente
+  console.log("componentes",componentes)
+  mostrarFormulario.value = true;
+  componenteSelecionado.value = componentes.value.find(ent => ent.id === selectedComponent.value.componente_id);
+//   componentes.value = { ...rowData }; // Copia los datos del componente
+  updateTotal();
+  editDialogVisible.value = true; // Mostrar el diálogo
+};
+
+const cancelarForm = () => {
+    editDialogVisible.value = false; // Mostrar el diálogo
+    componenteSelecionado.value = {};
+    selectedComponent.value = {}; // Copia los datos del componente
+    totalSuma.value = 0;
+};
+
+// Función para guardar los cambios
+const saveEdit = async() => {
+    try {
+    // Crear el payload con los datos del componente seleccionado
+    const payload = {
+      transferencia_id: selectedComponent.value.transferencia_id,  // o el campo que corresponda
+      componente_id: selectedComponent.value.componente_id,       // ID del componente
+      monto_aporte_local: selectedComponent.value.monto_aporte_local,
+      monto_cofinanciamiento: selectedComponent.value.monto_cofinanciamiento,
+      monto_finan_externo: selectedComponent.value.monto_finan_externo,
+      monto_otros: selectedComponent.value.monto_otros,
+    };
+
+    // Llamada a la API para guardar los cambios (puedes usar POST o PUT según tu API)
+    const response = await componenteService.modificarComponente(payload.transferencia_id, payload);
+    
+    // Si la respuesta es exitosa, actualizamos la lista localmente
+    const index = listaComponentes.value.findIndex((item) => item.componente_id === selectedComponent.value.componente_id);
+    if (index !== -1) {
+      listaComponentes.value[index] = { ...selectedComponent.value }; // Actualizar los valores en la lista
+    }
+
+    // Mostrar mensaje de éxito
+    toast.add({ severity: 'success', summary: 'Componente actualizado', detail: 'Se guardó correctamente', life: 3000 });
+
+    // Cerrar el diálogo
+    editDialogVisible.value = false;
+    limpiarFormularioComponente();
+    noMostrarComponente();
+  } catch (error) {
+    // Manejar el error, si ocurre
+    console.error('Error al guardar los cambios:', error);
+    toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el componente', life: 3000 });
+  }
 };
 
 const onRowEditInit = (event) => {
@@ -1692,13 +1777,14 @@ const abrirModalModificacion = async(dictamen_id) => {
     form.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
     console.log("fecha iii",formatDateVista(form.fechaInicio));
     console.log("fecha ttt",formatDateVista(form.fechaTermino));
+    console.log("Dictamen id",form.dictamen_id);
  
     Object.assign(form, data[0]);
             // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
     etapaSeleccionada.value = etapas.value.find(etapa => etapa.id === form.value[0].etapa_id);
     console.log("Formulario para edición:", form.value);
     mostrarModalModificacion.value = true;
-    // Rellenar otros campos...
+    listarComponentes()
   } catch (error) {
     console.error('Error al cargar los datos del formulario', error);
   }
