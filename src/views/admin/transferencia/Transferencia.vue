@@ -529,136 +529,101 @@
                         style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
                         />
                     </div> -->
-                    <template v-if="!mostrarFormulario">
-                        <Button 
-                            label="Agregar componente" 
-                            icon="pi pi-check" 
-                            @click="mostrarComponente"
-                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
-                            />
-                    </template>
-                    <template v-else>
-                        <Button 
-                            label="Ocultar agregar" 
-                            icon="pi pi-times" 
-                            @click="noMostrarComponente"
-                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
-                            />
-                    </template>
+                    <Button 
+                        label="Agregar componente" 
+                        icon="pi pi-check" 
+                        @click="adicionarComponente"
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                    />
+                  
                     <!-- Mensaje cuando el campo problemática no está lleno -->
                 <!--    <div v-else>
                         <p class="text-red-500">Por favor, complete la descripción del problema antes de llenar la localización geográfica.</p>
                     </div> -->
+                    <div class="modal-content">
+                        <h2>Información</h2>
+                        <p>Para actualizar los valores, presiona la tecla Enter (↵) mientras estés editando cualquier campo. Esto recalculará automáticamente los totales.</p>
+                    </div>
                     <div>
                         <DataTable :value="listaComponentes" responsiveLayout="scroll" editMode="row" @rowEditInit="onRowEditInit" @rowEditSave="onRowEditSave" @rowEditCancel="onRowEditCancel">
-                        <!-- Mostrar la lista de componentes (opcional para debugging) -->
-                       
-
-                        <!-- Columna Componentes Etapa -->
-                        <Column field="componente" header="Componentes Etapa" :style="{ width: '150px' }"/>
-
-                        <!-- Columnas editables con InputNumber -->
-                        <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
-                            <template #editor="slotProps">
-                                <InputNumber 
-                                    v-model="slotProps.data.monto_aporte_local" 
-                                    mode="decimal" 
-                                    :min="0" 
-                                    :step="0.01" 
-                                    :maxFractionDigits="2" 
-                                    :useGrouping="true"  
-                                    :locale="'es-ES'"
-                                    :currency="false"
-                                />
-                            </template>
-                        </Column>
-
-                        <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
-                            <template #editor="slotProps">
-                            <InputNumber v-model="slotProps.data.monto_cofinanciamiento" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
-                            </template>
-                        </Column>
-
-                        <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
-                            <template #editor="slotProps">
-                            <InputNumber v-model="slotProps.data.monto_finan_externo" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
-                            </template>
-                        </Column>
-
-                        <Column field="monto_otros" header="Otros (Bs.)" editor="true" :style="{ width: '150px' }" bodyStyle="text-align: right">
-                            <template #editor="slotProps">
-                            <InputNumber v-model="slotProps.data.monto_otros" mode="decimal" :min="0" :step="0.01" :maxFractionDigits="2" />
-                            </template>
-                        </Column>
-
-                        <!-- Columna para mostrar el total de cada fila -->
-                        <Column header="Total Etapa (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: right">
-                            <template #body="slotProps">
-                                {{ getRowTotal(slotProps.data) }}
-                            </template>
-                        </Column>
-
-                        <!-- Columna para el RowEditor (botón de edición/guardar) 
-                        <Column rowEditor headerStyle="width: 7rem" bodyStyle="text-align:center"></Column>-->
-                        
-                        <!-- Columna de acciones para eliminar -->
-                        <Column header="Actions" :style="{ width: '100px' }">
-                            <template #body="slotProps">
-                                <Button
-                                icon="pi pi-pencil"
-                                class="p-button-rounded p-button-text"
-                                @click="openEditDialog(slotProps.data)"
-                            />    
-                                <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
-                            </template>
-                        </Column>
-
-                        <!-- Footer para mostrar los totales de las columnas -->
-                        <!-- Fila para agregar un nuevo componente -->
-                            <template #footer>
-                                <template v-if="mostrarFormulario">
-                                <tr>
-                                    
-                                    <td >
-                                        <Dropdown 
+                            <!-- Columna Componentes Etapa -->
+                            <Column field="componente" header="Componentes Etapa" :style="{ width: '150px' }">
+                                <template #body="slotProps">
+                                    <Dropdown 
+                                        v-if="slotProps.data.nuevo"
                                         v-model="componenteSelecionado" 
                                         :options="componentes" 
                                         optionLabel="componente"
                                         placeholder="Seleccione componente" 
                                         class="custom-dropdown" 
-                                        :disabled="editDialogVisible"
+                                        :disabled="!slotProps.data.nuevo"
                                     />
-                                    </td>               
-                                    <td><InputNumber v-model="selectedComponent.monto_aporte_local" inputId="integeronly" fluid @input="updateTotal"/></td>
-                                    <td><InputNumber v-model="selectedComponent.monto_cofinanciamiento" inputId="integeronly" fluid @input="updateTotal" /></td>
-                                    <td><InputNumber v-model="selectedComponent.monto_finan_externo" inputId="integeronly" fluid @input="updateTotal" /></td>
-                                    <td><InputNumber v-model="selectedComponent.monto_otros" inputId="integeronly" fluid @input="updateTotal" /></td>
-                                    <td class="total-cell">{{ totalSuma }}</td>
-                                    <td>
-                                        <template v-if="editDialogVisible">
-                                            <Button icon="pi pi-check"  class="p-button-rounded p-button-text" @click="saveEdit" />
-                                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelarForm()" 
-                                            />
-                                        </template>
-                                        <template v-else>
-                                            <Button icon="pi pi-plus" class="p-button-rounded p-button-text" @click="guardarComponente" />
-                                            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelarForm()" />
-                                        </template>
-                                    </td>
-
-                                </tr>
+                                    <span v-else>{{ slotProps.data.componente }}</span>
                                 </template>
+                            </Column>
+
+                            <!-- Columnas editables con InputNumber -->
+                            <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
+                                <template #body="slotProps">
+                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_aporte_local" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                    <span v-else>{{ slotProps.data.monto_aporte_local }}</span>
+                                </template>
+                            </Column>
+
+                            <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
+                                <template #body="slotProps">
+                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_cofinanciamiento" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                    <span v-else>{{ slotProps.data.monto_cofinanciamiento }}</span>
+                                </template>
+                            </Column>
+
+                            <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
+                                <template #body="slotProps">
+                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_finan_externo" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                    <span v-else>{{ slotProps.data.monto_finan_externo }}</span>
+                                </template>
+                            </Column>
+
+                            <Column field="monto_otros" header="Otros (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
+                                <template #body="slotProps">
+                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_otros" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                    <span v-else>{{ slotProps.data.monto_otros }}</span>
+                                </template>
+                            </Column>
+
+                            <!-- Columna para mostrar el total de cada fila -->
+                            <Column header="Total Etapa (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: center">
+                                <template #body="slotProps">
+                                    {{ getRowTotal(slotProps.data) }}
+                                </template>
+                            </Column>
+
+                            <!-- Columna de acciones -->
+                            <Column header="Actions" :style="{ width: '150px' }">
+                                <template #body="slotProps">
+                                    <Button v-if="slotProps.data.editar" icon="pi pi-save" class="p-button-rounded p-button-success p-button-text" 
+                                        @click="slotProps.data.nuevo ? guardarComponente(slotProps.data) : saveEdit(slotProps.data)" />
+                                    <Button v-if="slotProps.data.editar" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cerrarEdicion(slotProps.data, index)" />
+                                    <Button v-if="!slotProps.data.editar" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="comenzarEdicion(slotProps.data)" />
+                                    <Button v-if="!slotProps.data.editar" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data.id)" />
+                                </template>
+                            </Column>
+
+                            <!-- Footer -->
+                            <template #footer>
                                 <tr>
-                                <td :style="{ width: '250px', textAlign: 'right' }">Total:</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_aporte_local')) }}</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_cofinanciamiento')) }}</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_finan_externo')) }}</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getColumnTotal('monto_otros')) }}</td>
-                                <td :style="{ width: '250px', textAlign: 'right' }">{{ formatCurrency(getGrandTotal()) }}</td>
-                                <td class="total-cell"></td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">Total</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getColumnTotal('monto_aporte_local')) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getColumnTotal('monto_cofinanciamiento')) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getColumnTotal('monto_finan_externo')) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getColumnTotal('monto_otros')) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getGrandTotal()) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }"></td>
                                 </tr>
                             </template>
                         </DataTable>
+
+
 
                         <!-- Dialog para la edición -->
                         <!-- <Dialog header="Editar Componente" v-model:visible="editDialogVisible" :modal="true" :closable="false" :style="{ width: '400px' }">
@@ -825,11 +790,10 @@ const localizacion = ref('');
 //const submitted = ref(false);
 const componentes = ref([]);
 const listaComponentes = ref([]);
-const selectedComponente = ref([]);
 const componenteSelecionado = ref({ id: null });
 const mostrarFormulario = ref(false);
 const totalSuma = ref(0);
-
+const esAbiertoComponente = ref(false);
 // Computed property para concatenar el nombre TPP
 const nombreTpp = computed(() => {
     return `${transferencia.value.objeto ?? ''} ${transferencia.value.localizacion ?? ''}`.trim().substring(0, 110);
@@ -1004,24 +968,23 @@ const guardarLocalizacion = async () => {
 };
 
 // Funccion guarda componente
-const guardarComponente = async () => {
+const guardarComponente = async (filaData) => {
     const selectedComponenteId = componenteSelecionado.value.id;
     console.log("Componente ID",selectedComponenteId)
     console.log("Transferencia ID",transferencia.value.id)
-    console.log(" monto_aporte_local",componentes.value.monto_aporte_local)
-    console.log(" monto_aporte_local",componentes.value.monto_cofinanciamiento)
+    console.log(" monto_aporte_local",filaData.monto_aporte_local)
+    console.log(" monto_aporte_local",filaData.monto_cofinanciamiento)
     try {
         // Crear el payload con los datos de la transferencia
         const payload = {
             transferencia_id: transferencia.value.id,
             componente_id: componenteSelecionado.value.id,
-            monto_aporte_local: selectedComponent.value.monto_aporte_local,
-            monto_cofinanciamiento: selectedComponent.value.monto_cofinanciamiento,
-            monto_finan_externo:selectedComponent.value.monto_finan_externo,
-            monto_otros:selectedComponent.value.monto_otros,
-
+            monto_aporte_local: filaData.monto_aporte_local,
+            monto_cofinanciamiento: filaData.monto_cofinanciamiento,
+            monto_finan_externo:filaData.monto_finan_externo,
+            monto_otros:filaData.monto_otros,
         };
-        console.log(payload);
+        console.log("envio componente",payload);
         // Llamar al servicio para guardar la problemática
         const { data } = await componenteService.store(payload);
         listarComponentes();
@@ -1030,8 +993,9 @@ const guardarComponente = async () => {
         toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
          // Limpiar el formulario después de guardar
          cargarComponente();
-         limpiarFormularioComponente();
-         noMostrarComponente();
+        //  limpiarFormularioComponente();
+        //  noMostrarComponente();
+         esAbiertoComponente.value = false;
     } catch (err) {
         error.value = 'Error saving data';
     }
@@ -1607,22 +1571,24 @@ const componentes = ref([
 
 //Listar componentes
 const listarComponentes = async () => {
-       console.log("compnenete",transferencia.value[0].id)
-//       transferencia_id=componentes.value.transferencia_id;
-//       componente_id=componentes.value.componente_id;
-    try {
-    
-    const { data } = await componenteService.show(transferencia.value[0].id);
-      console.log("data",data);
-    
-    listaComponentes.value = data;
-    //transferencias.value.codigo_presupuestario=codigoPresupuestario;
+    console.log("componente", transferencia.value[0].id);
 
-           
+    try {
+        const { data } = await componenteService.show(transferencia.value[0].id);
+        console.log("data componentes", data);
+
+        // Agregar la propiedad 'editar: false' a cada objeto del array 'data'
+        listaComponentes.value = data.map(item => ({
+            ...item,          // Mantener todas las propiedades originales del objeto
+            editar: false,     // Añadir la propiedad 'editar' con valor false
+            nuevo: false    // Añadir la propiedad 'nuevo' con valor false
+        }));
+
     } catch (error) {
-        alert("error al recuperar la lista de componentes")
+        alert("error al recuperar la lista de componentes");
     }
 };
+
 
 const onRowEditInit = (event) => {
   console.log('Iniciando edición', event.data);
@@ -1735,36 +1701,56 @@ const editDialogVisible = ref(false);
 const selectedComponent = ref({});
 
 // Función para abrir el diálogo con los datos seleccionados
-const openEditDialog = (rowData) => {
-  selectedComponent.value = { ...rowData }; // Copia los datos del componente
-  console.log("componentes",componentes)
-  mostrarFormulario.value = true;
-  componenteSelecionado.value = componentes.value.find(ent => ent.id === selectedComponent.value.componente_id);
+const comenzarEdicion = (rowData) => {
+    // componenteSelecionado.value = componentes.value.find(ent => ent.id === rowData.componente_id);
+    rowData.editar = true; // Habilitar la edición
+
+//   selectedComponent.value = { ...rowData }; // Copia los datos del componente
+//   console.log("componentes",selectedComponent.value)
+//   mostrarFormulario.value = true;
 //   componentes.value = { ...rowData }; // Copia los datos del componente
-  updateTotal();
-  editDialogVisible.value = true; // Mostrar el diálogo
+//   updateTotal();
+//   editDialogVisible.value = true; // Mostrar el diálogo
 };
 
-const cancelarForm = () => {
-    editDialogVisible.value = false; // Mostrar el diálogo
+const cerrarEdicion = (rowData, index) => {
+    if (rowData.transferencia_id === '') {
+        esAbiertoComponente.value = false;
+        listaComponentes.value.splice(index, 1)
+    } else {
+        rowData.editar = false; // Deshabilitar la edición
+    }
+};
+
+const adicionarComponente = () => {
     componenteSelecionado.value = {};
-    selectedComponent.value = {}; // Copia los datos del componente
-    totalSuma.value = 0;
-    noMostrarComponente();
-};
-
+    if(!esAbiertoComponente.value){
+        esAbiertoComponente.value = true;
+        listaComponentes.value.unshift({
+            transferencia_id: '',
+            componente_id: 0,
+            monto_aporte_local: 0,
+            monto_cofinanciamiento: 0,
+            monto_finan_externo: 0,
+            monto_otros: 0,
+            editar: true,
+            nuevo: true
+        })
+    }
+}
 // Función para guardar los cambios
-const saveEdit = async() => {
+const saveEdit = async(rowData) => {
     try {
     // Crear el payload con los datos del componente seleccionado
     const payload = {
-      transferencia_id: selectedComponent.value.transferencia_id,  // o el campo que corresponda
-      componente_id: selectedComponent.value.componente_id,       // ID del componente
-      monto_aporte_local: selectedComponent.value.monto_aporte_local,
-      monto_cofinanciamiento: selectedComponent.value.monto_cofinanciamiento,
-      monto_finan_externo: selectedComponent.value.monto_finan_externo,
-      monto_otros: selectedComponent.value.monto_otros,
+      transferencia_id: rowData.transferencia_id,  // o el campo que corresponda
+      componente_id: rowData.componente_id,       // ID del componente
+      monto_aporte_local: rowData.monto_aporte_local,
+      monto_cofinanciamiento: rowData.monto_cofinanciamiento,
+      monto_finan_externo: rowData.monto_finan_externo,
+      monto_otros: rowData.monto_otros,
     };
+    console.log("dataFila",payload);
 
     // Llamada a la API para guardar los cambios (puedes usar POST o PUT según tu API)
     const response = await componenteService.modificarComponente(payload.transferencia_id, payload);
@@ -1779,9 +1765,10 @@ const saveEdit = async() => {
     toast.add({ severity: 'success', summary: 'Componente actualizado', detail: 'Se guardó correctamente', life: 3000 });
 
     // Cerrar el diálogo
-    editDialogVisible.value = false;
-    limpiarFormularioComponente();
-    noMostrarComponente();
+    cerrarEdicion(rowData);
+    // editDialogVisible.value = false;
+    // limpiarFormularioComponente();
+    // noMostrarComponente();
   } catch (error) {
     // Manejar el error, si ocurre
     console.error('Error al guardar los cambios:', error);
@@ -1817,10 +1804,10 @@ const predefinedComponents = [
   { name: 'Otro', code: 'OTR' }
 ]
 
-const calculateTotal = (item) => {
-  item.total = item.ownContribution + item.coFinancing + item.externalFinancing + item.others + item.noFinancing
-  totalCost.value = costItems.value.reduce((sum, item) => sum + item.total, 0)
-}
+// const calculateTotal = (item) => {
+//   item.total = item.ownContribution + item.coFinancing + item.externalFinancing + item.others + item.noFinancing
+//   totalCost.value = costItems.value.reduce((sum, item) => sum + item.total, 0)
+// }
 
 const addComponent = () => {
   costItems.value.push({
@@ -1939,4 +1926,18 @@ const onComponentChange = (event, item) => {
   display: flex;
   gap: 0.5rem;
 }
+
+
+.input-cell input {
+    max-width: 120px;        /* Limita el ancho a 80px */
+    text-align: right;     /* Alinear texto a la derecha */
+}
+
+.modal-content {
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: left;
+}
+
 </style>
