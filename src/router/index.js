@@ -8,6 +8,7 @@ import Usuario from '../views/admin/usuario/Usuario.vue'
 import Persona from '../views/admin/usuario/Persona.vue'
 import Transferencia from '../views/admin/transferencia/Transferencia.vue'
 import Formulario from '../views/admin/formulario/formulario.vue'
+import Plan from '../views/admin/plan/Plan.vue'
 import Recurso from '../views/admin/recurso/recurso.vue'
 import NotFound from '../views/errors/NotFound.vue'
 
@@ -61,6 +62,13 @@ const router = createRouter({
                     path: 'formulario',
                     component: Formulario,
                     name: 'Formulario',
+                    meta: { requireAuth: true }
+        
+                },
+                {
+                    path: 'plan',
+                    component: Plan,
+                    name: 'Plan',
                     meta: { requireAuth: true }
         
                 },

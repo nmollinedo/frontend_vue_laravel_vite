@@ -18,5 +18,8 @@ export default {
     },
     asignarUser: (datos) => {
         return Api().post(`/programa/asignar-user`, datos);
+    },
+    listarPlanPrograma: () => {
+        return Api().get("/plan-programa");
     }
 }

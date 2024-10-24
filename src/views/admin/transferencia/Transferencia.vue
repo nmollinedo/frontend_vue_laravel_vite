@@ -277,12 +277,12 @@
 
                         <div>
                             <label for="fecha_inicio" class="block font-bold mb-3">Fecha Inicio</label>
-                            <Calendar v-model="transferencia.fecha_inicio" dateFormat="dd/mm/yy" showIcon />
+                            <Calendar v-model="transferencia.fecha_inicio" dateFormat="dd-mm-yy" showIcon />
                         </div>
 
                         <div>
                             <label for="fecha_termino" class="block font-bold mb-3">Fecha Término</label>
-                            <Calendar v-model="transferencia.fecha_termino" dateFormat="dd/mm/yy" showIcon />
+                            <Calendar v-model="transferencia.fecha_termino" dateFormat="dd-mm-yy" showIcon />
                         </div>
 
                         <!--<div class="mt-3">

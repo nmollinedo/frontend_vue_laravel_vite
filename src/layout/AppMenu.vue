@@ -33,6 +33,11 @@ const model = ref([
                 label: 'Formularios',
                 icon: 'pi pi-fw pi-file-edit',
                 to: '/admin/formulario'
+            },
+            {
+                label: 'Plan Programa',
+                icon: 'pi pi-fw pi-file-edit',
+                to: '/admin/plan'
             }
         ]
     },

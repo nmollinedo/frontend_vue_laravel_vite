@@ -28,11 +28,17 @@ export default {
     modificarFecha: (id,datos) => {
         return Api().post(`/modificar-dictamen-fecha/${id}`, datos);
     },
+    modificarEditFecha: (id,datos) => {
+        return Api().post(`/modificar-edit-fecha/${id}`, datos);
+    },
     eliminarCierre: (id,datos) => {
         return Api().post(`/eliminar-cierre/${id}`, datos);
     },
     verificarFormulario: (id,datos) => {
         return Api().get(`/verificar-formulario/${id}`);
+    },
+    mostrarFormEditFecha: (id) => {
+        return Api().get(`/dictamen-mostrar-fecha/${id}`);
     }
   
 }

@@ -152,7 +152,7 @@
               <span></span>
         </template>
         <div class="dictamenes-etapa">
-              <h3>Lista de formularios: </h3>
+              <h3>Lista de formularios: </h3>{{dictamenes}}
 
               <!-- DataTable de PrimeVue para mostrar los dictámenes -->
               <DataTable :value="dictamenes"  class="p-mt-4">
@@ -178,10 +178,16 @@
                 <Column header="Acciones">
                   <template #body="slotProps">
                     <Button 
-                    v-if="slotProps.data.cierre_entidad!==1"
+                    v-if="slotProps.data.cierre_entidad !== 1 && slotProps.data.tipo_dictamen_id === 1"
                       label="Editar" 
                       icon="pi pi-pencil" 
                       @click="abrirModalEdit(slotProps.data.dictamen_id)" 
+                      class="p-button-text" />
+                      <Button 
+                    v-if="slotProps.data.cierre_entidad!==1 && slotProps.data.tipo_dictamen_id === 4"
+                      label="Editar Fecha" 
+                      icon="pi pi-pencil" 
+                      @click="abrirModalEditFecha(slotProps.data.dictamen_id)" 
                       class="p-button-text" />
 
                    <!--   <Button 
@@ -190,12 +196,14 @@
                       icon="pi pi-pencil" 
                       @click="abrirModalCierre(slotProps.data)" 
                       class="p-button-text" />-->
+
                       <Button 
                             v-if="slotProps.data.bloqueo_proyecto===0" 
                             label="Cierre Form"
                             icon="pi pi-lock-open" 
                             @click="abrirModalCierre(slotProps.data)"
                             class="p-button-text" />
+                      
                             
                             <Button 
                             v-if="slotProps.data.cierre_entidad!==1"
@@ -303,7 +311,7 @@
                 <InputText id="respaldo_pregunta_3" v-model="form.respaldo_pregunta_3" required="true" />
                 
                 <label for="fecha_pregunta_3">Fecha:</label>
-                <Calendar v-model="form.fecha_pregunta_3" dateFormat="dd/mm/yy" placeholder="Fecha Registro"></Calendar>
+                <Calendar v-model="form.fecha_pregunta_3" dateFormat="dd-mm-yy" placeholder="Fecha Registro"></Calendar>
 
               </div>
             </div>
@@ -592,7 +600,7 @@
       </template>
     </Dialog>
 
-      <!-- Modal para editar formulario para modificar fecha -->
+  <!-- Modal para editar formulario para modificar fecha -->
       <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
       <template v-slot:header>
               <span>Modificar Formulario Fechas yyyy</span>
@@ -676,6 +684,178 @@
         <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalModificacion" class="p-button-secondary"></Button>
       </template>
     </Dialog>
+
+    <!-- Modal para editar formulario para editar modificar fecha -->
+      <Dialog :visible="mostrarModalModificacionEdit" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
+      <template v-slot:header>
+              <span>Modificar Formulario Fechas yyyy</span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+
+        <Button icon="pi pi-times" @click="cerrarModalEdit" class="p-button-text"></Button>
+      </template>
+     
+      <div style="max-height: 70vh;">
+        <h2>Datos del Formulario</h2>
+        
+        <!-- Select para Etapa -->
+        <div class="field">
+          <label for="etapa">Etapa del Formulario</label>
+          <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
+                        class="w-full md:w-14rem" />
+          <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>{{form}}
+        </div>
+        
+
+        <!-- Fechas -->
+        <div class="field">
+          <label>Duración (Inicio y Término de Etapa)</label>
+          <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
+          <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
+        </div>
+
+        <div class="field">
+          <label>Fecha de registro del Formulario</label>
+          <Calendar v-model="form.fecha_dictamen" dateFormat="dd/mm/yy" placeholder="Fecha Registro" :disabled="true"></Calendar>
+        </div>
+
+        <h2>Justificación y Respaldo</h2>
+
+        <!-- Preguntas con radio buttons -->
+        
+             <!-- Datos adicionales -->
+             <div>
+              <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
+              <InputText id="mae" v-model="form.mae" required="true"/>
+            </div>
+            <div>
+              <label for="mae_cargo">Cargo MAE</label>
+              <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
+            </div>
+            <div>
+              <label for="mae_ci">C.I. MAE</label>
+              <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
+            </div>
+            <div>
+              <label for="mae_documento_designacion">Documento de Designación MAE</label>
+              <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
+            </div>
+
+            <div>
+              <label for="responsable">Nombre Responsable del Proyecto</label>
+              <InputText id="responsable" v-model="form.responsable" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_cargo">Cargo Responsable</label>
+              <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_unidad">Unidad Responsable</label>
+              <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_ci">C.I. Responsable</label>
+              <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
+            </div>
+      </div>  
+    
+
+      <template v-slot:footer>
+        <Button label="Grabar" icon="pi pi-check" @click="guardarFormularioModificacion(form.dictamen_id)" class="p-button-primary"></Button>
+        <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalModificacion" class="p-button-secondary"></Button>
+      </template>
+    </Dialog>
+
+    <!-- Modal para editar fecha -->
+      <Dialog :visible="mostrarModalEditFecha" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
+      <template v-slot:header>
+              <span>Modificar Formulario Fechas ffff</span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+              <span>   </span>
+
+        <Button icon="pi pi-times" @click="cerrarModalEditFecha" class="p-button-text"></Button>
+      </template>
+     
+      <div style="max-height: 70vh;">
+        <h2>Datos del Formulario</h2>
+        
+        <!-- Select para Etapa -->
+        <div class="field">
+          <label for="etapa">Etapa del Formulario</label>
+    <!--      <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
+                        class="w-full md:w-14rem" /> -->
+          <p>ID etapa seleccionada: {{ form.tipo_dictamen_id }}</p>{{form}}
+        </div>
+        
+
+        <!-- Fechas -->
+        <div class="field">
+          <label>Duración (Inicio y Término de Etapa)</label>
+          <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
+          <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
+        </div>
+
+        <div class="field">
+          <label>Fecha de registro del Formulario</label>
+          <Calendar v-model="form.fecha_dictamen" dateFormat="dd/mm/yy" placeholder="Fecha Registro" :disabled="true"></Calendar>
+        </div>
+
+        <h2>Justificación y Respaldo</h2>
+
+        <!-- Preguntas con radio buttons -->
+        
+             <!-- Datos adicionales -->
+             <div>
+              <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
+              <InputText id="mae" v-model="form.mae" required="true"/>
+            </div>
+            <div>
+              <label for="mae_cargo">Cargo MAE</label>
+              <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
+            </div>
+            <div>
+              <label for="mae_ci">C.I. MAE</label>
+              <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
+            </div>
+            <div>
+              <label for="mae_documento_designacion">Documento de Designación MAE</label>
+              <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
+            </div>
+
+            <div>
+              <label for="responsable">Nombre Responsable del Proyecto</label>
+              <InputText id="responsable" v-model="form.responsable" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_cargo">Cargo Responsable</label>
+              <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_unidad">Unidad Responsable</label>
+              <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
+            </div>
+            <div>
+              <label for="responsable_ci">C.I. Responsable</label>
+              <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
+            </div>
+      </div>  
+    
+
+      <template v-slot:footer>
+        <Button label="Grabar" icon="pi pi-check" @click="guardarFormularioEditFecha(form.dictamen_id)" class="p-button-primary"></Button>
+        <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalEditFecha" class="p-button-secondary"></Button>
+      </template>
+    </Dialog>
+
+
     <!-- Modal para editar formulario para modificar fecha -->
       <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '70vw' }" :draggable="false" :closable="false">
       <template v-slot:header>
@@ -695,7 +875,8 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario****</label><Message severity="error" v-if="etapas2" :content="errorMessage" placeholder="Seleccionar..." />
+          <label for="etapa">Etapa del Formulario****</label>
+          <Message severity="error" v-if="etapas2" :content="errorMessage" placeholder="Seleccionar..." />
           
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
@@ -1129,7 +1310,9 @@ const etapaSeleccionada2 = ref(null);
 const mostrarModal = ref(false);  // Controla la visibilidad del modal
 const mostrarModalVer = ref(false);  // Controla la visibilidad del modal
 const mostrarModalEdit = ref(false);  // Controla la visibilidad del modal
+const mostrarModalEditFecha = ref(false);  // Controla la visibilidad del modal
 const mostrarModalModificacion = ref(false);  // Controla la visibilidad del modal
+const mostrarModalModificacionEdit = ref(false);  // Controla la visibilidad del modal
 // ID for the selected form
 const formId = ref(null);
 const fechaInicio = ref(null);
@@ -1514,6 +1697,10 @@ const loadTransferencias = async (entidadId) => {
     console.log("load trans adentro",entidadId.value)
    // const var.value = entidadId.value;
     const { data } = await transferenciaService.listarTrafrenciaFormulario(entidadId.value);
+    for (let i = 0; i < data.length; i++) {
+        data[i].fecha_inicio = formatDateVista(data[i].fecha_inicio);
+        data[i].fecha_termino = formatDateVista(data[i].fecha_termino);
+    }
     transferencias.value = data;
   } catch (error) {
     console.error('Error al cargar las transferencias', error);
@@ -1783,15 +1970,15 @@ const abrirModalEdit = async(id) => {
     form.dictamen_id = form.value[0].dictamen_id,
     form.transferencia_id = form.value[0].transferencia_id,
     form.etapa = form.value[0].etapa_id,
-    form.fechaRegistro = formatDate(form.value[0].fecha_registro),
-    form.fecha_dictamen = formatDate(form.value[0].fecha_dictamen),
-    form.fechaInicio = formatDate(form.value[0].etapa_fecha_inicio),
-    form.fechaTermino = formatDate(form.value[0].etapa_fecha_fin),
+    form.fechaRegistro = formatDateVista(form.value[0].fecha_registro),
+    form.fecha_dictamen = formatDateVista(form.value[0].fecha_dictamen),
+    form.fechaInicio = formatDateVista(form.value[0].etapa_fecha_inicio),
+    form.fechaTermino = formatDateVista(form.value[0].etapa_fecha_fin),
     form.pregunta_1 =Boolean(form.value[0].pregunta_1),
     form.pregunta_2 = form.value[0].pregunta_2,
     form.pregunta_3 = form.value[0].pregunta_3,
     form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
-    form.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
+    form.fecha_pregunta_3 = formatDateVista(form.value[0].fecha_pregunta_3),
     console.log("fecha",form.fechaInicio);
     Object.assign(form, data[0]);
             // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
@@ -1802,13 +1989,49 @@ const abrirModalEdit = async(id) => {
   } catch (error) {
     console.error('Error al cargar los datos del formulario', error);
   }
+};
 
-
+const abrirModalEditFecha = async(id) => {
+  console.log("formulario ID dictamen",id);
+  try {
+  
+    const { data } = await dictamenService.mostrarFormEditFecha(id);
+    form.value = data;
+    console.log("Editar form data",data);
+    console.log("Edit",form.value[0].fecha_registro);
+    console.log("Trans ID",form.value[0].transferencia_id);
+    form.dictamen_id = form.value[0].dictamen_id,
+    form.transferencia_id = form.value[0].transferencia_id,
+    form.etapa = form.value[0].tipo_dictamen_id,
+    form.fechaRegistro = formatDateVista(form.value[0].fecha_registro),
+    form.fecha_dictamen = formatDateVista(form.value[0].fecha_dictamen),
+    form.fechaInicio = formatDateVista(form.value[0].proyecto_fecha_inicio),
+    form.fechaTermino = formatDateVista(form.value[0].proyecto_fecha_fin),
+    form.pregunta_1 =Boolean(form.value[0].pregunta_1),
+    form.pregunta_2 = form.value[0].pregunta_2,
+    form.pregunta_3 = form.value[0].pregunta_3,
+    form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
+    form.fecha_pregunta_3 = formatDateVista(form.value[0].fecha_pregunta_3),
+    console.log("fecha",form.fechaInicio);
+    Object.assign(form, data[0]);
+            // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
+    //etapaSeleccionada.value = etapas.value.find(etapa => etapa.id === form.value[0].tipo_dictamen_id);
+    console.log("Formulario para edición:", form.value);
+    mostrarModalEditFecha.value = true;
+    // Rellenar otros campos...
+  } catch (error) {
+    console.error('Error al cargar los datos del formulario', error);
+  }
 };
 
 // Función para cerrar el modal
 const cerrarModalEdit = () => {
 mostrarModalEdit.value = false;
+};
+
+// Función para cerrar el modal
+const cerrarModalEditFecha = () => {
+mostrarModalEditFecha.value = false;
 };
 
 // Función para guardar el nuevo dictamen
@@ -1817,14 +2040,14 @@ const guardarFormularioModificacion = async (dictamen_id) => {
   console.log("Formulario IN",form.fechaInicio)
   console.log("Formulario Termino",form.fechaTermino)
   console.log("Formulario ID",formId)
-  console.log("Select ID",etapaSeleccionada.id)
+  console.log("Select ID",etapaSeleccionada.value.id)
 
   const bandera = verificarFormularioActivo(form.transferencia_id); 
 
-      if (bandera!=0){
+  /*    if (bandera!=0){
         toast.add({ severity: 'info', summary: 'Información', detail: 'Debe cerrar el formulario que aun tiene registrado', life: 3000 });
         
-      }else{
+      }else{*/
 
   
             const formData = reactive({
@@ -1865,7 +2088,7 @@ const guardarFormularioModificacion = async (dictamen_id) => {
               //await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
               //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
               console.log("datos form",formData);
-                //const response = await dictamenService.modificarFecha(form.dictamen_id,formData);
+                const response = await dictamenService.modificarFecha(form.dictamen_id,formData);
                 console.log("transferencia ID",form.transferencia_id)
                 //abrirModalVer(form.transferencia_id);
                 //dictamenes.value = data;
@@ -1880,8 +2103,82 @@ const guardarFormularioModificacion = async (dictamen_id) => {
             } catch (error) {
               console.error('Error al agregar el dictamen:', error);
             }
-    }
+    //}
 };
+
+
+// Función para guardar el nuevo dictamen
+const guardarFormularioEditFecha = async (dictamen_id) => {
+  console.log("Formulario Re",form.fechaRegistro)
+  console.log("Formulario IN",form.fechaInicio)
+  console.log("Formulario Termino",form.fechaTermino)
+  console.log("Formulario ID",formId)
+  console.log("Select ID",form.tipo_dictamen_id)
+
+  const bandera = verificarFormularioActivo(form.transferencia_id); 
+
+  /*    if (bandera!=0){
+        toast.add({ severity: 'info', summary: 'Información', detail: 'Debe cerrar el formulario que aun tiene registrado', life: 3000 });
+        
+      }else{*/
+
+  
+            const formData = reactive({
+              //id: formId, // Ensure the ID is sent
+              transferencia_id:form.transferencia_id,
+              dictamen_id: form.dictamen_id,
+              etapa: form.tipo_dictamen_id,
+              fecha_registro: form.fecha_dictamen,
+            
+              fecha_inicio:form.fechaInicio,
+              fecha_termino: form.fechaTermino,
+              pregunta_1: form.pregunta_1,
+              pregunta_2: form.pregunta_2,
+              pregunta_3: form.pregunta_3,
+              respaldo_pregunta_3: form.respaldo_pregunta_3,
+              fecha_pregunta_3: formatDate(form.fecha_pregunta_3),
+              pregunta_4: form.pregunta_4,
+              respaldo_pregunta_4: form.respaldo_pregunta_4,
+              fecha_pregunta_4: formatDate(form.fecha_pregunta_4),
+              pregunta_5: form.pregunta_5,
+              respaldo_pregunta_5: form.respaldo_pregunta_5,
+              fecha_pregunta_5: formatDate(form.fecha_pregunta_5),
+              pregunta_6: form.pregunta_6,
+              respaldo_pregunta_6: form.respaldo_pregunta_6,
+              fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
+              mae: form.mae,
+              mae_cargo: form.mae_cargo,
+              mae_ci: form.mae_ci,
+              mae_documento_designacion: form.mae_documento_designacion,
+              responsable: form.responsable,
+              responsable_cargo: form.responsable_cargo,
+              responsable_unidad: form.responsable_unidad,
+              responsable_ci: form.responsable_ci
+              // Add other form fields here
+            });
+
+            try {
+              //await axios.post(`/api/dictamenes/${proyectoSeleccionado.value.codigo_tpp}`, nuevoDictamen.value);
+              //await toggleDictamen(proyectoSeleccionado.value.codigo_tpp);  // Recargar los dictámenes
+              console.log("datos form",formData);
+                const response = await dictamenService.modificarEditFecha(form.dictamen_id,formData);
+                console.log("transferencia ID",form.transferencia_id)
+                //abrirModalVer(form.transferencia_id);
+                //dictamenes.value = data;
+                console.log('Formulario fecha Edit modificada con éxito:', response.data);
+
+                //mostrarModalModificacion=false;
+                toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
+                //toast.add({ severity: 'error', summary: 'Formulario fecha modificada con éxito', detail: error });
+              cerrarModalModificacion();  // Cerrar el modal después de guardar
+              loadTransferencias();
+              actualizarTabla();
+            } catch (error) {
+              console.error('Error al agregar el dictamen:', error);
+            }
+    //}
+};
+
 
 // Función para abrir el modal
 const abrirModalModificacion = async(dictamen_id) => {
@@ -1898,17 +2195,17 @@ const abrirModalModificacion = async(dictamen_id) => {
     form.dictamen_id = form.value[0].dictamen_id,
     form.transferencia_id = form.value[0].transferencia_id,
     form.etapa = form.value[0].etapa_id,
-    form.fechaRegistro = formatDateVista(form.value[0].fecha_registro),
-    form.fecha_dictamen = formatDateVista(form.value[0].fecha_dictamen),
-    form.fechaInicio = formatDateVista(form.value[0].proyecto_fecha_inicio),
-    form.fechaTermino = formatDateVista(form.value[0].proyecto_fecha_fin),
+    form.fechaRegistro = formatDate(form.value[0].fecha_registro),
+    form.fecha_dictamen = formatDate(form.value[0].fecha_dictamen),
+    form.fechaInicio = form.value[0].proyecto_fecha_inicio,
+    form.fechaTermino = form.value[0].proyecto_fecha_fin,
     form.pregunta_1 =Boolean(form.value[0].pregunta_1),
     form.pregunta_2 = form.value[0].pregunta_2,
     form.pregunta_3 = form.value[0].pregunta_3,
     form.respaldo_pregunta_3 = form.value[0].respaldo_pregunta_3,
     form.fecha_pregunta_3 = formatDate(form.value[0].fecha_pregunta_3),
-    console.log("fecha iii",formatDateVista(form.fechaInicio));
-    console.log("fecha ttt",formatDateVista(form.fechaTermino));
+    console.log("fecha iii",form.fechaInicio);
+    console.log("fecha ttt",form.fechaTermino);
     console.log("Dictamen id",form.dictamen_id);
  
     Object.assign(form, data[0]);
@@ -1929,6 +2226,8 @@ const abrirModalModificacion = async(dictamen_id) => {
 const cerrarModalModificacion = () => {
 mostrarModalModificacion.value = false;
 };
+
+
 
 // Función para abrir el modal
 // Function to open the modal and receive the ID
@@ -2206,9 +2505,9 @@ async function cargarTipoDictamen() {
   }
 };
 async function cargarTipoDictamen2() {
-  
+  /*
   const bandera = verificarFormularioActivo(form.transferencia_id); 
-console.log("bandera yyyy",form);
+  console.log("bandera yyyy",form);
       if (bandera!=0){
         
         errorMessage.value = "Todos los campos son obligatorios.";
@@ -2222,7 +2521,13 @@ console.log("bandera yyyy",form);
               } catch (error) {
                 console.error("Error al cargar los departamentos:", error);
               }
-      }  
+      }  */
+      try {
+                const { data } = await tipoDictamenService.listar2();
+                etapas2.value = data;
+              } catch (error) {
+                console.error("Error al cargar los departamentos:", error);
+              }
 };
 
 
