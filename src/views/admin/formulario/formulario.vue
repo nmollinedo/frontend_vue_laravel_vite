@@ -2170,7 +2170,7 @@ const guardarFormularioEditFecha = async (dictamen_id) => {
                 //mostrarModalModificacion=false;
                 toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
                 //toast.add({ severity: 'error', summary: 'Formulario fecha modificada con éxito', detail: error });
-              cerrarModalModificacion();  // Cerrar el modal después de guardar
+              cerrarModalEditFecha();  // Cerrar el modal después de guardar
               loadTransferencias();
               actualizarTabla();
             } catch (error) {
