@@ -12,7 +12,16 @@
       <Dialog v-model:visible="dialogVisible" header="Nuevo Plan o Programa" :style="{ width: '50vw' }">
           <form @submit.prevent="save">
               <div>
-                  <InputText v-model="planPrograma.tipo_clasificacion" placeholder="Tipo Clasificador" :style="{ width: '45vw' }"/>
+                  
+                  <label for="Clasificador" class="block font-bold mb-3">Tipo Clasificador</label>
+                        <Dropdown 
+                            v-model="selectedClasificador" 
+                            :options="clasificadores" 
+                            optionLabel="tipo_clasificador"
+                            placeholder="Seleccione clasificador" 
+                            class="w-full md:w-14rem" 
+                          
+                        />
               </div>
               <div>
                   <InputText v-model="planPrograma.clasificador" placeholder="Nombre Clasificador" :style="{ width: '45vw' }"/>
@@ -36,9 +45,12 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 
 import programaService from "../../../services/programa.service";
+import planService from '../../../services/plan.service';
 
 // Definir los estados reactivos
 const planesProgramas = ref([]);
+const clasificadores = ref([]);
+const selectedClasificador = ref({ id: null });
 const planPrograma = ref({ tipo_clasificacion: '', clasificador: '', descripcion: '' });
 const dialogVisible = ref(false);
 
@@ -71,10 +83,20 @@ const save = () => {
   }
 };
 
+const listarClasificador = async () => {
+  try {
+    const { data } = await planService.listarClasificador();
+    clasificadores.value = data;
+  } catch (error) {
+    console.error("Error al cargar los departamentos:", error);
+  }
+};
+
 // Ejecutar cuando se monta el componente
 onMounted(() => {
   //loadData();
   listarPlanPrograma();
+  listarClasificador();
 });
 </script>
 

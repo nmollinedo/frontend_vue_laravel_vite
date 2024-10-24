@@ -592,14 +592,14 @@
                             </Column>
 
                             <!-- Columna para mostrar el total de cada fila -->
-                            <Column header="Total Etapa (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: center">
+                            <Column header="Total (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
                                     {{ getRowTotal(slotProps.data) }}
                                 </template>
                             </Column>
 
                             <!-- Columna de acciones -->
-                            <Column header="Actions" :style="{ width: '150px' }">
+                            <Column header="Acciones" :style="{ width: '150px' }">
                                 <template #body="slotProps">
                                     <Button v-if="slotProps.data.editar" icon="pi pi-save" class="p-button-rounded p-button-success p-button-text" 
                                         @click="slotProps.data.nuevo ? guardarComponente(slotProps.data) : saveEdit(slotProps.data)" />

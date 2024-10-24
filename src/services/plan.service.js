@@ -18,5 +18,8 @@ export default {
     },
     asignarUser: (datos) => {
         return Api().post(`/plan/asignar-user`, datos);
+    },
+    listarClasificador: () => {
+        return Api().get(`/listar-clasificador`);
     }
 }

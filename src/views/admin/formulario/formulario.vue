@@ -152,7 +152,7 @@
               <span></span>
         </template>
         <div class="dictamenes-etapa">
-              <h3>Lista de formularios: </h3>{{dictamenes}}
+              <h3>Lista de formularios: </h3>
 
               <!-- DataTable de PrimeVue para mostrar los dictámenes -->
               <DataTable :value="dictamenes"  class="p-mt-4">
@@ -257,7 +257,7 @@
 
         <!-- Fechas -->
         <div class="field">
-          <label>Duración (Inicio y Término de Etapa)</label>
+          <label>Duración (Inicio y Término)</label>
           <Calendar v-model="fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio" :disabled="true"></Calendar>
           <Calendar v-model="fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término" :disabled="true"></Calendar>
         </div>
@@ -444,7 +444,7 @@
 
         <!-- Fechas -->
         <div class="field">
-          <label>Duración (Inicio y Término de Etapa)</label>
+          <label>Duración (Inicio y Término)</label>
           <Calendar v-model="fechaInicio" dateFormat="dd/mm/yy" placeholder="Fecha Inicio" :disabled="true"></Calendar>
           <Calendar v-model="fechaTermino" dateFormat="dd/mm/yy" placeholder="Fecha Término" :disabled="true"></Calendar>
         </div>
@@ -603,7 +603,7 @@
   <!-- Modal para editar formulario para modificar fecha -->
       <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
       <template v-slot:header>
-              <span>Modificar Formulario Fechas yyyy</span>
+              <span>Modificar Formulario Fechas--</span>
               <span>   </span>
               <span>   </span>
               <span>   </span>
@@ -622,13 +622,13 @@
           <label for="etapa">Etapa del Formulario</label>
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
-          <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>{{form}}
+          <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
         </div>
         
 
         <!-- Fechas -->
         <div class="field">
-          <label>Duración (Inicio y Término de Etapa)</label>
+          <label>Duración (Inicio y Término)</label>
           <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
           <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
         </div>
@@ -713,7 +713,7 @@
 
         <!-- Fechas -->
         <div class="field">
-          <label>Duración (Inicio y Término de Etapa)</label>
+          <label>Duración (Inicio y Término)</label>
           <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
           <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
         </div>
@@ -798,7 +798,7 @@
 
         <!-- Fechas -->
         <div class="field">
-          <label>Duración (Inicio y Término de Etapa)</label>
+          <label>Duración (Inicio y Término)</label>
           <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
           <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
         </div>
@@ -859,7 +859,7 @@
     <!-- Modal para editar formulario para modificar fecha -->
       <Dialog :visible="mostrarModalModificacion" modal :style="{ width: '70vw' }" :draggable="false" :closable="false">
       <template v-slot:header>
-              <span>Modificar Formulario yyyy</span>
+              <span>Modificar Formulario- </span>
               <span>   </span>
               <span>   </span>
               <span>   </span>
@@ -875,8 +875,8 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario****</label>
-          <Message severity="error" v-if="etapas2" :content="errorMessage" placeholder="Seleccionar..." />
+          <label for="etapa">Etapa del Formulario.</label>
+         <!-- <Message severity="error" v-if="etapas2" :content="errorMessage" placeholder="Seleccionar..." /> -->
           
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
                         class="w-full md:w-14rem" />
@@ -886,7 +886,7 @@
         <div v-if="etapaSeleccionada && etapaSeleccionada.id === 4">
         <!-- Fechas -->
         <div class="field">
-          <label>Duración (Inicio y Término de Etapa)</label>{{form.transferencia_id}}
+          <label>Duración (Inicio y Término)</label>{{form.transferencia_id}}
           <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio"></Calendar>
           <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
         </div>
@@ -939,7 +939,7 @@
         <div v-if="etapaSeleccionada && etapaSeleccionada.id === 3">
               <!-- Fechas -->
               <div class="field">
-                <label>Duración (Inicio y Término de Etapa)</label>
+                <label>Duración (Inicio y Término)</label>
                 <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio" :disabled="true"></Calendar>
                 <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" :disabled="true"></Calendar>
               </div>
@@ -1019,7 +1019,7 @@
                         </Column>
 
                         <!-- Columna para mostrar el total de cada fila -->
-                        <Column header="Total Etapa (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: right">
+                        <Column header="Total (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: right">
                             <template #body="slotProps">
                                 {{ getRowTotal(slotProps.data) }}
                             </template>
