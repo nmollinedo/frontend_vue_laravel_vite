@@ -33,7 +33,6 @@
   </template>
   
   <script setup>
-  /*
   import { ref, reactive, onMounted } from 'vue';
   import { useToast } from 'primevue/usetoast';
   //import { useVuelidate } from '@vuelidate/core';
@@ -66,7 +65,7 @@
     },
   };
   
-  const v$ = useVuelidate(rules, { form });*/
+  const v$ = useVuelidate(rules, { form });
  /* 
   let map;
   let marker;

@@ -10,7 +10,7 @@
       </DataTable>
 
       <Dialog v-model:visible="dialogVisible" header="Nuevo Plan o Programa" :style="{ width: '50vw' }">
-          <form @submit.prevent="save">
+          <form @submit.prevent="guardarPlanProgama">
               <div>
                   
                   <label for="Clasificador" class="block font-bold mb-3">Tipo Clasificador</label>
@@ -61,15 +61,20 @@ const openNew = () => {
 };
 
 // Función para guardar un nuevo plan o programa
-const save = () => {
-  axios.post('/planes-programas', planPrograma.value)
-      .then(response => {
-          loadData();
-          dialogVisible.value = false;
-      })
-      .catch(error => {
-          console.error('Error al guardar el plan/programa:', error);
-      });
+const guardarPlanProgama = async () => {
+
+  try {
+    const payload = {
+            clasificador: planPrograma.value.clasificador,
+            descripcion: planPrograma.value.descripcion,
+            tipo_clasificador_id: selectedClasificador.value.id
+        };
+        console.log("ID transferencia",payload)
+    const { data } = await programaService.guardarPlanPrograma(payload);
+    //planesProgramas.value = data;
+  } catch (error) {
+    console.error("Error al cargar los departamentos:", error);
+  }
 };
 
 // Función para cargar los datos de planes y programas

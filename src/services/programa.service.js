@@ -21,5 +21,8 @@ export default {
     },
     listarPlanPrograma: () => {
         return Api().get("/plan-programa");
+    },
+    guardarPlanPrograma: (datos) => {
+        return Api().post("/guardar-plan-programa", datos);
     }
 }

@@ -63,10 +63,10 @@
   <Column header="Acciones">
     <!-- Template para definir las acciones dentro de cada fila -->
     <template #body="slotProps">
-      <!-- Mostrar el valor de la función hasTransferencia -->
+      <!-- Mostrar el valor de la función hasTransferencia 
       <div>
         <p>Has transferencia: {{ transferenciaStatus[slotProps.data.id] }}</p>
-      </div>
+      </div>-->
       
       <!-- Botón "Ver Formulario" siempre disponible -->
       <Button 
@@ -158,8 +158,8 @@
               <DataTable :value="dictamenes"  class="p-mt-4">
                 
                 <Column header="Ver" body="verTemplate"></Column>
-                <Column field="transferencia_id" body="Id"></Column>
-                <Column field="dictamen_id" body="Id"></Column>
+              <!--  <Column field="transferencia_id" body="Id"></Column>
+                <Column field="dictamen_id" body="Id"></Column>  -->
                 <Column field="tipo_dictamen" header="Tipo de formulario"></Column>
               <!--  <Column field="etapa" header="Etapa"></Column> -->
                 <Column field="fecha_dictamen" header="Fecha formulario"></Column>
@@ -240,12 +240,12 @@
               <span></span>
         <Button icon="pi pi-times" @click="cerrarModal" class="p-button-text"></Button>
       </template>
-       <!-- Displaying the received ID -->
+       <!-- Displaying the received ID 
        <div>
         <label for="id">ID transferencia:</label>
         <input type="text" v-model="formId" readonly class="border rounded-md p-2">
         
-      </div>
+      </div>-->
     <div style="max-height: 70vh;">
         <h2>Datos del Formulario</h2> {{form.dictamen_id}}
         
@@ -425,12 +425,12 @@
 
         <Button icon="pi pi-times" @click="cerrarModalEdit" class="p-button-text"></Button>
       </template>
-      <div>
+<!--      <div>
         <label for="dictamen_id">ID formulario:</label>
         <input type="text" v-model="form.dictamen_id" readonly class="border rounded-md p-2">
         <label for="dictamen_id">ID trans:</label>
         <input type="text" v-model="form.transferencia_id" readonly class="border rounded-md p-2">
-      </div>
+      </div>  -->
       <div style="max-height: 70vh;">
         <h2>Datos del Formulario</h2>
         
@@ -1251,7 +1251,7 @@
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
             <span v-if="dictamenes">El registro del formulario tiene carácter de declaración jurada, realizado el cierre los datos del Formulario NO podrán modificarse, tampoco se podrá eliminar el formulario cerrado.
-              ¿Está seguro de cerrar el Formulario?<b>{{ dictamenEditar.transferencia_id }}</b>?</span>
+              ¿Está seguro de cerrar el Formulario??</span><!--<b>{{ dictamenEditar.transferencia_id }}</b>-->
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="cierreFormularioDialog = false" />

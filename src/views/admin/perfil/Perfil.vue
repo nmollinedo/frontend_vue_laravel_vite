@@ -33,11 +33,6 @@
                 </button>
                 </div>
 
-    
-                
-
-        
-
     </div>
 </template>
 
@@ -45,7 +40,7 @@
     import { onMounted, ref } from "vue";
     import authService from "./../../../services/auth.service"
 import { useRoute } from "vue-router";
-import moment from 'moment'
+import moment from 'moment';
 
 
     const router = useRoute()
