@@ -566,35 +566,35 @@
                             <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
                                     <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_aporte_local" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
-                                    <span v-else>{{ slotProps.data.monto_aporte_local }}</span>
+                                    <span v-else>{{ formatearMiles(slotProps.data.monto_aporte_local) }}</span>
                                 </template>
                             </Column>
 
                             <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
                                     <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_cofinanciamiento" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
-                                    <span v-else>{{ slotProps.data.monto_cofinanciamiento }}</span>
+                                    <span v-else>{{ formatearMiles(slotProps.data.monto_cofinanciamiento) }}</span>
                                 </template>
                             </Column>
 
                             <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
                                     <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_finan_externo" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
-                                    <span v-else>{{ slotProps.data.monto_finan_externo }}</span>
+                                    <span v-else>{{ formatearMiles(slotProps.data.monto_finan_externo) }}</span>
                                 </template>
                             </Column>
 
                             <Column field="monto_otros" header="Otros (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
                                     <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_otros" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
-                                    <span v-else>{{ slotProps.data.monto_otros }}</span>
+                                    <span v-else>{{ formatearMiles(slotProps.data.monto_otros) }}</span>
                                 </template>
                             </Column>
 
                             <!-- Columna para mostrar el total de cada fila -->
                             <Column header="Total (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
-                                    {{ getRowTotal(slotProps.data) }}
+                                    {{ formatCurrency(getRowTotal(slotProps.data)) }}
                                 </template>
                             </Column>
 
@@ -605,7 +605,7 @@
                                         @click="slotProps.data.nuevo ? guardarComponente(slotProps.data) : saveEdit(slotProps.data)" />
                                     <Button v-if="slotProps.data.editar" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cerrarEdicion(slotProps.data, index)" />
                                     <Button v-if="!slotProps.data.editar" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="comenzarEdicion(slotProps.data)" />
-                                    <Button v-if="!slotProps.data.editar" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data.id)" />
+                                    <Button v-if="!slotProps.data.editar" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
                                 </template>
                             </Column>
 
@@ -827,6 +827,10 @@ const formatCurrency = (value) => {
   if (value === null || value === undefined) return '0.00';
   return value.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
+
+function formatearMiles(numero) {
+  return new Intl.NumberFormat('es-BO').format(numero);
+}
 
 // Obtener total por fila con formato
 const getRowTotalFormatted = (data) => {
@@ -1618,14 +1622,15 @@ const deleteComponent1 = (rowData) => {
 };
 // Function to calculate row total
 const getRowTotal = (rowData) => {
-    const montoAporteLocal = parseFloat(rowData.monto_aporte_local) || 0;
+  const montoAporteLocal = parseFloat(rowData.monto_aporte_local) || 0;
   const montoCofinanciamiento = parseFloat(rowData.monto_cofinanciamiento) || 0;
   const montoFinanExterno = parseFloat(rowData.monto_finan_externo) || 0;
   const montoOtros = parseFloat(rowData.monto_otros) || 0;
 
   const total = montoAporteLocal + montoCofinanciamiento + montoFinanExterno + montoOtros;
 
-  return total.toFixed(2); // Devuelve el total con 2 decima
+  if (total === null || total === undefined) return '0.00';
+  return total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
 // Function to calculate total for a specific column
@@ -1680,7 +1685,7 @@ const editComponent = (rowData) => {
 };
 
 const deleteComponent = async(rowData) => {
-  console.log('Delete:', rowData.transferencia_id);
+  console.log('Delete:', rowData);
   console.log('Delete:', rowData.componente_id);
   const transferencia_id = rowData.transferencia_id;
   const componente_id = rowData.componente_id;
