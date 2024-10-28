@@ -86,7 +86,7 @@
       />
       <Button 
         v-if="slotProps.data.estado_id===2" 
-        label="Agregar modificacion" 
+        label="Agregar modificación" 
         icon="pi pi-plus" 
         @click="abrirModalModificacion(slotProps.data.dictamen_id)" 
         class="p-button-text" 
@@ -171,7 +171,7 @@
                   <Button 
                       label="Imprimir" 
                       icon="pi pi-print" 
-                      @click="abrirModalEditttt(slotProps.data.dictamen_id)" 
+                      @click="abrirModalEdit(slotProps.data.dictamen_id)" 
                       class="p-button-text" />
                     </template>   
                 </Column>
@@ -875,11 +875,14 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario.</label>
-         <!-- <Message severity="error" v-if="etapas2" :content="errorMessage" placeholder="Seleccionar..." /> -->
-          
+          <label for="etapa">Etapa del Formulario. {{ esModificableForm }}</label>
+          <!-- <Message severity="error" v-if="etapas2" :content="'Para actualizar los valores, presiona la tecla Enter (↵) mientras estés editando cualquier campo. Esto recalculará automáticamente los totales.'" placeholder="Seleccionar..." /> -->
+          <div v-if="!esModificableForm.valueOf()" class="modal-content-error">
+              <h2>Atención</h2>
+              <p>Para actualizar los valores del formulario, tiene que cerrar los formularios abiertos.</p>
+          </div>
           <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
-                        class="w-full md:w-14rem" />
+                        class="w-full md:w-14rem"  :disabled="!esModificableForm.valueOf()"  />
           <p>ID etapa seleccionada: {{ etapaSeleccionada.id }}</p>
         </div>
         
@@ -1094,7 +1097,7 @@
       </div>
 
       <template v-slot:footer>
-        <Button label="Grabar" icon="pi pi-check" @click="guardarFormularioModificacion(form.dictamen_id)" class="p-button-primary"></Button>
+        <Button label="Grabar" icon="pi pi-check" @click="guardarFormularioModificacion(form.dictamen_id)" class="p-button-primary" :disabled="!esModificableForm.valueOf()"></Button>
         <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalModificacion" class="p-button-secondary"></Button>
       </template>
     </Dialog>
@@ -1218,7 +1221,7 @@
       
       <!-- Botón para cerrar el diálogo -->
       <template #footer>
-        <Button label="Cerrar" icon="pi pi-times" @click="mostrarDialog = false" />
+        <Button label="Cerrar" icon="pi pi-times" @click="mostrarModal = false" />
       </template>
     </Dialog>
   </div>
@@ -1341,6 +1344,7 @@ const estados = ref([
 const estadoSeleccionado = ref(null);
 
 const errorMessage = ref('');
+const esModificableForm = ref(false);
 /*
 const filtrarProyectos = () => {
 // Lógica para filtrar los proyectos según el estado seleccionado
@@ -1846,18 +1850,20 @@ const verificarFormularioActivo = async (id) => {
         const { data } = await dictamenService.verificarFormulario(id);
         
         // Asegúrate de que 'data' tiene al menos un elemento
-        if (data && data.length > 0 && data[0].value) {
+        if (data && data.length > 0 ) {
             
-            const bandera = data
+            esModificableForm.value = false;
             console.log("lista formulario activo", 0);
-            return bandera;
+            return false;
         } else {
             console.error("No se encontró información válida en la respuesta");
-            return null; // O algún valor por defecto si no hay datos válidos
+            esModificableForm.value = true;
+            return true; // O algún valor por defecto si no hay datos válidos
         }
     } catch (error) {
         console.error("Error al verificar el formulario activo", error);
-        return null; // Manejo de errores
+        esModificableForm.value = false;
+        return false; // Manejo de errores
     }
 }
 
@@ -2207,8 +2213,10 @@ const abrirModalModificacion = async(dictamen_id) => {
     console.log("fecha iii",form.fechaInicio);
     console.log("fecha ttt",form.fechaTermino);
     console.log("Dictamen id",form.dictamen_id);
- 
     Object.assign(form, data[0]);
+
+    await verificarFormularioActivo(form.value[0].transferencia_id)
+
             // selectedArea.value = areas.value.find(area => area.id === transferencia.value[0].area_id);
     etapaSeleccionada.value = etapas.value.find(etapa => etapa.id === form.value[0].etapa_id);
     console.log("Formulario para edición:", form.value);
@@ -2592,6 +2600,22 @@ async function cargarTipoDictamen2() {
   width: 50%;
   max-width: 600px;
 }
+
+.modal-content-error {
+  padding: 7px;
+  border-radius: 8px;
+  margin: 7px auto;
+  width: 100%;
+  max-width: 500px; /* Limita el ancho máximo del modal */
+  background-color: #ffeded; /* Fondo rojo claro para error */
+  color: #d9534f; /* Texto en rojo */
+  border: 1px solid #d9534f; /* Borde rojo */
+  text-align: left;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar el modal */
+  position: flex;
+}
+
+
 
 .close {
   position: absolute;
