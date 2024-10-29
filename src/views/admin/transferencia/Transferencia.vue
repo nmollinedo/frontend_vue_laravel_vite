@@ -1633,6 +1633,17 @@ const getRowTotal = (rowData) => {
   return total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
+const getRowTotalSinFormato = (rowData) => {
+  const montoAporteLocal = parseFloat(rowData.monto_aporte_local) || 0;
+  const montoCofinanciamiento = parseFloat(rowData.monto_cofinanciamiento) || 0;
+  const montoFinanExterno = parseFloat(rowData.monto_finan_externo) || 0;
+  const montoOtros = parseFloat(rowData.monto_otros) || 0;
+
+  const total = montoAporteLocal + montoCofinanciamiento + montoFinanExterno + montoOtros;
+
+  return total
+};
+
 // Function to calculate total for a specific column
 const getColumnTotal = (field) => {
     const total = listaComponentes.value.reduce((total, item) => {
@@ -1644,12 +1655,13 @@ const getColumnTotal = (field) => {
 
 // Function to calculate grand total (sum of totals for each row)
 const getGrandTotal = () => {
-    const total = listaComponentes.value.reduce((total, item) => {
-    return total + parseFloat(getRowTotal(item)) || 0;
+  const total = listaComponentes.value.reduce((acc, item) => {
+    return acc + parseFloat(getRowTotalSinFormato(item)) || 0;
   }, 0);
 
-  return parseFloat(total.toFixed(2)); // Devuelve el total con 2 decimales como número
+  return parseFloat(total); // Devuelve el total con 2 decimales como número
 };
+
 
 
 const updateTotal = (nuevoValor) => {

@@ -10,10 +10,9 @@ export default {
     show: (id) => {
         return Api().get(`/dictamen-listar/${id}`);
     },
-    listarTodo: (id) => {
+    listarTodo: () => {
         return Api().get(`/dictamen-listar-todo`);
-    }
-    ,
+    },
     update: (id, datos) => {
         return Api().put(`/dictamen/${id}`, datos);
     },
