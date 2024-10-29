@@ -10,6 +10,10 @@ export default {
     show: (id) => {
         return Api().get(`/dictamen-listar/${id}`);
     },
+    listarTodo: (id) => {
+        return Api().get(`/dictamen-listar-todo`);
+    }
+    ,
     update: (id, datos) => {
         return Api().put(`/dictamen/${id}`, datos);
     },
@@ -39,6 +43,21 @@ export default {
     },
     mostrarFormEditFecha: (id) => {
         return Api().get(`/dictamen-mostrar-fecha/${id}`);
+    },
+    listarFormCosto: (id) => {
+        return Api().get(`/listar-formulario-costo/${id}`);
+    },
+    guardarFormCosto: () => {
+        return Api().post(`/guardar-formulario-componente`);
+    },
+    guardarDictamenCosto: (datos) => {
+        return Api().post(`/guardar-dictamen`, datos);
+    },
+    eliminarDictamenCosto: (transferencia_id,componenete_id) => {
+        return Api().delete(`/eliminar-dictamen-costo/${transferencia_id}/${componenete_id}`);
+    },
+    carrarFormularioCosto: (datos) => {
+        return Api().post(`/cerrar-formulario-costo`, datos);
     }
   
 }
