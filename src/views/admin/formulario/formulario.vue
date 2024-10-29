@@ -1236,6 +1236,7 @@ const estadoSeleccionado = ref(null);
 
 const esModificableForm = ref(false);
 const esAbiertoComponente = ref(false);
+const todosDictamenes = ref(null);
 /*
 const filtrarProyectos = () => {
 // Lógica para filtrar los proyectos según el estado seleccionado
@@ -1304,6 +1305,8 @@ const formatNumber = (num) => {
 // Cargar proyectos al montar el componente
 onMounted(async () => {
   await cargarProyectos();
+  await listarTodosDictamen();
+
   cargarTipoDictamen();
   cargarTipoDictamen2();
   transferencias.value.forEach(transferencia => {
@@ -1311,7 +1314,6 @@ onMounted(async () => {
   });
   // listarComponentes();
   cargarComponente();
-
    //await getTransferencias();
 });
 // Estado del diálogo
@@ -1701,8 +1703,13 @@ function limpiarFormulario() {
 }
 
 // Función que se llama al hacer clic en el botón de actualizar
-function actualizarTabla() {
-    cargarProyectos();
+const actualizarTabla = async() => {
+  //los 3 metodos actualzan la tabla
+  await cargarProyectos();
+  await listarTodosDictamen();
+  transferencias.value.forEach(transferencia => {
+    verificarTransferencia(transferencia.id);
+  });
 }
 
 const guardar = async () => {
@@ -2233,23 +2240,28 @@ const verificarTransferencia = async (id) => {
 // Variable reactiva para controlar el estado del botón "Agregar"
 const hasTransferencia = async (id) => {
   try {
-    // const { data } = await dictamenService.show(id);
-    // const { data } = await dictamenService.listarTodo();	
-    // console.log("data",data);
-    // dictamenes.value = data;
     
-    if (dictamenes.value && dictamenes.value.length > 0) {
-      const transferenciaId = dictamenes.value[0].transferencia_id;
-      console.log("if",transferenciaId);
-      // Comprobar si ya existe una transferencia con ese ID
-      return transferenciaId//transferencias.value.some(transferencia => transferencia.id === transferenciaId);
+    // Comprobar si todosDictamenes tiene datos
+    if (todosDictamenes.value && todosDictamenes.value.length > 0) {
+      // Verificar si el ID de entrada coincide con algún transferencia_id
+      const exists = todosDictamenes.value.some(dictamen => dictamen.transferencia_id === id);
+      return exists; // Devuelve true si existe, false si no
     } else {
-      console.log("else",dictamenes.value);
-      return 0; // No hay registros válidos
+      console.log("No hay dictámenes disponibles");
+      return false; // No hay registros válidos
     }
   } catch (error) {
     console.error("Error al verificar transferencia:", error);
-    return false;
+    return false; // Retornar false en caso de error
+  }
+};
+
+const listarTodosDictamen = async () => {
+  try {
+    const { data } = await dictamenService.listarTodo();
+    todosDictamenes.value = data;
+  } catch (error) {
+    console.error("Error al cargar los dictamenes:", error);
   }
 };
 
