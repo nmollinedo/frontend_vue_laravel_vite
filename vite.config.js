@@ -12,7 +12,9 @@ export default defineConfig({
     port: 80
   },
   optimizeDeps: {
-    noDiscovery: true
+    noDiscovery: true,
+    include: ['pbf', 'xml-utils/get-attribute.js', 'xml-utils/find-tags-by-name.js','earcut']
+    
   },
   plugins: [
     vue(),

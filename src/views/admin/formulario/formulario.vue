@@ -158,8 +158,8 @@
               <DataTable :value="dictamenes"  class="p-mt-4">
                 
                 <Column header="Ver" body="verTemplate"></Column>
-              <!--  <Column field="transferencia_id" body="Id"></Column>
-                <Column field="dictamen_id" body="Id"></Column>  -->
+                <Column field="transferencia_id" body="Id"></Column>
+                <Column field="id" body="Id"></Column> 
                 <Column field="tipo_dictamen" header="Tipo de formulario"></Column>
               <!--  <Column field="etapa" header="Etapa"></Column> -->
                 <Column field="fecha_dictamen" header="Fecha formulario"></Column>
@@ -228,10 +228,10 @@
                             @click="abrirModalCierre(slotProps.data)"
                             class="p-button-text" />   
 
-                  <!--    <Button 
-                            v-if="slotProps.data.cierre_entidad!==1"
+                <Button 
+                            v-if="slotProps.data.cierre_entidad===1"
                             icon="pi pi-trash" outlined rounded severity="danger"
-                            @click="confirmDeleteFormulario(slotProps.data)" />-->
+                            @click="confirmDeleteFormulario(slotProps.data)" />
 
                   <!--    <Button 
                             v-if="slotProps.data.cierre_entidad===1"
@@ -264,7 +264,7 @@
         
       </div>-->
     <div style="max-height: 70vh;">
-        <h2>Datos del Formulario</h2> {{form.dictamen_id}}
+        <h2>Datos del Formulario</h2> {{form}}
         
         <!-- Select para Etapa -->
         <div class="field">
@@ -1900,78 +1900,80 @@ const actualizarTabla = async() => {
 }
 
 const guardar = async () => {
-  console.log('ID entro:', formId.value);
-  //console.log('ID entro Form:', form.value.respaldo_pregunta_3);
-  if (!formId.value) {
-    console.error('No se ha seleccionado un ID');
-    return;
-  }
+            console.log('ID entro:', formId.value);
+            console.log('ID entro Form:', form);
+            if (!formId.value) {
+              console.error('No se ha seleccionado un ID');
+              return;
+            }
 
-  const errores = validarFormulario();
+                const errores = validarFormulario();
 
-  if (errores.length > 0) {
-    // Mostrar errores usando PrimeVue Toast
-    errores.forEach(error => {
-      toast.add({ severity: 'error', summary: 'Error de validación', detail: error });
-    });
-    return; // No guardar si hay errores
-  }
+                if (errores.length > 0) {
+                  // Mostrar errores usando PrimeVue Toast
+                  errores.forEach(error => {
+                    toast.add({ severity: 'error', summary: 'Error de validación', detail: error });
+                  });
+                  return; // No guardar si hay errores
+                }
 
-  // Prepare the form data
-  console.log("form id transfer cia",formId.value);
-  const formData = reactive({
-    
-    id: formId.value, // Ensure the ID is sent
-    etapa: form.etapa,
-    fecha_registro: formatDate(form.fechaRegistro),
-   
-    fecha_inicio: formatDate(form.fechaInicio),
-    fecha_termino: formatDate(form.fechaTermino),
-    pregunta_1: form.pregunta_1,
-    pregunta_2: form.pregunta_2,
-    pregunta_3: form.pregunta_3,
-    respaldo_pregunta_3: form.respaldo_pregunta_3,
-    fecha_pregunta_3: formatDate(form.fecha_pregunta_3),
-    pregunta_4: form.pregunta_4,
-    respaldo_pregunta_4: form.respaldo_pregunta_4,
-    fecha_pregunta_4: formatDate(form.fecha_pregunta_4),
-    pregunta_5: form.pregunta_5,
-    respaldo_pregunta_5: form.respaldo_pregunta_5,
-    fecha_pregunta_5: formatDate(form.fecha_pregunta_5),
-    pregunta_6: form.pregunta_6,
-    respaldo_pregunta_6: form.respaldo_pregunta_6,
-    fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
-    mae:form.mae,
-    mae_cargo:form.mae_cargo,
-    mae_ci: form.mae_ci,
-    mae_documento_designacion: form.mae_documento_designacion,
-    responsable: form.responsable,
-    responsable_cargo: form.responsable_cargo,
-    responsable_unidad: form.responsable_unidad,
-    responsable_ci: form.responsable_ci
-    // Add other form fields here
-  });
-  try {
-    console.log("datos form",formData);
-    const response = await dictamenService.guadarForm(formData.id,formData);
-    //dictamenes.value = data;
-    console.log('Formulario guardado con éxito:', response.data);
-    console.log("Guardado correctamente. Iniciando carga de transferencias...");
-    //await cargarProyectos(); //****
-    await cargarProyectos();
-    console.log("Transferencias cargadas correctamente");
-    //refrescarRuta(); 
-    cargarProyectosVerificandoTabla();
-    // refrescarPagina();
-    cerrarModal();
-  } catch (error) {
-    //console.log(error.response.data);
-    console.error('Error al guardar el formulario:', error);
-  } finally {
-    // Esto asegura que `cargarTransferencias` siempre se ejecutará
-    await cargarProyectos();
-    console.log("Transferencias cargadas o intento de cargar realizado");
-  }
+                // Prepare the form data
+                console.log("form id transfer cia",formId.value);
+
+
+                const formData = reactive({
+                  
+                  id: formId.value, // Ensure the ID is sent
+                  etapa: form.etapa,
+                  fecha_registro: formatDate(form.fechaRegistro),
+                
+                  fecha_inicio: formatDate(form.fechaInicio),
+                  fecha_termino: formatDate(form.fechaTermino),
+                  pregunta_1: form.pregunta_1,
+                  pregunta_2: form.pregunta_2,
+                  pregunta_3: form.pregunta_3,
+                  respaldo_pregunta_3: form.respaldo_pregunta_3,
+                  fecha_pregunta_3: formatDate(form.fecha_pregunta_3),
+                  pregunta_4: form.pregunta_4,
+                  respaldo_pregunta_4: form.respaldo_pregunta_4,
+                  fecha_pregunta_4: formatDate(form.fecha_pregunta_4),
+                  pregunta_5: form.pregunta_5,
+                  respaldo_pregunta_5: form.respaldo_pregunta_5,
+                  fecha_pregunta_5: formatDate(form.fecha_pregunta_5),
+                  pregunta_6: form.pregunta_6,
+                  respaldo_pregunta_6: form.respaldo_pregunta_6,
+                  fecha_pregunta_6: formatDate(form.fecha_pregunta_6),
+                  mae:form.mae,
+                  mae_cargo:form.mae_cargo,
+                  mae_ci: form.mae_ci,
+                  mae_documento_designacion: form.mae_documento_designacion,
+                  responsable: form.responsable,
+                  responsable_cargo: form.responsable_cargo,
+                  responsable_unidad: form.responsable_unidad,
+                  responsable_ci: form.responsable_ci
+                  // Add other form fields here
+                });
+          try {
+            console.log("datos form",formData);
+            const response = await dictamenService.guadarForm(formData.id,formData);
+            //dictamenes.value = data;
+            console.log('Formulario guardado con éxito:', response.data);
+            console.log("Guardado correctamente. Iniciando carga de transferencias...");
+            //await cargarProyectos(); //****
+            await cargarProyectos();
+            console.log("Transferencias cargadas correctamente");
+            //refrescarRuta(); 
+            cargarProyectosVerificandoTabla();
+            // refrescarPagina();
+            cerrarModal();
+          } catch (error) {
+            //console.log(error.response.data);
+            console.error('Error al guardar el formulario:', error);
+          } finally {
+            // Esto asegura que `cargarTransferencias` siempre se ejecutará
+            await cargarProyectos();
+            console.log("Transferencias cargadas o intento de cargar realizado");
+          }
 };
 
 function formatDate(date) {
@@ -2656,16 +2658,17 @@ const refrescarRuta = () => {
   router.push({ path: router.currentRoute.value.path })  // Empuja la ruta actual para refrescarla
 };
 
-async function deleteFormulario() {
+async function deleteFormulario(id) {
     try {
         // Verifica si hay un dictamen válido para eliminar
+        console.log("id para eliminar",dictamenEliminar.id)
         if (dictamenEliminar.value.dictamen_id) {
             console.log("Eliminando dictamen con ID:", dictamenEliminar.value.dictamen_id);  // Añade este log para depurar
             
             // Almacenar temporalmente transferencia_id antes de limpiar dictamenes
             const transferenciaId = dictamenEliminar.value.transferencia_id;
             
-            const { data } = await dictamenService.destroy(dictamenEliminar.value.dictamen_id);
+            const { data } = await dictamenService.destroy(id,transferenciaId);
             
             // Acción completada con éxito
             deleteFormularioDialog.value = false;  // Cierra el diálogo de confirmación

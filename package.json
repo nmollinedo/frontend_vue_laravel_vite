@@ -22,7 +22,9 @@
     "vue": "^3.4.31",
     "vue-router": "^4.4.0",
     "vue3-captcha": "^0.3.4",
-    "vue3-captcha-canvas": "^0.2.1"
+    "vue3-captcha-canvas": "^0.2.1",
+    "ol": "^8.2.0",
+    "vue3-openlayers": "^4.0.2"
   },
   "devDependencies": {
     "@primevue/auto-import-resolver": "^4.0.1",

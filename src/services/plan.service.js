@@ -21,5 +21,8 @@ export default {
     },
     listarClasificador: () => {
         return Api().get(`/listar-clasificador`);
+    },
+    listarPlan: (id) => {
+        return Api().get(`/plan/${id}`);
     }
 }

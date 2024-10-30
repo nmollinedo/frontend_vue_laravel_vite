@@ -16,8 +16,8 @@ export default {
     update: (id, datos) => {
         return Api().put(`/dictamen/${id}`, datos);
     },
-    destroy: (id) => {
-        return Api().delete(`/dictamen-eliminar/${id}`);
+    destroy: (id,transferencia_id) => {
+        return Api().delete(`/dictamen-eliminar/${id}/${transferencia_id}`);
     },
     guadarForm: (id,datos) => {
         return Api().post(`/guardar-dictamen/${id}`, datos);

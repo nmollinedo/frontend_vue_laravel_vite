@@ -1028,6 +1028,8 @@ const limpiarFormularioComponente = () => {
 
 
 const getPlanes = async () => {
+    //const entidadId = ref(localStorage.getItem('entidad_id'));
+    //console.log("Plan Id_ent",entidadId.value)
     const { data } = await planService.index();
 
     planes.value = data;

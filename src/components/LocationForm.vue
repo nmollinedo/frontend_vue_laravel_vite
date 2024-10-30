@@ -3,7 +3,7 @@ import { ref } from 'vue'
 //import InputText from 'primevue/inputtext'
 //import Button from 'primevue/button'
 //import Card from 'primevue/card'
-import MapComponent from '../../../components/MapComponent.vue'
+import MapComponent from '../components/MapComponent.vue'
 
 const latitude = ref('')
 const longitude = ref('')
