@@ -46,8 +46,8 @@ export default {
     listarFormCosto: (id) => {
         return Api().get(`/listar-formulario-costo/${id}`);
     },
-    guardarFormCosto: () => {
-        return Api().post(`/guardar-formulario-componente`);
+    guardarFormCosto: (datos) => {
+        return Api().post(`/guardar-formulario-costo`,datos);
     },
     guardarDictamenCosto: (datos) => {
         return Api().post(`/guardar-dictamen`, datos);
@@ -57,6 +57,9 @@ export default {
     },
     carrarFormularioCosto: (datos) => {
         return Api().post(`/cerrar-formulario-costo`, datos);
+    },
+    modificarFormularioCosto: (id,datos) => {
+        return Api().post(`/modificar-formulario-costo/${id}`, datos);
     }
   
 }

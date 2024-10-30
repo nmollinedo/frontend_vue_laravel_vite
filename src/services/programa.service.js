@@ -13,8 +13,8 @@ export default {
     update: (id, datos) => {
         return Api().put(`/programa/${id}`, datos);
     },
-    destroy: (id) => {
-        return Api().delete(`/programa/${id}`);
+    eliminarPlanPrograma: (id) => {
+        return Api().delete(`/eliminar-plan-programa/${id}`);
     },
     asignarUser: (datos) => {
         return Api().post(`/programa/asignar-user`, datos);
@@ -24,5 +24,8 @@ export default {
     },
     guardarPlanPrograma: (datos) => {
         return Api().post("/guardar-plan-programa", datos);
+    },
+    modificarPlanPrograma: (id,datos) => {
+        return Api().post(`/modificar-plan-programa/${id}`, datos);
     }
 }
