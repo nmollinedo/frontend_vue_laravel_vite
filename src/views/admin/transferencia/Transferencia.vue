@@ -64,7 +64,7 @@
                     
                 </template>
 
-                <Column field="id" header="COD" sortable style="min-width: 1rem"></Column>
+            <!--   <Column field="id" header="COD" sortable style="min-width: 1rem"></Column> -->
                 <Column field="codigo_tpp" header="CODIGO" sortable style="min-width: 7rem"></Column>
                 <Column field="nombre_formal" header="NOMBRES" sortable class="fixed-column"></Column>
                 
@@ -383,6 +383,20 @@
                         <label for="descripcion" class="block font-bold mb-3">Poblacion Beneficiada</label>
                         <InputNumber v-model="transferencia.poblacion" inputId="integeronly" fluid />
                         </div>
+                <!--        <div>
+                           
+                            <a href="#" @click.prevent="showDialog = true">Abrir mapa</a>
+
+                         
+                            <Button label="Mapa" icon="pi pi-external-link" @click="showDialog = true" />
+
+                          
+                            <Dialog v-model:visible="showDialog" header="Mapa" :style="{ width: '50vw' }">
+                            <p>.</p>
+                            <Recurso />
+                            <Button label="Close" icon="pi pi-times" @click="showDialog = false" />
+                            </Dialog>
+                        </div> -->
                         <div v-if="mensaje_loc" class="text-green-500">
                         {{ mensaje_loc }}
                         </div> 
@@ -703,7 +717,7 @@ import componenteService from "../../../services/componente.service";
 import InputNumber from 'primevue/inputnumber';
 import Button from 'primevue/button';
 import moment from 'moment'
-
+import Recurso from './../recurso/recurso.vue' // Import the Recurso component
 
 
 // Cambiar la entidad cuando el usuario selecciona una nueva
@@ -761,6 +775,9 @@ const transferencia = ref({
     cobertura: '',
     poblacion: ''
     });
+
+    // Reactive state for dialog visibility
+const showDialog = ref(false)
 
 // Inicializa el objeto transferencia con la propiedad denominacion_convenio
    

@@ -4,6 +4,7 @@ import { ref } from 'vue'
 //import Button from 'primevue/button'
 //import Card from 'primevue/card'
 import MapComponent from '../components/MapComponent.vue'
+import transferenciaService from '../services/transferencia.service';
 
 const latitude = ref('')
 const longitude = ref('')
@@ -14,10 +15,21 @@ const updateCoordinates = (coords: { lat: number; lon: number }) => {
 }
 
 const handleSubmit = () => {
+    console.log("punto",form);
   console.log('Coordinates submitted:', {
     latitude: latitude.value,
     longitude: longitude.value
   })
+
+  const id = form;
+ 
+  try {
+                const { data } = await transferenciaService.guardarPunto(172);
+                //etapas2.value = data;
+              } catch (error) {
+                console.error("Error al cargar los datos:", error);
+              }
+
 }
 </script>
 
@@ -40,7 +52,7 @@ const handleSubmit = () => {
             type="text"
             readonly
           />
-          <label for="latitude">Latitude</label>
+          <label for="latitude">Latitud</label>
         </span>
       </div>
       
@@ -52,12 +64,12 @@ const handleSubmit = () => {
             type="text"
             readonly
           />
-          <label for="longitude">Longitude</label>
+          <label for="longitude">Longitud</label>
         </span>
       </div>
       
       <Button
-        label="Submit"
+        label="Guardar"
         @click="handleSubmit"
         :disabled="!latitude || !longitude"
         class="submit-button"

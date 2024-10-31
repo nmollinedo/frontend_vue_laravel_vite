@@ -264,7 +264,7 @@
         
       </div>-->
     <div style="max-height: 70vh;">
-        <h2>Datos del Formulario</h2> {{form}}
+        <h2>Datos del Formulario</h2> 
         
         <!-- Select para Etapa -->
         <div class="field">
@@ -790,7 +790,7 @@
     <!-- Modal para editar fecha -->
       <Dialog :visible="mostrarModalEditFecha" modal :style="{ width: '50vw' }" :draggable="false" :closable="false">
       <template v-slot:header>
-              <span>Modificar Formulario Fechas ffff</span>
+              <span>Modificar Formulario Fechas.</span>
               <span>   </span>
               <span>   </span>
               <span>   </span>
@@ -806,10 +806,10 @@
         
         <!-- Select para Etapa -->
         <div class="field">
-          <label for="etapa">Etapa del Formulario</label>
+          <label for="etapa"></label>
     <!--      <Dropdown v-model="etapaSeleccionada" :options="etapas2" optionLabel="descrip_tipo_dictamen" placeholder="Seleccionar..."
-                        class="w-full md:w-14rem" /> -->
-          <p>ID etapa seleccionada: {{ form.tipo_dictamen_id }}</p>{{form}}
+                        class="w-full md:w-14rem" /> 
+          <p>ID etapa seleccionada: {{ form.tipo_dictamen_id }}</p>-->
         </div>
         
 
@@ -1282,7 +1282,7 @@
   <Dialog v-model:visible="deleteFormularioDialog" :style="{ width: '450px' }" header="Confirmar" :modal="true">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
-            <span v-if="dictamenes">Esta seguro de eliminar <b>{{ dictamenEliminar.id }}</b>?</span>
+            <span v-if="dictamenes">Esta seguro de eliminar <b></b>?</span>
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="deleteFormularioDialog = false" />
@@ -1293,7 +1293,7 @@
     <Dialog v-model:visible="deleteCierreDialog" :style="{ width: '450px' }" header="Confirmar" :modal="true">
         <div class="flex items-center gap-4">
             <i class="pi pi-exclamation-triangle !text-3xl" />
-            <span v-if="dictamenes">Esta seguro de eliminar cierre<b>{{ dictamenEliminar.dictamen_id }}</b>?</span>
+            <span v-if="dictamenes">Esta seguro de eliminar cierre<b></b>?</span>
         </div>
         <template #footer>
             <Button label="No" icon="pi pi-times" text @click="deleteCierreDialog = false" />
@@ -1966,6 +1966,7 @@ const guardar = async () => {
             cargarProyectosVerificandoTabla();
             // refrescarPagina();
             cerrarModal();
+            actualizarTabla();
           } catch (error) {
             //console.log(error.response.data);
             console.error('Error al guardar el formulario:', error);
@@ -2210,9 +2211,9 @@ const guardarFormularioModificacion = async (dictamen_id) => {
               //id: formId, // Ensure the ID is sent
               transferencia_id:form.transferencia_id,
               dictamen_id: form.dictamen_id,
-              etapa: etapaSeleccionada.value.id,
+              //etapa: etapaSeleccionada.value.id,
               fecha_registro: form.fecha_dictamen,
-            
+              tipo_dictamen_id: etapaSeleccionada.value.id,
               fecha_inicio:form.fechaInicio,
               fecha_termino: form.fechaTermino,
               pregunta_1: form.pregunta_1,
@@ -2661,7 +2662,7 @@ const refrescarRuta = () => {
 async function deleteFormulario(id) {
     try {
         // Verifica si hay un dictamen válido para eliminar
-        console.log("id para eliminar",dictamenEliminar.id)
+        console.log("id para eliminar",id)
         if (dictamenEliminar.value.dictamen_id) {
             console.log("Eliminando dictamen con ID:", dictamenEliminar.value.dictamen_id);  // Añade este log para depurar
             

@@ -20,12 +20,12 @@ const model = ref([
         ]
     },*/
     {
-        label: 'Proyectos',
+        label: 'Registro',
         icon: 'pi pi-fw pi-briefcase',
         to: '/pages',
         items: [
             {
-                label: 'Registro de proyectos',
+                label: 'Registro TPP',
                 icon: 'pi pi-fw pi-globe',
                 to: '/admin/transferencia'
             },
@@ -41,14 +41,14 @@ const model = ref([
             }
         ]
     },
-    {
+   /* {
         label: 'Presupuesto',
         items: [
             { label: 'Recursos', icon: 'pi pi-fw pi-id-card', to: '/admin/recurso' },
         //    { label: 'Programacion', icon: 'pi pi-fw pi-check-square', to: '/admin/programacion' },
             
         ]
-    },
+    },*/
 ]);
 </script>
 

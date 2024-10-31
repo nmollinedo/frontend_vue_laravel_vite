@@ -24,7 +24,7 @@ const handleSubmit = () => {
 <template>
   <Card class="location-form">
     <template #title>
-      Location Coordinates
+      Localizacion de las coordenadas
     </template>
     <template #content>
       <MapComponent

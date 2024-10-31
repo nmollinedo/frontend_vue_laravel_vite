@@ -36,5 +36,8 @@ export default {
     },
     listarTrafrenciaFormulario: (id) => {
         return Api().get(`/listar-transferencia-formulario/${id}`);
+    },
+    guardarPunto: (id) => {
+        return Api().post(`/guardar-punto/${id}`);
     }
 }
