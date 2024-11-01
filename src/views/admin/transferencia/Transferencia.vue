@@ -80,6 +80,12 @@
                            icon="pi pi-pencil" outlined rounded class="mr-2"
                             @click="editTransferencia(slotProps.data)"
                             style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+                   
+                        <Button
+                            v-if="slotProps.data.estado_id===1"  
+                           icon="pi pi-pencil" outlined rounded class="mr-2"
+                            @click="editTransferencia(slotProps.data)"
+                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
                         <Button
                         v-if="slotProps.data.estado_id===1"  
                         icon="pi pi-trash" outlined rounded severity="danger"
