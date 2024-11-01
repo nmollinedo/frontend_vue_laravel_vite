@@ -389,7 +389,7 @@
                         <label for="descripcion" class="block font-bold mb-3">Poblacion Beneficiada</label>
                         <InputNumber v-model="transferencia.poblacion" inputId="integeronly" fluid />
                         </div>
-                <!--        <div>
+                        <div>
                            
                             <a href="#" @click.prevent="showDialog = true">Abrir mapa</a>
 
@@ -402,7 +402,7 @@
                             <Recurso />
                             <Button label="Close" icon="pi pi-times" @click="showDialog = false" />
                             </Dialog>
-                        </div> -->
+                        </div> 
                         <div v-if="mensaje_loc" class="text-green-500">
                         {{ mensaje_loc }}
                         </div> 
