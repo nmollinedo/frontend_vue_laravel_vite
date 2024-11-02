@@ -585,28 +585,32 @@
                             <!-- Columnas editables con InputNumber -->
                             <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
-                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_aporte_local" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_aporte_local" 
+                                        @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
                                     <span v-else>{{ formatearMiles(slotProps.data.monto_aporte_local) }}</span>
                                 </template>
                             </Column>
 
                             <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
-                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_cofinanciamiento" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_cofinanciamiento"
+                                        @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
                                     <span v-else>{{ formatearMiles(slotProps.data.monto_cofinanciamiento) }}</span>
                                 </template>
                             </Column>
 
                             <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
-                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_finan_externo" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_finan_externo" 
+                                    @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
                                     <span v-else>{{ formatearMiles(slotProps.data.monto_finan_externo) }}</span>
                                 </template>
                             </Column>
 
                             <Column field="monto_otros" header="Otros (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
-                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_otros" @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                    <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_otros" 
+                                        @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
                                     <span v-else>{{ formatearMiles(slotProps.data.monto_otros) }}</span>
                                 </template>
                             </Column>
@@ -614,7 +618,7 @@
                             <!-- Columna para mostrar el total de cada fila -->
                             <Column header="Total (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: center">
                                 <template #body="slotProps">
-                                    {{ formatCurrency(getRowTotal(slotProps.data)) }}
+                                    {{ formatearMiles(getRowTotal(slotProps.data)) }}
                                 </template>
                             </Column>
 
@@ -633,11 +637,11 @@
                             <template #footer>
                                 <tr>
                                     <td :style="{ width: '150px', textAlign: 'center' }">Total</td>
-                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getColumnTotal('monto_aporte_local')) }}</td>
-                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getColumnTotal('monto_cofinanciamiento')) }}</td>
-                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getColumnTotal('monto_finan_externo')) }}</td>
-                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getColumnTotal('monto_otros')) }}</td>
-                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatCurrency(getGrandTotal()) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getColumnTotal('monto_aporte_local')) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getColumnTotal('monto_cofinanciamiento')) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getColumnTotal('monto_finan_externo')) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getColumnTotal('monto_otros')) }}</td>
+                                    <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getGrandTotal()) }}</td>
                                     <td :style="{ width: '150px', textAlign: 'center' }"></td>
                                 </tr>
                             </template>
@@ -1655,7 +1659,7 @@ const getRowTotal = (rowData) => {
   const total = montoAporteLocal + montoCofinanciamiento + montoFinanExterno + montoOtros;
 
   if (total === null || total === undefined) return '0.00';
-  return total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return total;
 };
 
 const getRowTotalSinFormato = (rowData) => {
