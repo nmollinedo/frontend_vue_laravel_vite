@@ -25,8 +25,8 @@ export default {
     guardarLocalizacion: (id,datos) => {
         return Api().post(`/guardar-localizacion/${id}`, datos);
     },
-    activarCierre: (id) => {
-        return Api().get(`/activar-cierre/${id}`);
+    listarPunto: (id) => {
+        return Api().get(`/listar-punto/${id}`);
     },
     cierreFormulario: (id) => {
         return Api().get(`/cierre-formulario/${id}`); 
