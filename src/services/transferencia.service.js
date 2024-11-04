@@ -39,5 +39,8 @@ export default {
     },
     guardarPunto: (id) => {
         return Api().post(`/guardar-punto/${id}`);
+    },
+    guardarCoordenadas: (id,datos) => {
+        return Api().post(`/guardar-localizacion-punto/${id}`,datos);
     }
 }
