@@ -386,7 +386,9 @@
                           
                             <Dialog v-model:visible="showDialog" header="Mapa" :style="{ width: '50vw' }">
                             <p>.</p>
-                            <Recurso />
+                            <!-- <Recurso /> -->
+                            <Recurso :idTransferencia="transferencia.id" @data-saved="showDialog = false" />
+
                             <Button label="Close" icon="pi pi-times" @click="showDialog = false" />
                             </Dialog>
                         </div> 
