@@ -19,7 +19,7 @@ const props = defineProps<{
 }>()
 
 const center = ref<Coordinate>(fromLonLat([-77.0369, -12.0864]))
-const initialZoom = 15 // Zoom inicial solo para la primera carga
+const initialZoom = 12 // Zoom inicial solo para la primera carga
 const userZoom = ref<number | null>(null) // Almacena el zoom actual del usuario o el inicial solo en la primera carga
 const rotation = ref(0)
 const projection = ref('EPSG:3857')
@@ -88,7 +88,12 @@ const loadLocations = async () => {
 
     if (locations.length > 0) {
       const location = locations[0]
-      const coords = [location.longitud, location.latitud]
+
+      // Asignar valores por defecto si las coordenadas son nulas
+      const lat = location.latitud !== null ? location.latitud : '-16.502373';
+      const lon = location.longitud !== null ? location.longitud : '-68.147049';
+
+      const coords = [lon, lat];
       center.value = fromLonLat(coords)
 
       // Solo establece el zoom inicial la primera vez
@@ -96,12 +101,17 @@ const loadLocations = async () => {
         userZoom.value = initialZoom
       }
 
-      updateMarkerPosition(coords)
-
-      emit('update:coordinates', {
-        lat: location.latitud,
-        lon: location.longitud
-      })
+      // Verificar si las coordenadas son válidas para actualizar el marcador
+      if (location.latitud !== null && location.longitud !== null) {
+        updateMarkerPosition(coords)
+        emit('update:coordinates', {
+          lat: lat,
+          lon: lon
+        })
+      } else {
+        // Si las coordenadas son nulas, no actualiza el marcador
+        markerFeature.setGeometry(null); // Esto asegura que no se muestre el marcador
+      }
     }
   } catch (error) {
     console.error('Error al cargar ubicaciones:', error)
