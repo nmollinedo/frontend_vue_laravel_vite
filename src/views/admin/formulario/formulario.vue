@@ -955,7 +955,7 @@
               <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
             </div>
         </div>  
-
+     <!-- formulario costo-->
         <div v-if="etapaSeleccionada && etapaSeleccionada.id === 3">
               <!-- Fechas -->
               <div class="field">
@@ -1074,15 +1074,208 @@
                       </DataTable>
                         
                   </div> 
+                  
+                    <!-- Datos adicionales -->
+                    <div>
+                      <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
+                      <InputText id="mae" v-model="form.mae" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_cargo">Cargo MAE</label>
+                      <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_ci">C.I. MAE</label>
+                      <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_documento_designacion">Documento de Designación MAE</label>
+                      <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
+                    </div>
+
+                    <div>
+                      <label for="responsable">Nombre Responsable del Proyecto</label>
+                      <InputText id="responsable" v-model="form.responsable" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_cargo">Cargo Responsable</label>
+                      <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_unidad">Unidad Responsable</label>
+                      <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_ci">C.I. Responsable</label>
+                      <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
+                    </div>
+              </div>        
+        </div>  
+
+        112
+        <!-- formulario fecha y costo-->  
+
+        <div v-if="etapaSeleccionada && etapaSeleccionada.id === 8">
+              <!-- Fechas -->
+              <div class="field">
+                <label>Duración (Inicio y Término)</label>
+                <Calendar v-model="form.fechaInicio" dateFormat="dd-mm-yy" placeholder="Fecha Inicio" ></Calendar>
+                <Calendar v-model="form.fechaTermino" dateFormat="dd-mm-yy" placeholder="Fecha Término" ></Calendar>
               </div>
 
-        
+              <div class="field">
+                <label>Fecha de registro del Formulario</label>
+                <Calendar v-model="form.fecha_dictamen" dateFormat="dd/mm/yy" placeholder="Fecha Registro" :disabled="true"></Calendar>
+              </div>
+
+              
+
+              <div class="field">
+                <label>Modificar Costo</label>{{form.transferencia_id}}
+                <!-- Botón para abrir el diálogo 
+                <Button label="Ver Componentes de Costos" icon="pi pi-info" @click="abrirDialogo(form.dictamen_id)" />-->
+                
+              </div>
+              <div>
+                    <Button 
+                        label="Agregar componente" 
+                        icon="pi pi-check" 
+                        @click="adicionarComponente"
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                    />
+                   
+                    <div class="modal-content-table">
+                        <h2>Información</h2>
+                        <p>Para actualizar los valores, presiona la tecla Enter (↵) mientras estés editando cualquier campo. Esto recalculará automáticamente los totales.</p>
+                    </div>
+                    <div>
+                    
+                      <DataTable :value="listaComponentes" responsiveLayout="scroll" editMode="row" @rowEditInit="onRowEditInit" @rowEditSave="onRowEditSave" @rowEditCancel="onRowEditCancel">
+                        <!-- Columna Componentes Etapa -->
+                        <Column field="componente" header="Componentes Etapa" :style="{ width: '150px' }">
+                            <template #body="slotProps">
+                                <Dropdown 
+                                    v-if="slotProps.data.nuevo"
+                                    v-model="componenteSelecionado" 
+                                    :options="componentes" 
+                                    optionLabel="componente"
+                                    placeholder="Seleccione componente" 
+                                    class="custom-dropdown" 
+                                    :disabled="!slotProps.data.nuevo"
+                                />
+                                <span v-else>{{ slotProps.data.componente }}</span>
+                            </template>
+                        </Column>
+
+                          <!-- Columnas editables con InputNumber -->
+                        <Column field="monto_aporte_local" header="Aporte Propio (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
+                            <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_aporte_local" 
+                                  @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                <span v-else>{{ formatearMiles(slotProps.data.monto_aporte_local) }}</span>
+                            </template>
+                        </Column>
+
+                        <Column field="monto_cofinanciamiento" header="Co-Finan./Transf. (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
+                            <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_cofinanciamiento"
+                                  @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                <span v-else>{{ formatearMiles(slotProps.data.monto_cofinanciamiento) }}</span>
+                            </template>
+                        </Column>
+
+                        <Column field="monto_finan_externo" header="Finan. Externo (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
+                            <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_finan_externo" 
+                                  @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                <span v-else>{{ formatearMiles(slotProps.data.monto_finan_externo) }}</span>
+                            </template>
+                        </Column>
+
+                        <Column field="monto_otros" header="Otros (Bs.)" :style="{ width: '140px' }" bodyStyle="text-align: center">
+                            <template #body="slotProps">
+                                <InputNumber v-if="slotProps.data.editar || slotProps.data.nuevo" v-model="slotProps.data.monto_otros" 
+                                  @input="calculateTotal(slotProps.data)" class="input-cell" :minFractionDigits="2" :maxFractionDigits="2" mode="decimal" />
+                                <span v-else>{{ formatearMiles(slotProps.data.monto_otros) }}</span>
+                            </template>
+                        </Column>
+
+                        <!-- Columna para mostrar el total de cada fila -->
+                        <Column header="Total (Bs.)" :style="{ width: '150px' }" bodyStyle="text-align: center">
+                            <template #body="slotProps">
+                                {{ formatearMiles(getRowTotal(slotProps.data)) }}
+                            </template>
+                        </Column>
+
+                        <!-- Columna de acciones -->
+                        <Column header="Acciones" :style="{ width: '150px' }">
+                            <template #body="slotProps">
+                                <Button v-if="slotProps.data.editar" icon="pi pi-save" class="p-button-rounded p-button-success p-button-text" 
+                                    @click="slotProps.data.nuevo ? guardarComponente(slotProps.data) : guardarEdit(slotProps.data)" />
+                                <Button v-if="slotProps.data.editar" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cerrarEdicion(slotProps.data, index)" />
+                                <Button v-if="!slotProps.data.editar" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="comenzarEdicion(slotProps.data)" />
+                                <Button v-if="!slotProps.data.editar" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
+                            </template>
+                        </Column>
+                        
+                        <!-- Footer -->
+                        <template #footer>
+                            <tr>
+                                <td :style="{ width: '140px', textAlign: 'center' }">Total</td>
+                                <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getColumnTotal('monto_aporte_local')) }}</td>
+                                <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getColumnTotal('monto_cofinanciamiento')) }}</td>
+                                <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getColumnTotal('monto_finan_externo')) }}</td>
+                                <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getColumnTotal('monto_otros')) }}</td>
+                                <td :style="{ width: '150px', textAlign: 'center' }">{{ formatearMiles(getGrandTotal()) }}</td>
+                                <td :style="{ width: '150px', textAlign: 'center' }"></td>
+                            </tr>
+                        </template>
+                      </DataTable>
+                        
+                  </div> 
+                  
+                    <!-- Datos adicionales -->
+                    <div>
+                      <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
+                      <InputText id="mae" v-model="form.mae" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_cargo">Cargo MAE</label>
+                      <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_ci">C.I. MAE</label>
+                      <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_documento_designacion">Documento de Designación MAE</label>
+                      <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
+                    </div>
+
+                    <div>
+                      <label for="responsable">Nombre Responsable del Proyecto</label>
+                      <InputText id="responsable" v-model="form.responsable" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_cargo">Cargo Responsable</label>
+                      <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_unidad">Unidad Responsable</label>
+                      <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_ci">C.I. Responsable</label>
+                      <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
+                    </div>
+              </div>        
         </div>  
+
 
       </div>
 
       <template v-slot:footer>
-        <Button label="Grabar" icon="pi pi-check" @click="guardarFormularioModificacion(form.dictamen_id)" class="p-button-primary" :disabled="!esModificableForm.valueOf()"></Button>
+        <Button label="Grabar Modificacion" icon="pi pi-check" @click="guardarFormularioModificacion(form.dictamen_id)" class="p-button-primary" :disabled="!esModificableForm.valueOf()"></Button>
         <Button label="Cerrar" icon="pi pi-times" @click="cerrarModalModificacion" class="p-button-secondary"></Button>
       </template>
     </Dialog>
@@ -1220,6 +1413,42 @@
                         </DataTable>
                         
                   </div> 
+
+                      <!-- Datos adicionales -->
+                      <div>
+                      <label for="mae">Nombre Máxima Autoridad Ejecutiva (MAE)</label>
+                      <InputText id="mae" v-model="form.mae" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_cargo">Cargo MAE</label>
+                      <InputText id="mae_cargo" v-model="form.mae_cargo" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_ci">C.I. MAE</label>
+                      <InputText id="mae_ci" v-model="form.mae_ci" required="true"/>
+                    </div>
+                    <div>
+                      <label for="mae_documento_designacion">Documento de Designación MAE</label>
+                      <InputText id="mae_documento_designacion" v-model="form.mae_documento_designacion" required="true"/>
+                    </div>
+
+                    <div>
+                      <label for="responsable">Nombre Responsable del Proyecto</label>
+                      <InputText id="responsable" v-model="form.responsable" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_cargo">Cargo Responsable</label>
+                      <InputText id="responsable_cargo" v-model="form.responsable_cargo" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_unidad">Unidad Responsable</label>
+                      <InputText id="responsable_unidad" v-model="form.responsable_unidad" required="true"/>
+                    </div>
+                    <div>
+                      <label for="responsable_ci">C.I. Responsable</label>
+                      <InputText id="responsable_ci" v-model="form.responsable_ci" required="true"/>
+                    </div>
+
               </div>
 
         

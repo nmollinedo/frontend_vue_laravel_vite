@@ -27,5 +27,8 @@ export default {
     },
     modificarPlanPrograma: (id,datos) => {
         return Api().post(`/modificar-plan-programa/${id}`, datos);
+    },
+    listarPrograma: (entidad_id,id) => {
+        return Api().get(`/listar-programa/${entidad_id}/${id}`);
     }
 }

@@ -189,11 +189,8 @@
 
 
     <Dialog v-model:visible="visibleDialogTransferencia" modal header="Actualizar Datos" :style="{ width: '78rem' }">
-        <!--    <div class="p-6">
-        <p>Codigo TPP: <span class="text-lg font-medium text-gray-900">{{  }}</span></p>
-        <p>Nombre: <span class="text-lg font-medium text-gray-900">{{  }}</span></p>
-        </div>
-  {{ transferencia }}   -->
+     
+    <!--   {{ transferencia }}   -->
         
 
         <div class="mt-6 mb-6 space-y-6" style="max-width: 1050px; margin-top: 20px; margin-bottom: 20px;">
@@ -201,17 +198,7 @@
             <basic-tabs class="mt-6 mb-6 space-y-6 " style="max-width: 1050px; margin-top: 20px; margin-bottom: 20px;">
                 <basic-tab title="Aspectos Generales">
                     <div class="flex flex-col gap-6">
-                       <!-- <Fieldset legend="Header">
-                            <label for="Entidad" class="block font-bold mb-3">Responsable de la Operación</label>
-                            <Dropdown v-model="transferencia.entidad_operadora" :options="entidades"
-                                optionLabel="nombre" placeholder="Seleccione Entidad" class="w-full md:w-14rem" />
-
-                            <label for="responsableEjecucion" class="block font-bold mb-3">Responsable de la
-                                Ejecución</label>
-                            <Dropdown v-model="transferencia.entidad_ejecutora" :options="entidades_ejecutoras"
-                                optionLabel="nombre" placeholder="Seleccione Entidad Ejecutora" class="w-full md:w-14rem" />    
-                            
-                        </Fieldset> -->
+                      
                 <Fieldset legend="">
                     <td> <!--{{transferencia}}-->
                         <label for="Entidad" class="block font-bold mb-3">Responsable de la operacion</label>
@@ -256,7 +243,7 @@
                         <div>
                             <label for="nombre_tpp">Nombre TPP</label>
                            
-                            <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid />
+                            <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid :disabled="true"/>
 
                             <!-- Mostrar el mensaje de error si excede los 110 caracteres -->
                             <span v-if="nombreTppError" class="text-red-110">
@@ -313,7 +300,7 @@
                 </basic-tab>
 
                 <basic-tab title="Problematica  "> <!--{{ transferencia }}-->
-                    <div class="flex flex-col gap-6"> <!--{{ planes }} -->
+                    <div class="flex flex-col gap-6"> {{ planes }}
                         <Fieldset legend="">
                                 <!-- Plan Dropdown -->
                                 <label for="Plan" class="block font-bold mb-3">Plan</label>
@@ -423,132 +410,7 @@
 
                     
                 <basic-tab title="Componente">
-                    <!--
-                        <div>
-                            <h2>Costo de la Etapa (Expresado en Bolivianos)</h2>
-                            <p>Ejecución reportada a la fecha: {{ reportedExecution.toFixed(2) }}</p>
-                            <div class="button-row">
-                            <Button label="Adicionar Componente" icon="pi pi-plus" @click="addComponent" class="p-button-secondary" />
-                            </div>
-                            <DataTable :value="costItems" >
-                            <Column field="component" header="Componentes Etapa">
-                                <template #body="slotProps">
-                                <div v-if="slotProps.data.isEditing">
-                                    <Dropdown v-model="slotProps.data.component" :options="predefinedComponents" optionLabel="name" placeholder="Seleccione un componente" @change="(e) => onComponentChange(e, slotProps.data)">
-                                    <template #option="slotProps">
-                                        <div>{{ slotProps.option.name }}</div>
-                                    </template>
-                                    </Dropdown>
-                                    <InputText v-if="slotProps.data.component === ''" v-model="slotProps.data.component" placeholder="Ingrese componente personalizado" />
-                                </div>
-                                <span v-else>{{ slotProps.data.component }}</span>
-                                </template>
-                            </Column>
-                            <Column field="ownContribution" header="Aporte Propio (Bs.)">
-                                <template #body="slotProps">
-                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.ownContribution" @input="calculateTotal(slotProps.data)" />
-                                <span v-else>{{ slotProps.data.ownContribution }}</span>
-                                </template>
-                            </Column>
-                            <Column field="coFinancing" header="Co-Finan./Transf.(Bs.)">
-                                <template #body="slotProps">
-                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.coFinancing" @input="calculateTotal(slotProps.data)" />
-                                <span v-else>{{ slotProps.data.coFinancing }}</span>
-                                </template>
-                            </Column>
-                            <Column field="externalFinancing" header="Finan. Externo (Bs.)">
-                                <template #body="slotProps">
-                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.externalFinancing" @input="calculateTotal(slotProps.data)" />
-                                <span v-else>{{ slotProps.data.externalFinancing }}</span>
-                                </template>
-                            </Column>
-                            <Column field="others" header="Otros (Bs.)">
-                                <template #body="slotProps">
-                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.others" @input="calculateTotal(slotProps.data)" />
-                                <span v-else>{{ slotProps.data.others }}</span>
-                                </template>
-                            </Column>
-                            <Column field="noFinancing" header="Sin Finan.(Bs.)">
-                                <template #body="slotProps">
-                                <InputNumber v-if="slotProps.data.isEditing" v-model="slotProps.data.noFinancing" @input="calculateTotal(slotProps.data)" />
-                                <span v-else>{{ slotProps.data.noFinancing }}</span>
-                                </template>
-                            </Column>
-                            <Column field="total" header="Total Etapa(Bs.)">
-                                <template #body="slotProps">
-                                {{ slotProps.data.total.toFixed(2) }}
-                                </template>
-                            </Column>
-                            <Column>
-                                <template #body="slotProps">
-                                <div class="action-buttons">
-                                    <Button v-if="slotProps.data.isEditing" icon="pi pi-check" class="p-button-rounded p-button-success p-button-text" @click="saveChanges(slotProps.data)" />
-                                    <Button v-if="slotProps.data.isEditing" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cancelEditing(slotProps.data, slotProps.index)" />
-                                    <Button v-if="!slotProps.data.isEditing" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="startEditing(slotProps.data)" />
-                                    <Button v-if="!slotProps.data.isEditing" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="removeComponent(slotProps.data.id)" />
-                                </div>
-                                </template>
-                            </Column>
-                            
-                                <template #footer>
-                                <td class="total-cell">Total:</td>
-                                <td class="total-cell">{{ getColumnTotal('aporte_propio') }}</td>
-                                <td class="total-cell">{{ getColumnTotal('cofinanciamiento') }}</td>
-                                <td class="total-cell">{{ getColumnTotal('finan_externo') }}</td>
-                                <td class="total-cell">{{ getColumnTotal('otros') }}</td>
-                            
-                                <td class="total-cell">{{ getGrandTotal() }}</td>
-                                <td class="total-cell"></td> 
-                                </template>
-                            </DataTable>
-                            
-                            <div class="total-row">
-                            <strong>TOTAL</strong>
-                            <span>{{ totalCost.toFixed(2) }}</span>
-                            </div>
-                        </div> -->
-                       
-                <!--    <div v-if="transferencia.descripcion && transferencia.descripcion.length > 0" class="flex flex-col gap-6">-->
-                        <!-- <div  class="flex flex-col gap-6">    
-                        <Fieldset legend="">
-                        <label for="Componente" class="block font-bold mb-3">Componente</label>
-                        <Dropdown 
-                            v-model="selectedComponente" 
-                            :options="componentes" 
-                            optionLabel="componente"
-                            placeholder="Seleccione componente" 
-                            class="w-full md:w-14rem" 
-                            
-                        />
-                       
-                        </Fieldset>
-                        <div>
-                        <label for="monto_aporte_local" class="block font-bold mb-3">Aporte Propio (Bs.) </label>
-                        <InputNumber v-model="componentes.monto_aporte_local" inputId="integeronly" fluid />
-                        </div>
-                        <div>
-                        <label for="monto_cofinanciamiento" class="block font-bold mb-3">Co-Finan./Transf.(Bs.)</label>
-                            <InputNumber v-model="componentes.monto_cofinanciamiento" inputId="integeronly" fluid />
-                        </div>
-                        <div>
-                        <label for="monto_finan_externo" class="block font-bold mb-3">Finan. Externo (Bs.)</label>
-                        <InputNumber v-model="componentes.monto_finan_externo" inputId="integeronly" fluid />
-                        </div>
-                        <div>
-                        <label for="monto_otros" class="block font-bold mb-3">Otros (Bs.)</label>
-                        <InputNumber v-model="componentes.monto_otros" inputId="integeronly" fluid />
-                        </div>
-                        <div v-if="mensaje_loc" class="text-green-500">
-                        {{ mensaje_loc }}
-                        </div> 
-                        <Toast />
-                        <Button 
-                        label="Guardar componente" 
-                        icon="pi pi-check" 
-                        @click="guardarComponente"
-                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
-                        />
-                    </div> -->
+                    
                     <Button 
                         label="Agregar componente" 
                         icon="pi pi-check" 
@@ -1055,12 +917,22 @@ const limpiarFormularioComponente = () => {
 
 
 const getPlanes = async () => {
-    //const entidadId = ref(localStorage.getItem('entidad_id'));
-    //console.log("Plan Id_ent",entidadId.value)
-    const { data } = await planService.index();
+ 
+    const entidadId = ref(localStorage.getItem('entidad_id'));
 
+    // Verifica si la entidad_id existe
+    if (!entidadId.value) {
+    console.warn("entidad_id no está presente en localStorage");
+    } else {
+    console.log("entidad_id:", entidadId.value);
+
+    //const { data } = await planService.index();
+    const { data } = await planService.listarPlan(entidadId.value);
+    console.log("Planes Data", data)
     planes.value = data;
-    //alert(entidades.value);
+    }
+    
+   
 };
 
 const getAreas = async () => {
@@ -1069,20 +941,30 @@ const getAreas = async () => {
     areas.value = data;
     //alert(entidades.value);
 };
-// Fetch programas based on selected plan
+// seleccionadomos programa en base a un plam seleccionado
 const fetchProgramas = async (planId) => {
-    
+    // Recupera entidad_id desde localStorage
+        const entidadId = ref(localStorage.getItem('entidad_id'));
+
+        // Verifica si la entidad_id existe
+        if (!entidadId.value) {
+        console.warn("entidad_id no está presente en localStorage");
+        } else {
+        console.log("entidad_id programa:", entidadId.value);
+        }
+
     console.log("Selected Plan ID***:", planId);
     try {
         //const response = await axios.get(`http://127.0.0.1:8000/api/programa/${planId}`);
-        const { data } = await programaService.show(planId);
+        const { data } = await programaService.listarPrograma(entidadId.value,planId);
         programas.value = data;
+        console.log("Lista programas***:", programas.value);
     } catch (err) {
         error.value = 'Error fetching programas';
     }
 };
 
-// Handler when plan is changed
+// cargar prorgama con el cambio de plan
 const onPlanChange = () => {
     // const selectedPlanId = transferencia.value.plan.id;
     const selectedPlanId = selectedPlan.value.id;
