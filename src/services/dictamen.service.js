@@ -25,11 +25,17 @@ export default {
     mostrarForm: (id) => {
         return Api().get(`/dictamen-mostrar/${id}`);
     },
+    mostrarFormEdit: (id) => {
+        return Api().get(`/dictamen-mostrar-edit/${id}`);
+    },
     modificarForm: (id,datos) => {
         return Api().post(`/modificar-dictamen/${id}`, datos);
     },
     modificarFecha: (id,datos) => {
         return Api().post(`/modificar-dictamen-fecha/${id}`, datos);
+    },
+    modificarCostoFecha: (id,datos) => {
+        return Api().post(`/modificar-dictamen-costo-fecha/${id}`, datos);
     },
     modificarEditFecha: (id,datos) => {
         return Api().post(`/modificar-edit-fecha/${id}`, datos);
@@ -55,8 +61,14 @@ export default {
     eliminarDictamenCosto: (transferencia_id,componenete_id) => {
         return Api().delete(`/eliminar-dictamen-costo/${transferencia_id}/${componenete_id}`);
     },
-    carrarFormularioCosto: (datos) => {
+    cerrarFormularioCosto: (datos) => {
         return Api().post(`/cerrar-formulario-costo`, datos);
+    },
+    cerrarFormularioCostoFecha: (datos) => {
+        return Api().post(`/cerrar-formulario-costo-fecha`, datos);
+    },
+    cerrarFormularioFecha: (datos) => {
+        return Api().post(`/cerrar-formulario-fecha`, datos);
     },
     modificarFormularioCosto: (id,datos) => {
         return Api().post(`/modificar-formulario-costo/${id}`, datos);

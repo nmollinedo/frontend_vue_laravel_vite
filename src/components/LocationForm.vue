@@ -63,6 +63,7 @@ const handleSubmit = () => {
             v-model="longitude"
             type="text"
             readonly
+           
           />
           <label for="longitude">Longitud</label>
         </span>
@@ -71,8 +72,9 @@ const handleSubmit = () => {
       <Button
         label="Guardar"
         @click="handleSubmit"
-        :disabled="!latitude || !longitude"
+        :disabled="!latitude || !longitude || transferencia.estado_id === 2"
         class="submit-button"
+       
       />
     </template>
   </Card>

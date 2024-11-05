@@ -1,4 +1,4 @@
-<template>
+<!--<template>
    <div>
       <Button label="Nuevo Plan o Programa" @click="abrirNuevo" />
 
@@ -6,7 +6,7 @@
           <Column field="tipo_clasificador" header="Tipo Clasificación"></Column>
           <Column field="clasificador" header="Clasificador"></Column>
           <Column field="descripcion" header="Descripción"></Column>
-           <!-- Columna de Acciones con botones de editar y eliminar -->
+          
     <Column header="Acciones" :exportable="false" style="min-width: 12rem">
         <template #body="slotProps">
             <Button 
@@ -23,7 +23,7 @@
     </Column>
       </DataTable>
 
-      <!-- Dialog para nuevo o editar plan o programa -->
+    
       <Dialog v-model:visible="dialogVisible" :header="isEditing ? 'Editar Plan o Programa' : 'Nuevo Plan o Programa'" :style="{ width: '50vw' }">
           <form @submit.prevent="guardarPlanPrograma">
               <div>
@@ -147,4 +147,82 @@ onMounted(() => {
 
 <style scoped>
 /* Estilos personalizados si los necesitas */
+</style>-->
+
+<template>
+  <div>
+    <h2>Relación Plan-Programa</h2>
+
+    <!-- Plan Dropdown -->
+    <Dropdown v-model="selectedPlan" :options="plans" optionLabel="name" placeholder="Seleccione un Plan" />
+
+    <!-- Program Selection -->
+    <DataTable v-if="selectedPlan" :value="programas" selectionMode="multiple" v-model:selection="selectedProgramas">
+      <Column selectionMode="multiple" headerStyle="width: 3em"></Column>
+      <Column field="name" header="Programa"></Column>
+      <Column field="description" header="Descripción"></Column>
+      <Column field="status" header="Vigencia"></Column>
+    </DataTable>
+
+    <!-- CRUD Actions -->
+    <div>
+      <Button label="Guardar Relación" icon="pi pi-save" @click="saveRelation" />
+      <Button label="Actualizar Relación" icon="pi pi-refresh" @click="updateRelation" />
+      <Button label="Eliminar Relación" icon="pi pi-trash" @click="deleteRelation" />
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import planService from '../../../services/plan.service';
+import programaService from '../../../services/programa.service';
+
+
+
+const plans = ref([]);
+const programas = ref([]);
+const selectedPlan = ref(null);
+const selectedProgramas = ref([]);
+
+//const planService = new PlanService();
+//const programaService = new ProgramaService();
+//const relacionService = new RelacionService();
+
+onMounted(async () => {
+  plans.value = await planService.index();
+  programas.value = await programaService.index();
+});
+
+const saveRelation = async () => {
+  try {
+    await relacionService.saveRelacion(selectedPlan.value, selectedProgramas.value);
+    alert('Relación guardada exitosamente');
+  } catch (error) {
+    console.error('Error al guardar la relación:', error);
+  }
+};
+
+const updateRelation = async () => {
+  try {
+    await relacionService.updateRelacion(selectedPlan.value, selectedProgramas.value);
+    alert('Relación actualizada exitosamente');
+  } catch (error) {
+    console.error('Error al actualizar la relación:', error);
+  }
+};
+
+const deleteRelation = async () => {
+  try {
+    await relacionService.deleteRelacion(selectedPlan.value);
+    alert('Relación eliminada exitosamente');
+    selectedProgramas.value = [];
+  } catch (error) {
+    console.error('Error al eliminar la relación:', error);
+  }
+};
+</script>
+
+<style>
+/* Add your custom styles here */
 </style>

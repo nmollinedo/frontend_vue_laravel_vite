@@ -75,14 +75,14 @@
 
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
-                        <Button
+                    <!--    <Button
                             v-if="slotProps.data.estado_id===1"  
                            icon="pi pi-pencil" outlined rounded class="mr-2"
                             @click="editTransferencia(slotProps.data)"
-                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+                            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />-->
                    
                         <Button
-                            v-if="slotProps.data.estado_id===1"  
+                           
                            icon="pi pi-pencil" outlined rounded class="mr-2"
                             @click="editTransferencia(slotProps.data)"
                             style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
@@ -104,7 +104,7 @@
                  </td>
                  <div>
                      <Dropdown v-model="selectedEntidad" :options="entidades" optionLabel="nombre"
-                         placeholder="Seleccionar una entidad" class="w-full md:w-14rem" />
+                         placeholder="Seleccionar una entidad" class="w-full md:w-14rem"  />
                  </div>
                  <div>
                      <label for="responsableEjecucion" class="block font-bold mb-2">Responsable de la ejecucion</label>
@@ -129,7 +129,7 @@
              
              <div>
                  <label for="objeto" class="block font-bold mb-2">Objeto</label>
-                 <InputText id="objeto" v-model.trim="transferencia.objeto" required="true" fluid />
+                 <InputText id="objeto" v-model.trim="transferencia.objeto" required="true" fluid  />
              </div>
              
              <div>
@@ -139,23 +139,23 @@
  
              <div>
                  <label for="nombre_tpp" class="block font-bold mb-2">Nombre TPP</label>
-                 <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid disabled />
+                 <InputText id="nombre_tpp" v-model="nombreTpp" @input="validateNombreTpp" fluid disabled  />
                  <span v-if="nombreTppError" class="text-red-110">Máximo 110 caracteres permitidos</span>
              </div>
  
              <div>
                  <label for="denominacion_convenio" class="block font-bold mb-2">Denominación del Convenio</label>
-                 <Textarea id="denominacion_convenio" v-model="transferencia.denominacion_convenio" rows="4" fluid />
+                 <Textarea id="denominacion_convenio" v-model="transferencia.denominacion_convenio" rows="4" fluid   />
              </div>
  
              <div>
                  <label for="Entidad" class="block font-bold mb-2">Área de Influencia</label>
-                 <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione una área" class="w-full md:w-14rem" />
+                 <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area" placeholder="Seleccione una área" class="w-full md:w-14rem"  />
              </div>
  
              <div>
                  <label for="fecha_inicio" class="block font-bold mb-2">Fecha Inicio</label>
-                 <Calendar v-model="fecha_inicio" dateFormat="dd/mm/yy" showIcon />
+                 <Calendar v-model="fecha_inicio" dateFormat="dd/mm/yy" showIcon   />
              </div>
  
              <div>
@@ -189,10 +189,7 @@
 
 
     <Dialog v-model:visible="visibleDialogTransferencia" modal header="Actualizar Datos" :style="{ width: '78rem' }">
-     
-    <!--   {{ transferencia }}   -->
-        
-
+    
         <div class="mt-6 mb-6 space-y-6" style="max-width: 1050px; margin-top: 20px; margin-bottom: 20px;">
 
             <basic-tabs class="mt-6 mb-6 space-y-6 " style="max-width: 1050px; margin-top: 20px; margin-bottom: 20px;">
@@ -206,14 +203,14 @@
                     <div>
 
                         <Dropdown v-model="selectedEntidad" :options="entidades" optionLabel="nombre"
-                            placeholder="Seleccionar una entidad" class="w-full md:w-14rem" />
+                            placeholder="Seleccionar una entidad" class="w-full md:w-14rem" :disabled="transferencia.estado_id === 2"/>
                         <!--    <p>ID de la ciudad seleccionada: </p>  -->
                         </div>
                     <div>
                         <label for="responsableEjecucion" class="block font-bold mb-3">Responsable de la
                             ejecucion</label>
                         <!-- Aquí el campo InputText se llena automáticamente con el nombre de la entidad seleccionada -->
-                        <InputText v-model="selectedEntidadNombre" id="responsableEjecucion" fluid />
+                        <InputText v-model="selectedEntidadNombre" id="responsableEjecucion" fluid :disabled="transferencia.estado_id === 2"/>
                     </div>
 
                 </Fieldset>
@@ -229,12 +226,12 @@
                         <div>
                         <!--    <p><strong>Fecha Inicio Seleccionada:</strong>{{ objeto }}</p> -->
                             <label for="objeto" class="block font-bold mb-3">Objeto</label>
-                            <InputText id="objeto" v-model="transferencia.objeto" required="true" fluid />
+                            <InputText id="objeto" v-model="transferencia.objeto" required="true" fluid :disabled="transferencia.estado_id === 2"/>
                         </div>
                 <!--{{ transferencia.localizacion }}-->        
                         <div>
                             <label for="localizacion" class="block font-bold mb-3">Localización</label>
-                            <InputText id="localizacion" v-model="transferencia.localizacion" required="true" fluid />
+                            <InputText id="localizacion" v-model="transferencia.localizacion" required="true" fluid :disabled="transferencia.estado_id === 2"/>
                         </div>
                     <!--    <div>
                             <label for="nombre_tpp">Nombre TPP</label>
@@ -258,6 +255,7 @@
                             rows="4" 
                             fluid 
                             @input="validateDenominacion"
+                            :disabled="transferencia.estado_id === 2"
                             />
                             <span v-if="denominacionError" class="text-red-500">Máximo 110 caracteres permitidos</span>
                         </div>
@@ -265,17 +263,17 @@
                         <div><!--{{areas}}-->
                             <label for="area_influencia" class="block font-bold mb-3">Área de Influencia</label>
                             <Dropdown v-model="selectedArea" :options="areas" optionLabel="descrip_area"
-                                placeholder="Seleccione Área" class="w-full md:w-14rem" />
+                                placeholder="Seleccione Área" class="w-full md:w-14rem" :disabled="transferencia.estado_id === 2"/>
                         </div>
 
                         <div>
                             <label for="fecha_inicio" class="block font-bold mb-3">Fecha Inicio</label>
-                            <Calendar v-model="transferencia.fecha_inicio" dateFormat="dd-mm-yy" showIcon />
+                            <Calendar v-model="transferencia.fecha_inicio" dateFormat="dd-mm-yy" showIcon  :disabled="transferencia.estado_id === 2"/>
                         </div>
 
                         <div>
                             <label for="fecha_termino" class="block font-bold mb-3">Fecha Término</label>
-                            <Calendar v-model="transferencia.fecha_termino" dateFormat="dd-mm-yy" showIcon />
+                            <Calendar v-model="transferencia.fecha_termino" dateFormat="dd-mm-yy" showIcon  :disabled="transferencia.estado_id === 2"/>
                         </div>
 
                         <!--<div class="mt-3">
@@ -296,11 +294,11 @@
                     <Toast />
                     
                     <Button label="Guardar datos" icon="pi pi-check" @click="validarFechasYGuardar"
-                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" :disabled="transferencia.estado_id === 2"/>
                 </basic-tab>
 
                 <basic-tab title="Problematica  "> <!--{{ transferencia }}-->
-                    <div class="flex flex-col gap-6"> {{ planes }}
+                    <div class="flex flex-col gap-6"> <!--{{ planes }}-->
                         <Fieldset legend="">
                                 <!-- Plan Dropdown -->
                                 <label for="Plan" class="block font-bold mb-3">Plan</label>
@@ -311,6 +309,7 @@
                                     placeholder="Seleccione plan"
                                     class="w-full md:w-14rem"
                                     @change="onPlanChange"
+                                    :disabled="transferencia.estado_id === 2"
                                 />
                                <!-- {{planes}} -->
                                 <!-- Programa Dropdown -->
@@ -322,12 +321,13 @@
                                     placeholder="Seleccione programa"
                                     class="w-full md:w-14rem"
                                     :disabled="!selectedPlan"
+                                    
                                 />
                         </Fieldset>
 
                         <div>
                             <label for="descripcion" class="block font-bold mb-3">Descripcion</label>
-                            <Textarea id="descripcion" v-model="transferencia.descripcion" rows="4" fluid />
+                            <Textarea id="descripcion" v-model="transferencia.descripcion" rows="4" fluid :disabled="transferencia.estado_id === 2"/>
                         </div>
                    
                         <div v-if="mensaje_prob" class="text-green-500">
@@ -335,7 +335,7 @@
                         </div>     
                         <Toast />
                         <Button label="Guardar problematica" icon="pi pi-check" @click="guardarProblematica"
-                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+                        style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" :disabled="transferencia.estado_id === 2"/>
                     </div>
                 </basic-tab>
 
@@ -351,6 +351,7 @@
                             placeholder="Seleccione departamento" 
                             class="w-full md:w-14rem" 
                             @change="onDepartamentoChange"
+                            :disabled="transferencia.estado_id === 2"
                         />
                         <label for="Municipio" class="block font-bold mb-3">Municipio</label>
                         <Dropdown 
@@ -361,6 +362,7 @@
                             class="w-full md:w-14rem"
                             :disabled="!selectedDepartamento"
                             @change="onMunicipioChange"
+                           
                         />
                         <label for="Poblacion" class="block font-bold mb-3">Población</label>
                         <Dropdown 
@@ -370,18 +372,19 @@
                             placeholder="Seleccione población" 
                             class="w-full md:w-14rem"
                             :disabled="!selectedMunicipio"
+                            
                         />
                         </Fieldset>
                         <div>
                         <label for="descripcion" class="block font-bold mb-3">Poblacion Beneficiada</label>
-                        <InputNumber v-model="transferencia.poblacion" inputId="integeronly" fluid />
+                        <InputNumber v-model="transferencia.poblacion" inputId="integeronly" fluid :disabled="transferencia.estado_id === 2"/>
                         </div>
                         <div>
                            
                             <a href="#" @click.prevent="showDialog = true">Abrir mapa</a>
 
                          
-                            <Button label="Mapa" icon="pi pi-external-link" @click="showDialog = true" />
+                            <Button label="Mapa" icon="pi pi-external-link" @click="showDialog = true" :disabled="transferencia.estado_id === 2"/>
 
                           
                             <Dialog v-model:visible="showDialog" header="Mapa" :style="{ width: '50vw' }">
@@ -401,7 +404,7 @@
                         icon="pi pi-check" 
                         @click="guardarLocalizacion"
                         style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
-                        />
+                        :disabled="transferencia.estado_id === 2"/>
                     </div>
 
                     <!-- Mensaje cuando el campo problemática no está lleno -->
@@ -418,6 +421,7 @@
                         icon="pi pi-check" 
                         @click="adicionarComponente"
                         style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" 
+                        :disabled="transferencia.estado_id === 2"
                     />
                   
                     <!-- Mensaje cuando el campo problemática no está lleno -->
@@ -492,8 +496,8 @@
                                     <Button v-if="slotProps.data.editar" icon="pi pi-save" class="p-button-rounded p-button-success p-button-text" 
                                         @click="slotProps.data.nuevo ? guardarComponente(slotProps.data) : saveEdit(slotProps.data)" />
                                     <Button v-if="slotProps.data.editar" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" @click="cerrarEdicion(slotProps.data, index)" />
-                                    <Button v-if="!slotProps.data.editar" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="comenzarEdicion(slotProps.data)" />
-                                    <Button v-if="!slotProps.data.editar" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" />
+                                    <Button v-if="!slotProps.data.editar" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="comenzarEdicion(slotProps.data)" :disabled="transferencia.estado_id === 2"/>
+                                    <Button v-if="!slotProps.data.editar" icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-text" @click="deleteComponent(slotProps.data)" :disabled="transferencia.estado_id === 2"/>
                                 </template>
                             </Column>
 
