@@ -25,6 +25,9 @@ export default {
     guardarPlanPrograma: (datos) => {
         return Api().post("/guardar-plan-programa", datos);
     },
+    guardarPlanesProgramas: (datos) => {
+        return Api().post("/guardar-planes-programas", datos);
+    },
     modificarPlanPrograma: (id,datos) => {
         return Api().post(`/modificar-plan-programa/${id}`, datos);
     },
