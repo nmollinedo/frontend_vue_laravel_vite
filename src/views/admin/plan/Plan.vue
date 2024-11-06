@@ -42,7 +42,7 @@
               <span v-else>{{ slotProps.data.clasificador }}</span>
             </template>
           </Column>
-
+          
           <Column field="descripcion" header="Descripción"></Column>
           <Column header="Vigencia">
             <template #body="slotProps">
@@ -55,7 +55,7 @@
             <template #body="slotProps">
               <Button v-if="!slotProps.data.nuevo" icon="pi pi-trash"
                 class="p-button-text p-button-rounded p-button-danger"
-                @click="eliminarPlanPrograma(slotProps.data.id)" />
+                @click="eliminarPlanPrograma(slotProps.data.rel_clasificador)" />
               <Button v-if="slotProps.data.nuevo" icon="pi pi-save"
                 class="p-button-rounded p-button-success p-button-text" @click="guardarProgramaPlan(slotProps.data)" />
               <Button v-if="slotProps.data.nuevo" icon="pi pi-times"
@@ -234,11 +234,12 @@ const editarPlanPrograma = (programa) => {
 };
 
 // Función para eliminar un plan o programa
-const eliminarPlanPrograma = async (id) => {
+const eliminarPlanPrograma = async (id,) => {
   if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
     try {
-      await programaService.eliminarPlanPrograma(id);
+      await programaService.eliminarRelPlanPrograma(id);
       listarPlanPrograma(); // Actualizar lista
+      obtieneProgramaPorIdPlan(planId.id)
     } catch (error) {
       console.error("Error al eliminar el plan o programa:", error);
     }

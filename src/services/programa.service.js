@@ -36,6 +36,9 @@ export default {
     },
     listarRelPlanPrograma: (id) => {
         return Api().get(`/rel-plan-programa/${id}`);
+    },
+    eliminarRelPlanPrograma: (id) => {
+        return Api().delete(`/eliminar-rel-plan-programa/${id}`);
     }
 
 
