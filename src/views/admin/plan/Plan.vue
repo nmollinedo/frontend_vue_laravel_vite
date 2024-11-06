@@ -21,20 +21,23 @@
       </basic-tab>
       <basic-tab title="Relación Plan - Programa">
 
-        <DataTable :value="planesProgramas" paginator rows="10" @row-click="onRowClick">
+        <DataTable :value="planes" paginator rows="10" @row-click="onRowClick">
           <Column field="tipo_clasificador" header="Tipo Clasificación"></Column>
           <Column field="clasificador" header="Plan"></Column>
           <Column field="descripcion" header="Descripción"></Column>
         </DataTable>
 
-        <Button  v-if="programasPlan.length" label="Adicionar" icon="pi pi-plus" @click="adicionarComponente"
-          style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+        <Button v-if="programasPlan.length " 
+            label="Adicionar" 
+            icon="pi pi-plus" 
+            @click="adicionarComponente"
+            style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
 
-        <DataTable v-if="programasPlan.length"  :value="programasPlan" paginator rows="10">
+        <DataTable v-if="programasPlan.length"  :value="programasPlan" paginator rows="10"> 
           <Column field="clasificador" header="Programa">
             <template #body="slotProps">
               <Dropdown v-if="slotProps.data.nuevo" v-model="componenteSelecionado" :options="programasPlan"
-                optionLabel="clasificador" placeholder="Seleccione componente" class="custom-dropdown"
+                optionLabel="clasificador" placeholder="Seleccione programa" class="custom-dropdown"
                 :disabled="!slotProps.data.nuevo" />
               <span v-else>{{ slotProps.data.clasificador }}</span>
             </template>
@@ -54,7 +57,7 @@
                 class="p-button-text p-button-rounded p-button-danger"
                 @click="eliminarPlanPrograma(slotProps.data.id)" />
               <Button v-if="slotProps.data.nuevo" icon="pi pi-save"
-                class="p-button-rounded p-button-success p-button-text" @click="guardarComponente(slotProps.data)" />
+                class="p-button-rounded p-button-success p-button-text" @click="guardarPlanesProgramas(slotProps.data)" />
               <Button v-if="slotProps.data.nuevo" icon="pi pi-times"
                 class="p-button-rounded p-button-danger p-button-text" @click="cerrarEdicion(slotProps.data, index)" />
 
@@ -131,7 +134,7 @@ const onRowClick = async (event) => {
   const planId = event.data.id;
   // Realizar la petición para obtener los detalles del plan seleccionado
   try {
-    const response = await programaService.show(1)
+    const response = await programaService.listarRelPlanPrograma(planId)
     programasPlan.value = response.data;
   } catch (error) {
     console.error('Error al obtener los detalles del plan:', error);
@@ -168,6 +171,26 @@ const guardarPlanPrograma = async () => {
   }
 };
 
+
+const guardarPlanesProgramas = async () => {
+  const payload = {
+    clasificador_plan: componenteSelecionado.value.id,
+    clasificador_programa: componenteSelecionado.value.id,
+  
+  };
+
+  try {
+    if (isEditing.value) {
+      await programaService.guardarPlanesProgramas(payload);
+    } else {
+      await programaService.guardarPlanesProgramas(payload);
+    }
+    dialogVisible.value = false;
+    listarPlanPrograma(); // Actualizar lista
+  } catch (error) {
+    console.error("Error al guardar el plan o programa:", error);
+  }
+};
 // Función para editar un plan o programa
 const editarPlanPrograma = (programa) => {
   planPrograma.value = { ...programa }; // Cargar los datos en el formulario
@@ -197,6 +220,8 @@ const listarPlanPrograma = async () => {
     console.error("Error al cargar los planes y programas:", error);
   }
 };
+
+
 
 const listarClasificador = async () => {
   try {

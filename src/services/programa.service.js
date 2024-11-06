@@ -33,5 +33,10 @@ export default {
     },
     listarPrograma: (entidad_id,id) => {
         return Api().get(`/listar-programa/${entidad_id}/${id}`);
+    },
+    listarRelPlanPrograma: (id) => {
+        return Api().get(`/rel-plan-programa/${id}`);
     }
+
+
 }
