@@ -162,8 +162,8 @@ const guardarProgramaPlan = async (filaData) => {
     try {
       esAbiertoComponente.value = false;
       const payload = {
-        clasificador_plan: selectedComponenteId,
-        clasificador_programa: planId.id,
+        clasificador_plan: planId.id,
+        clasificador_programa: selectedComponenteId,
       };
       console.log("envio Programa Plan",payload);
       const { data } = await programaService.guardarPlanesProgramas(payload);
