@@ -58,6 +58,7 @@
                 @click="eliminarPlanPrograma(slotProps.data.id)" />
               <Button v-if="slotProps.data.nuevo" icon="pi pi-save"
                 class="p-button-rounded p-button-success p-button-text" @click="guardarPlanesProgramas(slotProps.data)" />
+                class="p-button-rounded p-button-success p-button-text" @click="guardarProgramaPlan(slotProps.data)" />
               <Button v-if="slotProps.data.nuevo" icon="pi pi-times"
                 class="p-button-rounded p-button-danger p-button-text" @click="cerrarEdicion(slotProps.data, index)" />
 
@@ -100,8 +101,10 @@ import BasicTab from "./../../../components/Tab.vue";
 import BasicTabs from "./../../../components/Tabs.vue";
 import programaService from "../../../services/programa.service";
 import planService from '../../../services/plan.service';
+import { useToast } from 'primevue/usetoast';
 
 // Estados reactivos
+const toast = useToast();
 const planesProgramas = ref([]);
 const clasificadores = ref([]);
 const planes = ref([]);
@@ -115,7 +118,7 @@ const selectedClasificador = ref({ id: null });
 const planPrograma = ref({ tipo_clasificacion: '', clasificador: '', descripcion: '' });
 const dialogVisible = ref(false);
 const isEditing = ref(false); // Nuevo estado para identificar si es edición
-
+const planId = ref({ id: null });
 // Función para abrir el formulario de nuevo plan o programa
 const abrirNuevo = () => {
   planPrograma.value = { tipo_clasificacion: '', clasificador: '', descripcion: '' };
@@ -131,15 +134,56 @@ const cerrarEdicion = (rowData, index) => {
 
 // Función para manejar el clic en una fila de la primera tabla
 const onRowClick = async (event) => {
-  const planId = event.data.id;
+  planId.id = event.data.id;
+  esAbiertoComponente.value = false;
   // Realizar la petición para obtener los detalles del plan seleccionado
+  obtieneProgramaPorIdPlan(event.data.id);
+};
+
+const obtieneProgramaPorIdPlan = async (id) => {
   try {
     const response = await programaService.listarRelPlanPrograma(planId)
+    const response = await programaService.show(id)
     programasPlan.value = response.data;
   } catch (error) {
     console.error('Error al obtener los detalles del plan:', error);
   }
 };
+
+const guardarProgramaPlan = async (filaData) => {
+    const selectedComponenteId = componenteSelecionado.value.id;
+    if(!selectedComponenteId){
+      toast.add({ severity: 'error', summary: 'Error', detail: 'Seleccione un programa', life: 3000 });
+      return;
+    }
+    console.log("progrmaa seleccionado ID",selectedComponenteId)
+    console.log("plan  ID",planId.id)
+
+    console.log(filaData)
+    try {
+      // Crear el payload con los datos de la transferencia
+      const payload = {
+        clasificador_plan: selectedComponenteId,
+        clasificador_programa: planId.id,
+      };
+      console.log("envio componente",payload);
+      // Llamar al servicio para guardar la problemática
+      // const { data } = await componenteService.store(payload);
+      const { data } = await programaService.guardarPlanesProgramas(payload);
+      obtieneProgramaPorIdPlan(planId.id);
+      // Mostrar mensaje de éxito o manejar la respuesta según sea necesario
+      //console.log(data);
+      toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
+      // Limpiar el formulario después de guardar
+      cargarComponente();
+      //  limpiarFormularioComponente();
+      //  noMostrarComponente();
+         esAbiertoComponente.value = false;
+    } catch (err) {
+      console.log("error guardar programa en form",err);
+    }
+};
+
 
 const adicionarComponente = () => {
   componenteSelecionado.value = {};
