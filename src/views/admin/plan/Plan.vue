@@ -160,24 +160,15 @@ const guardarProgramaPlan = async (filaData) => {
       return;
     }
     try {
-      // Crear el payload con los datos de la transferencia
+      esAbiertoComponente.value = false;
       const payload = {
         clasificador_plan: selectedComponenteId,
         clasificador_programa: planId.id,
       };
       console.log("envio Programa Plan",payload);
-      // Llamar al servicio para guardar la problemática
-      // const { data } = await componenteService.store(payload);
       const { data } = await programaService.guardarPlanesProgramas(payload);
       obtieneProgramaPorIdPlan(planId.id);
-      // Mostrar mensaje de éxito o manejar la respuesta según sea necesario
-      //console.log(data);
       toast.add({ severity: 'success', summary: 'Guardar', detail: 'Se guardo correctamente', life: 3000 });
-      // Limpiar el formulario después de guardar
-      cargarComponente();
-      //  limpiarFormularioComponente();
-      //  noMostrarComponente();
-         esAbiertoComponente.value = false;
     } catch (err) {
       console.log("error guardar programa en form",err);
     }
