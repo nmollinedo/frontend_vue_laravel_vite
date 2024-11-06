@@ -1,50 +1,87 @@
 <template>
-   <div>
-      <Button label="Nuevo Plan o Programa" @click="abrirNuevo" />
+  <div>
 
-      <DataTable :value="planesProgramas" paginator rows="10">
+    <basic-tabs class="" style="width: 100%; height: 100%; color: black;">
+      <basic-tab title="Plan - Programa" style="margin-top: 20px; margin-bottom: 0px; ">
+        <Button label="Nuevo Plan o Programa" @click="abrirNuevo" />
+        <DataTable :value="planesProgramas" paginator rows="10">
           <Column field="tipo_clasificador" header="Tipo Clasificación"></Column>
           <Column field="clasificador" header="Clasificador"></Column>
           <Column field="descripcion" header="Descripción"></Column>
-          
-    <Column header="Acciones" :exportable="false" style="min-width: 12rem">
-        <template #body="slotProps">
-            <Button 
-                icon="pi pi-pencil" 
-                class="p-button-text p-button-rounded p-button-info" 
-                @click="editarPlanPrograma(slotProps.data)" 
-            />
-            <Button 
-                icon="pi pi-trash" 
-                class="p-button-text p-button-rounded p-button-danger" 
-                @click="eliminarPlanPrograma(slotProps.data.id)" 
-            />
-        </template>
-    </Column>
-      </DataTable>
 
-    
-      <Dialog v-model:visible="dialogVisible" :header="isEditing ? 'Editar Plan o Programa' : 'Nuevo Plan o Programa'" :style="{ width: '50vw' }">
-          <form @submit.prevent="guardarPlanPrograma">
-              <div>
-                  <label for="Clasificador" class="block font-bold mb-3">Tipo Clasificador</label>
-                  <Dropdown 
-                      v-model="selectedClasificador" 
-                      :options="clasificadores" 
-                      optionLabel="tipo_clasificador"
-                      placeholder="Seleccione clasificador" 
-                      class="w-full md:w-14rem" 
-                  />
-              </div>
-              <div>
-                  <InputText v-model="planPrograma.clasificador" placeholder="Nombre Clasificador" :style="{ width: '45vw' }"/>
-              </div>
-              <div>
-                  <InputText v-model="planPrograma.descripcion" placeholder="Descripción" :style="{ width: '45vw' }"/>
-              </div>
-              <Button label="Guardar" type="submit" />
-          </form>
-      </Dialog>
+          <Column header="Acciones" :exportable="false" style="min-width: 12rem">
+            <template #body="slotProps">
+              <Button icon="pi pi-pencil" class="p-button-text p-button-rounded p-button-info"
+                @click="editarPlanPrograma(slotProps.data)" />
+              <Button icon="pi pi-trash" class="p-button-text p-button-rounded p-button-danger"
+                @click="eliminarPlanPrograma(slotProps.data.id)" />
+            </template>
+          </Column>
+        </DataTable>
+      </basic-tab>
+      <basic-tab title="Relación Plan - Programa">
+
+        <DataTable :value="planesProgramas" paginator rows="10" @row-click="onRowClick">
+          <Column field="tipo_clasificador" header="Tipo Clasificación"></Column>
+          <Column field="clasificador" header="Plan"></Column>
+          <Column field="descripcion" header="Descripción"></Column>
+        </DataTable>
+
+        <Button  v-if="programasPlan.length" label="Adicionar" icon="pi pi-plus" @click="adicionarComponente"
+          style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
+
+        <DataTable v-if="programasPlan.length"  :value="programasPlan" paginator rows="10">
+          <Column field="clasificador" header="Programa">
+            <template #body="slotProps">
+              <Dropdown v-if="slotProps.data.nuevo" v-model="componenteSelecionado" :options="programasPlan"
+                optionLabel="clasificador" placeholder="Seleccione componente" class="custom-dropdown"
+                :disabled="!slotProps.data.nuevo" />
+              <span v-else>{{ slotProps.data.clasificador }}</span>
+            </template>
+          </Column>
+
+          <Column field="descripcion" header="Descripción"></Column>
+          <Column header="Vigencia">
+            <template #body="slotProps">
+              <span v-if="slotProps.data.nuevo"></span>
+              <span v-else>Vigente</span>
+            </template>
+          </Column>
+
+          <Column header="Acciones" :exportable="false" style="min-width: 12rem">
+            <template #body="slotProps">
+              <Button v-if="!slotProps.data.nuevo" icon="pi pi-trash"
+                class="p-button-text p-button-rounded p-button-danger"
+                @click="eliminarPlanPrograma(slotProps.data.id)" />
+              <Button v-if="slotProps.data.nuevo" icon="pi pi-save"
+                class="p-button-rounded p-button-success p-button-text" @click="guardarComponente(slotProps.data)" />
+              <Button v-if="slotProps.data.nuevo" icon="pi pi-times"
+                class="p-button-rounded p-button-danger p-button-text" @click="cerrarEdicion(slotProps.data, index)" />
+
+            </template>
+          </Column>
+        </DataTable>
+
+      </basic-tab>
+    </basic-tabs>
+
+    <Dialog v-model:visible="dialogVisible" :header="isEditing ? 'Editar Plan o Programa' : 'Nuevo Plan o Programa'"
+      :style="{ width: '50vw' }">
+      <form @submit.prevent="guardarPlanPrograma">
+        <div>
+          <label for="Clasificador" class="block font-bold mb-3">Tipo Clasificador</label>
+          <Dropdown v-model="selectedClasificador" :options="clasificadores" optionLabel="tipo_clasificador"
+            placeholder="Seleccione clasificador" class="w-full md:w-14rem" />
+        </div>
+        <div>
+          <InputText v-model="planPrograma.clasificador" placeholder="Nombre Clasificador" :style="{ width: '45vw' }" />
+        </div>
+        <div>
+          <InputText v-model="planPrograma.descripcion" placeholder="Descripción" :style="{ width: '45vw' }" />
+        </div>
+        <Button label="Guardar" type="submit" />
+      </form>
+    </Dialog>
   </div>
 </template>
 
@@ -56,13 +93,21 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
-
+import BasicTab from "./../../../components/Tab.vue";
+import BasicTabs from "./../../../components/Tabs.vue";
 import programaService from "../../../services/programa.service";
 import planService from '../../../services/plan.service';
 
 // Estados reactivos
 const planesProgramas = ref([]);
 const clasificadores = ref([]);
+const planes = ref([]);
+const programasPlan = ref([]);
+const programasData = ref([]);
+const selectedOption = ref(null);  // Opción seleccionada en el ComboBox
+const componenteSelecionado = ref({ id: null });
+const esAbiertoComponente = ref(false);
+
 const selectedClasificador = ref({ id: null });
 const planPrograma = ref({ tipo_clasificacion: '', clasificador: '', descripcion: '' });
 const dialogVisible = ref(false);
@@ -76,6 +121,32 @@ const abrirNuevo = () => {
   dialogVisible.value = true;
 };
 
+const cerrarEdicion = (rowData, index) => {
+  esAbiertoComponente.value = false;
+  programasPlan.value.splice(index, 1)
+};
+
+// Función para manejar el clic en una fila de la primera tabla
+const onRowClick = async (event) => {
+  const planId = event.data.id;
+  // Realizar la petición para obtener los detalles del plan seleccionado
+  try {
+    const response = await programaService.show(1)
+    programasPlan.value = response.data;
+  } catch (error) {
+    console.error('Error al obtener los detalles del plan:', error);
+  }
+};
+
+const adicionarComponente = () => {
+  componenteSelecionado.value = {};
+  if (!esAbiertoComponente.value) {
+    esAbiertoComponente.value = true;
+    programasPlan.value.unshift({
+      nuevo: true
+    })
+  }
+}
 // Función para guardar o actualizar un plan o programa
 const guardarPlanPrograma = async () => {
   const payload = {
@@ -83,7 +154,7 @@ const guardarPlanPrograma = async () => {
     descripcion: planPrograma.value.descripcion,
     tipo_clasificador_id: selectedClasificador.value.id
   };
-  
+
   try {
     if (isEditing.value) {
       await programaService.modificarPlanPrograma(planPrograma.value.id, payload);
@@ -136,10 +207,22 @@ const listarClasificador = async () => {
   }
 };
 
+const listarPlanes = async () => {
+  try {
+    const { data } = await planService.index();
+    planes.value = data;
+  } catch (error) {
+    console.error("Error al cargar los planes:", error);
+  }
+};
+
+
+
 // Ejecutar cuando se monta el componente
 onMounted(() => {
   listarPlanPrograma();
   listarClasificador();
+  listarPlanes();
 });
 
 
