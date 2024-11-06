@@ -27,16 +27,16 @@
           <Column field="descripcion" header="Descripción"></Column>
         </DataTable>
 
-        <Button v-if="programasPlan.length " 
+        <Button v-if="mostrar2daTabla" 
             label="Adicionar" 
             icon="pi pi-plus" 
             @click="adicionarComponente"
             style="background-color: #1e88e5; border-color: #1e88e5; color: #fff;" />
 
-        <DataTable v-if="programasPlan.length"  :value="programasPlan" paginator rows="10"> 
+        <DataTable v-if="mostrar2daTabla"  :value="programasPlan" paginator rows="10"> 
           <Column field="clasificador" header="Programa">
             <template #body="slotProps">
-              <Dropdown v-if="slotProps.data.nuevo" v-model="componenteSelecionado" :options="programasPlan"
+              <Dropdown v-if="slotProps.data.nuevo" v-model="componenteSelecionado" :options="programasData"
                 optionLabel="clasificador" placeholder="Seleccione programa" class="custom-dropdown"
                 :disabled="!slotProps.data.nuevo" />
               <span v-else>{{ slotProps.data.clasificador }}</span>
@@ -57,7 +57,6 @@
                 class="p-button-text p-button-rounded p-button-danger"
                 @click="eliminarPlanPrograma(slotProps.data.id)" />
               <Button v-if="slotProps.data.nuevo" icon="pi pi-save"
-                class="p-button-rounded p-button-success p-button-text" @click="guardarPlanesProgramas(slotProps.data)" />
                 class="p-button-rounded p-button-success p-button-text" @click="guardarProgramaPlan(slotProps.data)" />
               <Button v-if="slotProps.data.nuevo" icon="pi pi-times"
                 class="p-button-rounded p-button-danger p-button-text" @click="cerrarEdicion(slotProps.data, index)" />
@@ -119,6 +118,7 @@ const planPrograma = ref({ tipo_clasificacion: '', clasificador: '', descripcion
 const dialogVisible = ref(false);
 const isEditing = ref(false); // Nuevo estado para identificar si es edición
 const planId = ref({ id: null });
+const mostrar2daTabla = ref(false);
 // Función para abrir el formulario de nuevo plan o programa
 const abrirNuevo = () => {
   planPrograma.value = { tipo_clasificacion: '', clasificador: '', descripcion: '' };
@@ -136,14 +136,14 @@ const cerrarEdicion = (rowData, index) => {
 const onRowClick = async (event) => {
   planId.id = event.data.id;
   esAbiertoComponente.value = false;
+  mostrar2daTabla.value = true;
   // Realizar la petición para obtener los detalles del plan seleccionado
   obtieneProgramaPorIdPlan(event.data.id);
 };
 
 const obtieneProgramaPorIdPlan = async (id) => {
   try {
-    const response = await programaService.listarRelPlanPrograma(planId)
-    const response = await programaService.show(id)
+    const response = await programaService.listarRelPlanPrograma(id)
     programasPlan.value = response.data;
   } catch (error) {
     console.error('Error al obtener los detalles del plan:', error);
@@ -152,21 +152,20 @@ const obtieneProgramaPorIdPlan = async (id) => {
 
 const guardarProgramaPlan = async (filaData) => {
     const selectedComponenteId = componenteSelecionado.value.id;
+    console.log("filaData",componenteSelecionado)
+    console.log("progrmaa seleccionado ID",selectedComponenteId)
+    console.log("plan  ID",planId.id)
     if(!selectedComponenteId){
       toast.add({ severity: 'error', summary: 'Error', detail: 'Seleccione un programa', life: 3000 });
       return;
     }
-    console.log("progrmaa seleccionado ID",selectedComponenteId)
-    console.log("plan  ID",planId.id)
-
-    console.log(filaData)
     try {
       // Crear el payload con los datos de la transferencia
       const payload = {
         clasificador_plan: selectedComponenteId,
         clasificador_programa: planId.id,
       };
-      console.log("envio componente",payload);
+      console.log("envio Programa Plan",payload);
       // Llamar al servicio para guardar la problemática
       // const { data } = await componenteService.store(payload);
       const { data } = await programaService.guardarPlanesProgramas(payload);
@@ -285,13 +284,21 @@ const listarPlanes = async () => {
   }
 };
 
-
+const listarProgramas = async () => {
+  try {
+    const { data } = await programaService.show(1)
+    programasData.value = data;
+  } catch (error) {
+    console.error("Error al cargar los programas:", error);
+  }
+};
 
 // Ejecutar cuando se monta el componente
 onMounted(() => {
   listarPlanPrograma();
   listarClasificador();
   listarPlanes();
+  listarProgramas();
 });
 
 
